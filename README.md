@@ -12,6 +12,8 @@ Stránka předmětu https://www.fit.vutbr.cz/study/courses/IFJ/
 
 Stránka projektu https://www.fit.vutbr.cz/study/courses/IFJ/public/project/
 
+Stránka s popisem jazyku Lua http://www.lua.org/manual/5.1/manual.html
+
 Zadání **pokud se podaří vykrást**
 
 

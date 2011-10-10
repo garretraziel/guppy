@@ -1,0 +1,251 @@
+1 Obecné informace
+------------------
+Název projektu: Implementace interpretu imperativního jazyka IFJ11.
+Informace: diskusní fórum IFJ v IS FIT
+Pokusné odevzdání: neděle 20. listopadu 2011, 23:59 (nepovinné)
+Datum odevzdání: neděle 11. prosince 2011, 23:59
+Zpusob odevzdání: prostřednictvím IS FIT do datového skladu předmětu IFJ
+
+Hodnocení:
+- Do předmětu IFJ získá každý maximálně 25 bodů (20 funkčnost projektu, 5 dokumentace).
+- Do předmětu IAL získá každý maximálně 15 bodů (10 prezentace, 5 dokumentace).
+- Max. 25% bodů Vašeho individuálního základního hodnocení do předmětu IFJ navíc za tvůrčí přístup (různá rozšíření apod.).
+- Udělení zápočtu z IFJ i IAL je podmíněno získáním min. 20 bodu v pruběhu semestru. Navíc v IFJ z těchto 20 bodů musíte získat nejméně 5 bodu za programovou část projektu.
+- Dokumentace bude hodnocena nejvýše polovinou bodů z hodnocení funkčnosti projektu a bude také reﬂektovat procentuální rozdělení bodů.
+
+Rešitelské týmy:
+- Projekt budou řešit čtyř- až pětičlenné týmy. Týmy s jiným počtem členů jsou nepřípustné.
+- Registrace do týmů se provádí přihlášením na příslušnou variantu zadání v IS FIT. Registrace je dvoufázová. V první fázi se na jednotlivé varianty projektu přihlašují pouze vedoucí týmů (kapacita je omezena na 1). Ve druhé fázi se pak sami doregistrují ostatní členové (kapacita bude zvýšena na 5). Vedoucí týmů budou mít plnou pravomoc nad složením a velikostí svého týmu. Rovněž vzájemná komunikace mezi vyučujícími a týmy bude probíhat výhradně prostřednictvím vedoucích. Ve výsledku bude u každého týmu první zaregistrovaný člen považován za vedoucího tohoto týmu. Začátek obou fází registrace bude předem oznámen.
+- Zadání obsahuje více variant. Každý tým řeší pouze jednu vybranou variantu. Výběr variant se provádí přihlášením do skupiny řešitelů dané varianty v IS FIT. Převážná část zadání je pro všechny skupiny shodná a jednotlivé varianty se liší pouze ve způsobu implementace tabulky symbolů a vestavěných funkcí pro vyhledávání podřetězci a pro řazení. V IS je pro označení variant použit zápis písmeno/arabská číslice/římská číslice, kde písmeno udává variantu implementace metody pro vyhledávání podřetězce v řetězci, arabská číslice udává variantu řadicí metody a římská číslice způsob implementace tabulky symbolů.
+
+2 Zadání
+--------
+Vytvořte program, který načte zdrojový soubor zapsaný v jazyce IFJ11 a interpretuje jej. Jestliže proběhne činnost interpretu bez chyb, vrací se návratová hodnota 0 (nula). Jestliže došlo k nějaké chybě, vrací se návratová hodnota následovně:
+- 1 = chyba v programu v rámci lexikální analýzy (chybná struktura aktuálního lexému).
+- 2 = chyba v programu v rámci syntaktické analýzy (chybná syntaxe struktury programu).
+- 3 = chyba v programu v rámci sémantických kontrol (nedeklarovaná proměnná, nekompatibilita typů atd.).
+- 4 = chyba interpretace, kdy je struktura programu v pořádku, ale chyba nastala až za běhu programu při interpretaci konkrétních dat (dělení nulou, nekompatibilní typ hodnoty výrazu atd.).
+- 5 = interní chyba interpretu tj. neovlivněná vstupním programem (např. chyba alokace paměti, chyba při otvírání vstupního souboru atd.).
+
+Jméno souboru s řídicím programem v jazyce IFJ11 bude předáno jako první a jediný parametr na příkazové řádce. Bude možné jej zadat s relativní i absolutní cestou. Program bude přijímat vstupy ze standardního vstupu, směrovat všechny své výstupy diktované řídicím programem na standardní výstup, všechna chybová hlášení na standardní chybový výstup; tj. bude se jednat o konzolovou aplikaci, nikoliv o aplikaci s graﬁckým uživatelským rozhraním.
+
+3 Popis programovacího jazyka
+-----------------------------
+Jazyk IFJ11 je podmnožinou jazyka Lua, což je skriptovací jazyk často používaný například ve hrách.
+
+3.1 Obecné vlastnosti a datové typy
+-----------------------------------
+Programovací jazyk IFJ11 je case-sensitive (při porovnání jmen záleží na velikosti písmen) a je jazykem netypovaným, takže každá proměnná má svůj typ určen hodnotou do ní přiřazenou.
+
+- Identiﬁkátor je deﬁnován jako neprázdná posloupnost číslic, písmen (malých i velkých) a znaku podtržítka ("_") začínající písmenem nebo podtržítkem. Jazyk IFJ11 obsahuje navíc níže uvedená klíčová slova, která mají speciﬁcký význam, a proto se nesmějí vyskytovat jako identiﬁkátory:
+do, if, then, else, local, true, end, nil, while, false, read, write, function, return.
+
+Jazyk IFJ11 také obsahuje několik rezervovaných slov, které nemají speciﬁcký význam, ale nelze je použít jako identiﬁkátor:
+and, break, elseif, for, in, not, or, repeat a until.
+
+- Číselný literál (rozsah C-double) vyjadřuje nezáporná čísla v desítkové soustavě, přičemž literál je tvořen celou částí, nebo celou a desetinnou částí, nebo celou částí a exponentem, nebo celou a desetinnou částí a exponentem. Celá i desetinná část je tvořena neprázdnou posloupností číslic. Exponent má před touto posloupností nepovinné znaménko "+" (plus) nebo "-" (mínus) a začíná znakem "e" nebo "E". Mezi jednotlivými částmi nesmí být jiný znak, celou a desetinnou část odděluje znak e "." (teˇ ka). c ˇ ezcový literál je ohraniˇ en uvozovkami (", ASCII hodnota 34) z obou stran. Tvoˇí • Retˇ c r ˇ ezec m˚ že obsahovat escape sekvence: ho znaky s ASCII hodnotou vˇ tší než 1. Retˇ e u ’\n’, ’\t’, ’\\’, ’\"’. Jejich význam se shoduje s odpovídajícími znakovými literály jazyka C. Znak v ˇetˇ zci m˚ že být zadán také pomocí escape sekvence ’\ddd’, kde r e u ˇ ddd je císlo od 001 do 255. Délka ˇetˇ zce není omezena (snad jen velikostí haldy r e interpretu). Napˇíklad ˇetˇ zec r r e
+"\"Ahoj\nSvete!\""
+
+bude interpretován (napˇ. vytisknut) jako r
+"Ahoj Svete!"
+
+• Logický literál nabývá hodnoty bud’ true, nebo false. • Datové typy pro jednotlivé uvedené literály jsou oznaˇ eny number, string, resp. c boolean. Speciálním pˇípadem je typ nil, který nabývá pouze hodnoty nil. Typy r se používají pouze internˇ a slouží napˇíklad pˇi provádˇ ní implicitních konverzí a e r r e sémantických kontrol. • Jazyk IFJ11 podporuje rádkové komentáˇe. Komentáˇ je oznaˇ en pomocí dvojité ˇ r r c pomlˇ ky ("--", ASCII hodnota 45) a za komentáˇ je považováno vše, co následuje c r až do konce ˇádku. r • Jazyk IFJ11 podporuje blokové komentáˇe. Tyto komentáˇe zaˇ ínají posloupností r r c symbol˚ "--[[" a jsou ukonˇ eny dvojicí symbol˚ "]]". Vnoˇené blokové komentáˇe u c u r r neuvažujte.
+2 Pˇebyteˇ né r c
+
+poˇ áteˇ ní císlice 0 jsou ignorovány. c c ˇ
+
+3
+
+4 Struktura jazyka
+IFJ11 je strukturovaný programovací jazyk podporující deﬁnice promˇ nných a funkcí e vˇ etnˇ jejich rekurzivního volání. Vstupním bodem ˇídicího programu je hlavní tˇ lo proc e r e gramu (funkce main). 4.1 Základní struktura jazyka
+
+Program se skládá ze sekce deﬁnic funkcí následované hlavním tˇ lem programu. e ˇ Jednotlivé konstrukce jazyka IFJ11 lze zapisovat na jednom ci více ˇádcích. Každý pˇíkaz r r je vždy ukonˇ en znakem ";" (stˇedník, ASCII hodnota 59). c r 4.2 Sekce deﬁnice a deklarace funkcí
+
+Sekce je tvoˇena deﬁnicemi (které jsou zároveˇ deklaracemi) funkcí. Každá funkce r n musí být deﬁnována právˇ jednou. Deﬁnice funkce musí být vždy k dispozici pˇed prvním e r voláním funkce s výjimkou rekurze, kdy m˚ že funkce volat sama sebe (pˇíkaz volání je u r deﬁnován níže; neuvažujte vzájemnou rekurzi). Deﬁnice funkcí mají následující tvar: • Deﬁnice funkce je konstrukce ve tvaru: function id ( seznam_parametr˚ ) u sekvence_deklarace_promˇ nných e sekvence_pˇíkaz˚ r u
+end
+
+ˇ – Seznam parametr˚ je tvoˇen posloupností identiﬁkátor˚ oddˇ lených cárkou, u r u e ˇ pˇiˇ emž za posledním z nich se cárka neuvádí. Parametry jsou vždy pˇedávány rc r hodnotou. – Tˇ lo funkce je sekvence deklarací promˇ nných a pˇíkaz˚ . Jejich syntaxe a sée e r u mantika je shodná s deklaracemi a pˇíkazy v hlavním tˇ le programu (viz dále). r e 4.3 Sekce hlavního tˇ la programu e
+
+Hlavní tˇ lo programu je uvozeno hlaviˇ kou funkce main následovanou sekvencí e c deklarací promˇ nných a sekvencí dílˇ ích pˇíkaz˚ (sekvence mohou být i prázdné). Celá e c r u sekvence je ukonˇ ena klíˇ ovým slovem end a stˇedníkem, tedy: c c r
+function main ()
+
+sekvence_deklarace_promˇ nných e sekvence_pˇíkaz˚ r u
+end;
+
+Funkce main musí být poslední deﬁnovanou funkcí v programu. Struktura dílˇ ích deklarací c a pˇíkaz˚ je uvedena v následujících sekcích. r u
+
+4
+
+4.3.1
+
+Deklarace promˇ nných e
+
+Promˇ nné jazyka IFJ11 jsou pouze lokální. Pro každou dílˇ í deklaraci promˇ nné e c e s názvem id se používá následující zápis: local id ; Promˇ nné jsou implicitnˇ inicializovány na hodnotu nil. Deklarace promˇ nných m˚ že e e e u být spojena i s jejich uživatelskou inicializací, a to následujícím zp˚ sobem: u local id = literál ; V rámci jedné funkce nelze deklarovat více promˇ nných stejného jména. Dále nelze deklae rovat promˇ nnou stejného jména jako nˇ která již deﬁnovaná funkce. e e 4.3.2 Syntaxe a sémantika pˇ íkazu r ˚ Dílˇ ím pˇíkazem se rozumí: c r • Pˇíkaz pro naˇ tení hodnot: r c id = read( formát ); Sémantika pˇíkazu je následující: Pˇíkaz naˇ te hodnotu ze standardního vstupu a r r c uloží ji do promˇ nné id. Datový typ naˇ tené hodnoty a chování funkce jsou urˇ eny e c c ˇ prvním parametrem ve formˇ formátovacího ˇetˇ zce nebo císla, a to následovnˇ : e r e e návratový typ "*n" number "*l" string "*a" string kladné_ˇ íslo string c formát funkce naˇ te císlo c ˇ naˇ te všechny znaky až po konec ˇádku3 c r naˇ te všechny znaky až po EOF c naˇ te daný poˇ et (kladné_ˇ íslo) znak˚ c c c u
+
+ˇ ˇ Formát naˇ ítaného císla je shodný s deﬁnicí císelných literál˚ v sekci 4.1. Pro forc u mát naˇ ítaného ˇetˇ zce pak platí deﬁnice ˇetˇ zcového literálu s tím rozdílem, že c r e r e není ohraniˇ en uvozovkami a neuvažujeme escape sekvence. V pˇípadˇ nekorektc r e ních vstupních hodnot je vrácen nil. • Pˇíkaz pro výpis hodnot: r write( výraz1 , výraz2 , . . . , výrazn ); Sémantika pˇíkazu je následující: Postupnˇ vyhodnocuje jednotlivé výrazy (podrobr e nˇ ji popsány v kapitole 5) a vypisuje jejich hodnoty na standardní výstup ihned za e sebe, bez jakýchkoliv oddˇ lovaˇ u a v patˇiˇ ném formátu. Hodnota parametr˚ nesmí e c˚ rc u 4 . Hodnota parametru typu number bude vytištˇ na pomocí být typu nil ani boolean e "%g"5 . • Pˇíkaz pˇiˇazení: r rr id = výraz ; Sémantika pˇíkazu je následující: Pˇíkaz provádí pˇiˇazení hodnoty pravého operandu r r rr do levého operandu. Levý operand musí být vždy pouze promˇ nná (tzv. l-hodnota). e • Podmínˇ ný pˇíkaz: e r if výraz then
+4 Pro 5 Formátovací
+
+urˇ ení typu chyby se ˇid’te pokyny v kapitole 5. c r ˇetˇ zec standardní funkce printf jazyka C. r e
+
+5
+
+sekvence_pˇíkaz˚ 1 r u
+else
+
+sekvence_pˇíkaz˚ 2 r u
+end;
+
+Sémantika pˇíkazu je následující: Nejprve vyhodnotí daný výraz. Pokud výsledná r hodnota výrazu je rovna hodnotˇ false nebo nil, výraz je považován za neprave divý. Za pravdivý je výraz považován pro všechny ostatní hodnoty jeho výsledku (pozor, i hodnota 0 a prázdný ˇetˇ zec jsou považovány za pravdivé). r e Pokud je hodnota výrazu pravdivá, vykoná se sekvence_pˇíkaz˚ 1 , jinak se vykoná r u sekvence_pˇíkaz˚ 2 . Sekvence_pˇíkaz˚ 1 a sekvence_pˇíkaz˚ 2 jsou opˇ t sekvence dílr u r u r u e ˇ cích pˇíkaz˚ (mohou být i prázdné) deﬁnované v této kapitole. r u • Pˇíkaz cyklu: r while výraz do sekvence_pˇíkaz˚ r u
+end;
+
+Sémantika pˇíkazu cyklu je následující: Pravidla pro urˇ ení pravdivosti výrazu jsou r c stejná jako v pˇípadˇ podmínˇ ného pˇíkazu. Opakuje provádˇ ní sekvence dílˇ ích r e e r e c pˇíkaz˚ (m˚ že být i prázdná) tak dlouho, dokud je hodnota výrazu pravdivá. r u u • Volání vestavˇ né a uživatelem deﬁnované funkce: e výstupní_id = název_funkce(seznam_vstupních_parametr˚ ); u ˇ Seznam_vstupních_parametr˚ je seznam literál˚ a promˇ nných oddˇ lených cárkau u e e mi6 . Stejnˇ jako v jazyce Lua není kontrolován poˇ et zadaných parametr˚ , proe c u tože za chybˇ jící parametry je dosazena hodnota nil a pˇebývající parametry jsou e r ignorovány. Sémantika vestavˇ ných funkcí bude popsána v kapitole 6. Sémantika e volání uživatelem deﬁnovaných funkcí je následující: Pˇíkaz zajistí pˇedání argur r ment˚ hodnotou a pˇedání ˇízení do tˇ la funkce. Po návratu z tˇ la funkce (viz dále) u r r e e dojde k uložení výsledku do promˇ nné výstupní_id a pokraˇ ování bˇ hu programu e c e bezprostˇednˇ za pˇíkazem volání funkce. r e r • Pˇíkaz návratu z funkce: r return výraz; Pˇíkaz m˚ že být použit v tˇ le libovolné funkce. Jeho sémantika je následující: Dor u e jde k vyhodnocení výrazu výraz (získání návratové hodnoty), okamžitému ukonˇ ení c provádˇ ní tˇ la funkce a návratu do místa volání, kam funkce vrátí vypoˇ tenou návrae e c tovou hodnotu. Výjimkou je funkce main, která provede vyhodnocení výrazu a ukonˇ ení interpretace bez ovlivnˇ ní návratové hodnoty interpretu (tj. bezchybnˇ inc e e terpretovaný validní program bude i bez provedení pˇíkazu return vždy vracet 0). r Ukonˇ ení uživatelem deﬁnované funkce bez provedení return vrací nil. c
+
+5 Výrazy
+Výrazy jsou tvoˇeny literály, již deﬁnovanými promˇ nnými, závorkami nebo výrazy r e tvoˇenými binárními aritmetickými a relaˇ ními operátory. Na rozdíl od jazyka Lua nejr c sou implicitní konverze povoleny až na speciﬁkované výjimky. Je-li nˇ který operand dané e
+6 Pozn.
+
+parametrem funkce není výraz. Jedná se o nepovinné (bodované) rozšíˇení projektu. r
+
+6
+
+operace nekompatibilního typu, jedná se o sémantickou chybu (jde-li o literál), jinak jde o chybu interpretace. 5.1 Aritmetické a relaˇ ní operátory c
+
+Operátory +, -, *, / a ˆ znaˇ í sˇ ítání, odˇ ítání, násobení, dˇ lení a umocˇ ování. Platí c c c e n pro nˇ : Pokud jsou oba operandy typu number, výsledek je typu number. e ˇ e Retˇ zcový operátor .. provádí se dvˇ ma operandy typu string jejich konkatenaci. e Pro operátor == platí: Pokud je první operand jiného typu než druhý operand, výsledek je false (takže 0 == "0" bude vyhodnoceno jako false). Pokud jsou operandy stejného typu, tak se porovnají hodnoty daných operand˚ . Operátor ~= je negace operátoru u ==. Pro operátory <, >, <=, >= platí: Pokud je první operand stejného typu jako druhý operand, a to number nebo string, výsledek je typu boolean. U ˇetˇ zc˚ se porovnání provádí r e u lexikograﬁcky. Jiné, než uvedené kombinace typ˚ ve výrazech pro dané operátory, jsou u považovány za chybu. 5.2 Priorita operátoru ˚
+
+Prioritu operátor˚ lze explicitnˇ upravit závorkováním podvýraz˚ . Následující tabulu e u ka udává priority operátor˚ (nahoˇe nejvyšší): u r Priorita 1 2 3 4 5 Operátory
+ˆ * / + .. < >
+
+<=
+
+>=
+
+~=
+
+==
+
+Asociativita ← (pravá) → (levá) → → →
+
+6 Vestavˇ né funkce e
+Interpret bude poskytovat tyto základní vestavˇ né funkce (tj. funkce, které jsou pˇímo e r implementovány v interpretu a využitelné v programovacím jazyce IFJ11 bez jejich deﬁˇ nice ci deklarace): • type(id) – Vrátí ˇetˇ zec obsahující datový typ promˇ nné nebo literálu id (viz sekce r e e 3.1). • substr(string, number, number) – Vrátí podˇetˇ zec v zadaném ˇetˇ zci. První r e r e parametr je vstupní ˇetˇ zec, druhým parametrem je dán zaˇ átek požadovaného podr e c ˇetˇ zce (poˇ ítáno od jedniˇ ky) a tˇetí parametr urˇ uje poslední znak podˇetˇ zce. r e c c r c r e ˇ ˇ Druhý a tˇetí parametr m˚ že být záporný. Desetinná cást císel je pˇípadnˇ oˇíznuta. r u r e r Je-li druhý nebo tˇetí parametr záporný, -1 oznaˇ uje poslední znak ˇetˇ zce, -2 pˇedr c r e r poslední znak ˇetˇ zce atd. Je-li nˇ který z index˚ pˇíliš vysoký nebo nízký, chová se r e e u r funkce konzistentnˇ s knihovní funkcí string.sub jazyka Lua. Napˇíklad: e r
+
+7
+
+substr("abc", -4, -4) == "" substr("abc", -4, -3) == "a" substr("abc", 3, 6) == "c" substr("abc", 5, 5) == ""
+
+Pokud jsou parametry jiného typu, je vrácen nil. • find(string, string) – Vyhledá první výskyt zadaného podˇetˇ zce v ˇetˇ zci a vrátí r e r e jeho pozici (poˇ ítáno od jedniˇ ky). První parametr je ˇetˇ zec, ve kterém bude daný c c r e podˇetˇ zec vyhledáván. Druhým parametrem je vyhledávaný podˇetˇ zec. Prázdný r e r e ˇetˇ zec se vyskytuje v libovolném ˇetˇ zci na pozici 0. Pokud podˇetˇ zec není nalezen, r e r e r e je vrácena hodnota false. Pokud jsou parametry jiného datového typu než string, je vrácen nil. Pro vyhledání podˇetˇ zce v ˇetˇ zci použijte metodu, která odpovídá r e r e vašemu zadání. Výˇ et metod korespondující k zadáním je uveden dále. c • sort(string) – Seˇadí znaky v daném ˇetˇ zci tak, aby znak s nižší ordinální hodr r e notou vždy pˇedcházel pˇed znakem s vyšší ordinální hodnotou. Vrácen je ˇetˇ zec r r r e obsahující seˇazené znaky. Pokud je parametr jiného datového typu než string, je r vrácen nil. Pro ˇazení použijte metodu, která odpovídá vašemu zadání. Výˇ et metod r c korespondující k zadáním je uveden dále.
+
+ˇ e 7 Implementace vyhledávání podˇ etˇ zce v retˇ zci r e
+Metoda vyhledávání, kterou bude využívat vestavˇ ná funkce find, je v zadání pro e daný tým oznaˇ ena písmeny a-b, a to následovnˇ : c e a) Pro vyhledávání použijte Knuth-Moris-Pratt˚ v algoritmus. u b) Pro vyhledávání použijte Boyer-Moore˚ v algoritmus (libovolný typ heuristiky). u ˇ e Metoda vyhledávání podˇetˇ zce v retˇ zci musí být implementována v souboru se r e jménem ial.c (pˇípadnˇ ial.h). Oba algoritmy budou probírány v rámci pˇedmˇ tu r e r e IAL.
+
+ˇ 8 Implementace razení
+Metoda ˇazení, kterou bude využívat vestavˇ ná funkce sort, je v zadání pro daný r e ˇ tým oznaˇ ena arabskými císlicemi 1-4, a to následovnˇ : c e 1) 2) 3) 4) Pro ˇazení použijte algoritmus Quick sort. r Pro ˇazení použijte algoritmus Heap sort. r Pro ˇazení použijte algoritmus Shell sort. r Pro ˇazení použijte algoritmus Merge sort. r
+
+Metoda ˇazení bude souˇ ástí souboru ial.c (pˇípadnˇ ial.h). Všechny tyto algor c r e ritmy budou probírány v rámci pˇedmˇ tu IAL. r e
+
+8
+
+9 Implementace tabulky symbolu ˚
+Tabulka symbol˚ bude implementována pomocí abstraktní datové struktury, která je u ˇ v zadání pro daný tým oznaˇ ena ˇímskými císlicemi I-II, a to následovnˇ : c r e I) Tabulku symbol˚ implementujte pomocí binárního vyhledávacího stromu. u II) Tabulku symbol˚ implementujte pomocí hashovací tabulky. u Implementace tabulky symbol˚ bude uložena taktéž v souboru ial.c (pˇípadnˇ u r e ial.h). Oba druhy struktur a vyhledávání v nich budou probírány v rámci pˇedmˇ tu IAL. r e
+
+10 Pˇ íklady r
+Tato kapitola popisuje tˇi jednoduché pˇíklady ˇídicích program˚ v jazyce IFJ11. r r r u 10.1 Výpoˇ et faktoriálu (iterativnˇ ) c e
+
+-- Program 1: Vypocet faktorialu (iterativne) function main() --Hlavni telo programu local a; local vysl; write("Zadejte cislo pro vypocet faktorialu\n"); a = read("*n"); if a < 0 then write("Faktorial nelze spocitat\n"); else vysl = 1; while a > 0 do vysl = vysl * a; a = a - 1; end; write("Vysledek je: ", vysl, "\n"); end; end;
+
+10.2
+
+Výpoˇ et faktoriálu (rekurzivnˇ ) c e
+
+-- Program 2: Vypocet faktorialu (rekurzivne) function factorial(n) local temp_result; local decremented_n; local result; if n < 2 then result = 1; else decremented_n = n - 1; temp_result = factorial(decremented_n);
+
+9
+
+result = n * temp_result; end; return result; end function main() --Hlavni telo programu local a; local vysl; write("Zadejte cislo pro vypocet faktorialu\n"); a = read("*n"); if a < 0 then write("Faktorial nelze spocitat\n"); else vysl = factorial(a); write("Vysledek je: ", vysl, "\n"); end; end;
+
+10.3
+
+ˇ e Práce s retˇ zci a vestavˇ nými funkcemi e
+
+-- Program 3: Prace s retezci a vestavenymi funkcemi function main() --Hlavni telo programu local str1 = "Toto je nejaky text v programu jazyka IFJ11"; local str2; local str3; local p; str1 = substr(str1, 1, -25); str2 = str1 .. ", ktery je ulozeny jako "; str3 = type(str2); str2 = str2 .. str3; write(str1, "\n", str2, "\n"); p = find(str2, "text"); write("Pozice retezce \"text\" v retezci str2: ", p, "\n"); write("Zadejte nejakou posloupnost vsech malych pismen a-h, "); write("pricemz se pismena nesmeji v posloupnosti opakovat\n"); str1 = read("*l"); str2 = sort(str1); while (str2 ~= "abcdefgh") do write("Spatne zadana posloupnost, zkuste znovu\n"); str1 = read("*l"); str2 = sort(str1); end; return 0; end;
+
+11 Doporuˇ ení k testování c
+Programovací jazyk je schválnˇ navržen tak, aby byl podmnožinou jazyka Lua. Pokud e si student není jistý, co by mˇ l interpret pˇesnˇ vykonat pro nˇ jaký kód jazyka IFJ11, m˚ že e r e e u ˇ si to ovˇ ˇit následovnˇ . Pˇed program jazyka IFJ11 pˇidá následující cást kódu (obsahuje er e r r
+
+10
+
+deﬁnice vestavˇ ných funkcí, které jsou souˇ ástí jazyka IFJ11, ale chybí v základních knie c hovnách jazyka Lua):
+-- Zajisteni zakladni kompatibility IFJ11->Lua function read(n) return io.read(n); end function write(...) io.write(unpack(arg)); end function substr(str, i, j) if (type(str) ~= "string" or type(i) ~= "number" or type(j) ~= "number") then return nil; end; return string.sub(str, i, j); end function find (haystack, needle) if type(haystack) ~= "string" or type(needle) ~= "string" then return nil; elseif needle == "" then return 0; end; local found = string.find(haystack, needle); if found == nil then return false; end; return found; end function sort (s) -- Bubble Sort local i = 1; local j; local n; local finished; local result = s; if (type(s) ~= "string") then return nil; end; n = #s; repeat finished = true; for j = n, i+1, -1 do if (string.byte(result, j-1) > string.byte(result, j)) then -- Retezce jsou v Lua nemenitelne (immutable) hodnoty result = string.sub(result,1,j-2) .. string.sub(result,j,j) .. string.sub(result,j-1,j-1) .. string.sub(result,j+1, n); finished = false; end;
+
+11
+
+end; i = i + 1; until (finished or (i == n + 1)); return result; end -- Zde bude nasledovat program jazyka IFJ11
+
+Takto vytvoˇený program lze interpretovat napˇíklad na serveru merlin pomocí r r pˇíkaz˚ : r u
+export LUA_INIT=@nazev_programu.lua lua -e "main()"
+
+Na Windows pak pomocí pˇíkaz˚ : r u
+set LUA_INIT=@nazev_programu.lua lua -e "main()"
+
+Tím lze tedy velice jednoduše zkontrolovat, co by daný interpret mˇ l provést. Je e ale potˇeba si uvˇ domit, že Lua je nadmnožinou jazyka IFJ11 a tudíž m˚ že zpracovat i r e u ˇ konstrukce, které nejsou v IFJ11 povolené (napˇ. mírnˇ odlišný výpis desetinných císel r e nebo sémantika pˇíkaz˚ write a read). Výˇ et tˇ chto odlišností bude uveden na diskuzním r u c e fóru pˇedmˇ tu IFJ. r e
+
+12 Instrukce ke zpusobu vypracování a odevzdání ˚
+ˇ Tyto d˚ ležité informace nepodceˇ ujte, nebot’ projekty bude cásteˇ nˇ opravovat auu n c e tomat a nedodržení tˇ chto pokyn˚ povede k tomu, že automat daný projekt nebude schopen e u zkompilovat, což m˚ že vést až k nehodnocení vašeho projektu! u 12.1 Obecné informace
+
+Za celý tým odevzdá projekt jediný student. Všechny odevzdané soubory budou ˇ zkomprimovány programem TAR+GZIP ci ZIP do jediného archivu, který se bude jmeˇ r novat pˇihlašovací_jméno.tgz, ci pˇihlašovací_jméno.zip. Archiv nesmí r ˇ obsahovat adresáˇovou strukturu ani speciální ci spustitelné soubory. Názvy všech soubor˚ r u ˇ budou obsahovat pouze malá písmena, císlice, teˇ ku a podtržítko (ne velká písmena ani c mezery – krom souboru Makefile!). Celý projekt je tˇeba odevzdat v daném termínu (viz výše). Pokud tomu tak nebude, r je projekt považován za neodevzdaný. Stejnˇ tak, pokud se bude jednat o plagiátorství e jakéhokoliv druhu, je projekt hodnocený nula body, navíc v IFJ ani v IAL nebude udˇ len e zápoˇ et a bude zváženo zahájení disciplinárního ˇízení. c r
+
+12
+
+12.2
+
+Dˇ lení bodu e ˚
+
+Odevzdaný archív bude povinnˇ obsahovat soubor rozdeleni, ve kterém zohlede ˇ níte dˇ lení bod˚ mezi jednotlivé cleny týmu (i pˇi požadavku na rovnomˇ rné dˇ lení). e u r e e ˇ Na každém ˇádku je uveden login jednoho clena týmu, bez mezery je následován dvojteˇ r c kou a po ní je bez mezery uveden požadovaný celoˇ íselný poˇ et procent bod˚ bez uvedení c c u znaku %. Každý ˇádek (i poslední) je poté ihned ukonˇ en jedním znakem LF (ASCII r c hodnota 10, tj. unixové ukonˇ ení ˇádku, ne windowsovské!). Obsah souboru bude vypadat c r napˇíklad takto: r xnovak01:30<LF> xnovak02:40<LF> xnovak03:30<LF> xnovak04:00<LF> Souˇ et všech procent musí být roven 100. V pˇípadˇ chybného celkového souˇ tu c r e c všech procent bude použito rovnomˇ rné rozdˇ lení. Formát odevzdaného souboru musí být e e ˇ správný a obsahovat všechny cleny týmu (i ty hodnocené 0%). Vedoucí týmu je pˇed odevzdáním projektu povinen celý tým informovat o rozdˇ lení r e ˇ bod˚ . Každý clen týmu je navíc povinen rozdˇ lení bod˚ zkontrolovat po odevzdání do WIS u e u a pˇípadnˇ rozdˇ lení bod˚ reklamovat ještˇ pˇed obhajobou projektu. r e e u e r
+
+ˇ 13 Požadavky na rešení
+Kromˇ požadavk˚ na implementaci a dokumentaci obsahuje tato kapitola i výˇ et e u c rozšíˇení za prémiové body a nˇ kolik rad pro zdárné ˇešení tohoto projektu. r e r 13.1 Závazné metody pro implementaci interpretu
+
+Projekt bude hodnocen pouze jako funkˇ ní celek a nikoli jako soubor separátc ních dohromady nekooperujících modulu. Pˇi tvorbˇ lexikální analýzy využijete znalosti ˚ r e koneˇ ných automat˚ . Pˇi konstrukci syntaktické analýzy využijte metodu rekurzivního c u r sestupu pro kontext jazyka založeného na LL-gramatice (vše kromˇ výraz˚ ). Výrazy zprae u cujte pomocí precedenˇ ní syntaktické analýzy. Vše bude probíráno na pˇednáškách v rác r ˇ mci pˇedmˇ tu IFJ. Implementace bude provedena v jazyce C, címž úmyslnˇ omezujeme r e e možnosti použití objektovˇ orientovaného návrhu a implementace. Návrh implementace e interpretu je zcela v režii ˇešitelských tým˚ . Není dovoleno spouštˇ t další procesy a vytváˇet r u e r ˇ nové ci modiﬁkovat existující soubory (ani v adresáˇi /temp). Nedodržení tˇ chto metod r e bude penalizováno znaˇ nou ztrátou bod˚ ! c u 13.2 ˇ ˇ Textová cást rešení
+
+Souˇ ástí ˇešení bude dokumentace, vypracovaná ve formátu PDF a uložená v jediném c r souboru dokumentace.pdf. Jakékoliv jiné formáty dokumentace, než pˇedepsané, bur dou ignorovány, což povede ke ztrátˇ bod˚ za dokumentaci. Dokumentace bude vypracoe u ˇ vána v ceském, slovenském nebo anglickém jazyce v rozsahu cca. 4-7 stran A4. Dokumentace musí povinnˇ obsahovat: e
+
+13
+
+• 1. strana: jména, pˇíjmení a pˇihlašovací jména ˇešitel˚ (oznaˇ ení vedoucího) + údaje r r r u c o rozdˇ lení bod˚ , identiﬁkaci vašeho variantního zadání ve tvaru “Tým císlo, varianta e u ˇ α/n/X” a výˇ et zvolených rozšíˇení vˇ etnˇ identiﬁkátor˚ . c r c e u • Strukturu koneˇ ného automatu, který speciﬁkuje lexikální analyzátor. c • LL-gramatiku, která je jádrem vašeho syntaktického analyzátoru. • Popis vašeho zp˚ sobu ˇešení interpretu (z pohledu IFJ) - návrh, implementace, vývou r jový cyklus, zp˚ sob práce v týmu, speciální použité techniky, algoritmy. u • Popis vašeho zp˚ sobu ˇešení ˇadicího algoritmu, vyhledávání podˇetˇ zce v ˇetˇ zci u r r r e r e a tabulky symbol˚ (z pohledu pˇedmˇ tu IAL). u r e ˇ ˇ • Rozdˇ lení práce mezi cleny týmu (uved’te kdo a jak se podílel na jednotlivých cástech e projektu; pˇíp. zd˚ vodnˇ te odchylky od rovnomˇ rného rozdˇ lení bod˚ ). r u e e e u Dokumentace nesmí: ˇ • Obsahovat kopii zadání ci text, obrázky7 nebo diagramy, které nejsou vaše p˚ vodní u (kopie z pˇednášek, sítˇ , WWW, . . . ). r e • Být založena pouze na výˇ tu a obecném popisu jednotlivých použitých metod (jde c o váš vlastní pˇístup k ˇešení; a proto dokumentujte postup, kterým jste se pˇi ˇešení r r r r ubírali; pˇekážkách, se kterými jste se pˇi ˇešení setkali; problémech, které jste ˇešili r r r r a jak jste je ˇešili; atd.). r ˇ V rámci dokumentace bude rovnˇ ž vzat v úvahu stav kódu jako jeho citelnost, srozumitele nost a dostateˇ né, ale nikoli pˇehnané komentáˇe. c r r 13.3 ˇ ˇ Programová cást rešení
+
+ˇ r Programová cást ˇešení bude vypracována v jazyce C bez použití generátor˚ lex/ﬂex, u ˇ yacc/bison ci jiných podobného ražení. Programy musí být pˇeložitelné pˇekladaˇ em gcc. r r c Pˇi hodnocení budou projekty pˇekládány na školním serveru merlin. Poˇ ítejte tedy r r c s touto skuteˇ ností (pˇedevším, pokud budete projekt psát pod jiným OS). Pokud projekt c r ˇ nep˚ jde pˇeložit ci nebude správnˇ pracovat kv˚ li použití funkce nebo nˇ jaké nestandardní u r e u e implementaˇ ní techniky závislé na OS, ztrácíte právo na reklamaci výsledk˚ . Ve sporných c u pˇípadech bude vždy za platný považován výsledek pˇekladu na serveru merlin bez r r použití jakýchkoliv dodateˇ ných nastavení (promˇ nné prostˇedí, . . . ). c e r Souˇ ástí ˇešení bude soubor Makefile (projekty budou pˇekládány pomocí gmake), c r r ve kterém lze nastavit pˇípadné parametry pˇekladu (viz info gmake). Pokud soubor r r pro sestavení cílového programu nebude obsažen nebo se na jeho základˇ nepodaˇí sestavit e r cílový program, nebude projekt hodnocený! Jméno cílového programu není rozhodující, bude pˇejmenován automatem. r Binární soubor (pˇeložený interpret) v žádném pˇípadˇ do archívu nepˇikládejte! r r e r Úvod všech zdrojových text˚ musí obsahovat zakomentovaný název projektu, pˇiu r hlašovací jména a jména student˚ , kteˇí se na nˇ m autorsky podíleli. u r e Veškerá chybová hlášení vzniklá v pr˚ bˇ hu cinnosti interpretu budou vždy vypisováu e ˇ na na standardní chybový výstup. Veškeré texty tištˇ né ˇídicím programem budou vypisoe r vány na standardní výstup. Kromˇ chybových hlášení vypisovaných na standardní chybový e
+7 Vyjma
+
+loga fakulty na úvodní stranˇ . e
+
+14
+
+ˇ výstup nebude interpret v pr˚ bˇ hu interpretace na žádný výstup vypisovat žádné znaky ci u e dokonce celé texty, které nejsou pˇímo pˇedepsány ˇídicím programem. Základní testování r r r bude probíhat pomocí automatu, který bude postupnˇ spouštˇ t sadu testovacích pˇíklad˚ e e r u v odevzdaném interpretu a porovnávat produkované výstupy s výstupy oˇ ekávanými. Pro c porovnání výstup˚ bude použit program diff (viz info diff). Proto jediný neoˇ ekáu c vaný znak, který váš interpret svévolnˇ vytiskne, povede k nevyhovujícímu hodnocení ake tuálního výstupu a tím snížení bodového hodnocení celého projektu. 13.4 Jak postupovat pˇ i rešení projektu r ˇ
+
+Pˇi rešení je pochopitelnˇ možné využít vlastní výpoˇ etní techniku. Instalace pˇer ˇ e c r kladaˇ e gcc není nezbytnˇ nutná, pokud máte jiný pˇekladaˇ jazyka C již instalován a nec e r c hodláte využívat vlastností, které právˇ tento a žádné jiné pˇekladaˇ e nemají. Pˇed použitím e r c r nˇ jaké vyspˇ lé konstrukce je dobré si ovˇ ˇit, že jí disponuje i pˇekladaˇ , který nakonec bude e e er r c použit pˇi opravování. Po vypracování je též vhodné vše ovˇ ˇit na cílovém pˇekladaˇ i, aby r er r c pˇi bodování projektu vše probˇ hlo bez problém˚ . r e u Teoretické znalosti, potˇebné pro vytvoˇení projektu, získáte v pr˚ bˇ hu semestru r r u e na pˇednáškách a diskuzním fóru IFJ. Je nezbytné, aby na ˇešení projektu spolupracoval r r celý tým. Návrh interpretu, základních rozhraní a rozdˇ lení práce lze vytvoˇit již v první e r polovinˇ semestru. Je dobré, když se celý tým domluví na pravidelných sch˚ zkách a komue u nikaˇ ních kanálech, které bude bˇ hem ˇešení projektu využívat (instant messaging, konferc e r ence, verzovací systém, štábní kulturu atd.). ˇ Situaci, kdy je projekt ignorován cástí týmu, lze ˇešit prostˇednictvím souboru rozr r deleni. Je ale nutné, abyste se vzájemnˇ , nejlépe na pravidelných sch˚ zkách týmu, e u ˇ ujišt’ovali o skuteˇ ném pokroku na jednotlivých cástech projektu a pˇípadnˇ vˇ as pˇerozdˇ c r e c r e lili práci. Maximální poˇ et bodu získatelný na jednu osobu za programovou implementaci c ˚ je 25. ˇ Nenechávejte rešení projektu až na poslední týden. Projekt je tvoˇ en z nˇ kolika r e ˇ cástí (napˇ . lexikální analýza, syntaktická analýza, sémantická analýza, intermediální r reprezentace, interpret, tabulka symbolu, dokumentace, testování!) a dimenzován ˚ ˇ tak, aby nˇ které cásti bylo možno navrhnout a implementovat již v prubˇ hu semestru e ˚ e na základˇ znalostí získaných na pˇ ednáškách pˇ edmˇ tu IFJ a IAL a na diskuzním e r r e ˚ fóru IFJ. 13.5 Pokusné odevzdání
+
+Pro zvýšení motivace student˚ pro vˇ asné vypracování projektu zavádíme nový konu c cept nepovinného pokusného odevzdání. Výmˇ nou za pokusné odevzdání do uvedeného e termínu (nˇ kolik týdn˚ pˇed ﬁnálním termínem) dostanete zpˇ tnou vazbu v podobˇ proe u r e e centuálního hodnocení aktuální kvality vašeho projektu. Pokusné odevzdání bude relativnˇ rychle vyhodnoceno automatickými testy a stue ˇ dent˚ m zaslána informace o procentuální správnosti stˇ žejních cástí pokusnˇ odevzdaného u e e ˇ projektu z hlediska cásti automatických test˚ (tj. nebude se jednat o ﬁnální hodnocení; u proto nebudou sdˇ lovány ani body). Výsledky nejsou nijak bodovány, a proto nebudou ine dividuálnˇ sdˇ lovány žádné detaily k chybám v zaslaných projektech, jako je tomu u ﬁnále e 15
+
+ního termínu. Využití pokusného termínu není povinné, ale jeho nevyužití m˚ že být vzato u v úvahu v pˇípadˇ r˚ zných reklamací. r e u Formální požadavky na pokusné odevzdání jsou totožné s požadavky na ﬁnální termín a odevzdání se bude provádˇ t do speciálního termínu “Projekt - Pokusné odevzdání”. e Není nutné zahrnout dokumentaci, která spolu s rozšíˇeními pokusnˇ vyhodnocena nebude. r e ˇ Pokusnˇ odevzdává nejvýše jeden clen týmu (nejlépe vedoucí). e 13.6 Registrovaná rozšíˇ ení r
+
+V pˇípadˇ implementace nˇ kterých registrovaných rozšíˇení bude odevzdaný archív r e e r obsahovat soubor rozsireni, ve kterém uvedete na každém ˇádku identiﬁkátor jednoho r implementovaného rozšíˇení (ˇádky jsou opˇ t ukonˇ eny znakem LF ). r r e c V pr˚ bˇ hu ˇešení (do stanoveného termínu) bude postupnˇ (pˇípadnˇ i na váš popud) u e r e r e aktualizován ceník rozšíˇení a identiﬁkátory rozšíˇení projektu (viz fórum k pˇedmˇ tu IFJ). r r r e V nˇ m budou uvedena hodnocená rozšíˇení projektu, za která lze získat prémiové body. e r Cviˇ ícím m˚ žete bˇ hem semestru zasílat návrhy na dosud neuvedená rozšíˇení, která byste c u e r chtˇ li navíc implementovat. Cviˇ ící rozhodnou o pˇijetí/nepˇijetí rozšíˇení a hodnocení e c r r r rozšíˇení dle jeho nároˇ nosti vˇ etnˇ pˇiˇazení unikátního identiﬁkátoru. Body za impler c c e rr mentovaná rozšíˇení se poˇ ítají do bod˚ za programovou implementaci8 , takže stále platí r c u získatelné maximum 25 bod˚ . u 13.6.1 Ceník prémiových bodu za nˇ která rozšíˇ ení (zaˇ ínají identiﬁkátorem): ˚ e r c
+
+• BYTECODE: Generování standardního Lua bajt-kódu9 a jeho následná interpretace. Generování se bude zapínat parametrem -g, interpretace bajt-kódu parametrem -b (+3 body). • MINUS: Interpret bude pracovat i s operátorem unární mínus10 . Do dokumentace je potˇeba uvést, jak je tento problém ˇešen (+1 bod). r r • LENGTH: Podpora unárního operátoru "#", který realizuje výpoˇ et délky ˇetˇ zce10 c r e (+0,5 bodu). • MODULO: Podpora binárního operátoru "%", který realizuje funkci modulo10 (+0,5 bodu). • REPEAT: Interpret bude podporovat i cyklus repeat . . . until (+1 bod). • FORDO: Interpret bude podporovat i cyklus for . . . do . . . end (+1,5 bodu). • FUNEXP: Funkce mohou být souˇ ástí výrazu, zároveˇ mohou být výrazy v paramec n trech funkcí (+1 bod). ˇ • IFTHEN: Podpora pˇíkazu if-then-elseif-else-end pˇesnˇ dle manuálu1 . Cásti r r e elseif a else jsou tedy volitelné. Do dokumentace je potˇeba uvést, jak je tento r 11 (+2 body). problém ˇešen r
+8 Body
+
+za rozšíˇení se však nepoˇ ítají do minima na zápoˇ et! r c c
+
+9 http://www.lua.org/source/5.1/lopcodes.h.html
+
+precedenci operátor˚ dle manuálu http://www.lua.org/manual/5.1/manual. u html#2.5.6 11 Napˇíklad, jak ˇešit u zanoˇení if-then a if-then-else párování if a else? U moderních r r r programovacích jazyk˚ platí konvence párování else s nejbližším if. u
+
+10 Uvažujte
+
+16
+
+• TABLE: Projekt bude pracovat i s promˇ nnými typu pole (kompatibilní s jazykem e 1 ). Tj. bude možné deklarovat a deﬁnovat tyto promˇ nné a indexovat jejich hodLua e noty (+2 body). • LOGOP: Podpora logických operátor˚ and, or a not ve výrazech12 (+1 bod). u • MUTREC: Podpora vzájemné rekurze funkcí (+2 body). • ...
+
+12 http://www.lua.org/manual/5.1/manual.html#2.5.3
+
+17
+
+

@@ -48,6 +48,7 @@ Funkce mají blok až na dalším řádku. Cykly a podmíněné příkazy hned. 
 
 ### Ostatní
 Řádky max 80 znaků, to známe.
+
 Konce radku unixove (lf)
 
 

@@ -43,20 +43,20 @@ do, if, then, else, local, true, end, nil, while, false, read, write, function, 
 Jazyk IFJ11 také obsahuje několik rezervovaných slov, které nemají speciﬁcký význam, ale nelze je použít jako identiﬁkátor:
 and, break, elseif, for, in, not, or, repeat a until.
 
-- Číselný literál (rozsah C-double) vyjadřuje nezáporná čísla v desítkové soustavě, přičemž literál je tvořen celou částí, nebo celou a desetinnou částí, nebo celou částí a exponentem, nebo celou a desetinnou částí a exponentem. Celá i desetinná část je tvořena neprázdnou posloupností číslic. Exponent má před touto posloupností nepovinné znaménko "+" (plus) nebo "-" (mínus) a začíná znakem "e" nebo "E". Mezi jednotlivými částmi nesmí být jiný znak, celou a desetinnou část odděluje znak e "." (teˇ ka). c ˇ ezcový literál je ohraniˇ en uvozovkami (", ASCII hodnota 34) z obou stran. Tvoˇí • Retˇ c r ˇ ezec m˚ že obsahovat escape sekvence: ho znaky s ASCII hodnotou vˇ tší než 1. Retˇ e u ’\n’, ’\t’, ’\\’, ’\"’. Jejich význam se shoduje s odpovídajícími znakovými literály jazyka C. Znak v ˇetˇ zci m˚ že být zadán také pomocí escape sekvence ’\ddd’, kde r e u ˇ ddd je císlo od 001 do 255. Délka ˇetˇ zce není omezena (snad jen velikostí haldy r e interpretu). Napˇíklad ˇetˇ zec r r e
-"\"Ahoj\nSvete!\""
+- Číselný literál (rozsah C-double) vyjadřuje nezáporná čísla v desítkové soustavě, přičemž literál je tvořen celou částí, nebo celou a desetinnou částí, nebo celou částí a exponentem, nebo celou a desetinnou částí a exponentem. Celá i desetinná část je tvořena neprázdnou posloupností číslic. Exponent má před touto posloupností nepovinné znaménko "+" (plus) nebo "-" (mínus) a začíná znakem "e" nebo "E". Mezi jednotlivými částmi nesmí být jiný znak, celou a desetinnou část odděluje znak "." (tečka).
 
-bude interpretován (napˇ. vytisknut) jako r
-"Ahoj Svete!"
+- Řetězcový literál je ohraničen uvozovkami (", ASCII hodnota 34) z obou stran. Tvoří ho znaky s ASCII hodnotou větší než 1. Řetězec může obsahovat escape sekvence:  ’\n’, ’\t’, ’\\’, ’\"’. Jejich význam se shoduje s odpovídajícími znakovými literály jazyka C. Znak v řetězci může být zadán také pomocí escape sekvence ’\ddd’, kde ddd je číslo od 001 do 255. Délka řetězce není omezena (snad jen velikostí haldy interpretu). Například řetězec "\"Ahoj\nSvete!\"" bude interpretován (např. vytisknut) jako "Ahoj Svete!".
 
-• Logický literál nabývá hodnoty bud’ true, nebo false. • Datové typy pro jednotlivé uvedené literály jsou oznaˇ eny number, string, resp. c boolean. Speciálním pˇípadem je typ nil, který nabývá pouze hodnoty nil. Typy r se používají pouze internˇ a slouží napˇíklad pˇi provádˇ ní implicitních konverzí a e r r e sémantických kontrol. • Jazyk IFJ11 podporuje rádkové komentáˇe. Komentáˇ je oznaˇ en pomocí dvojité ˇ r r c pomlˇ ky ("--", ASCII hodnota 45) a za komentáˇ je považováno vše, co následuje c r až do konce ˇádku. r • Jazyk IFJ11 podporuje blokové komentáˇe. Tyto komentáˇe zaˇ ínají posloupností r r c symbol˚ "--[[" a jsou ukonˇ eny dvojicí symbol˚ "]]". Vnoˇené blokové komentáˇe u c u r r neuvažujte.
-2 Pˇebyteˇ né r c
+- Logický literál nabývá hodnoty buď true, nebo false.
 
-poˇ áteˇ ní císlice 0 jsou ignorovány. c c ˇ
+- Datové typy pro jednotlivé uvedené literály jsou označeny number, string, resp. c boolean. Speciálním případem je typ nil, který nabývá pouze hodnoty nil. Typy se používají pouze interně a slouží například při provádění implicitních konverzí a sémantických kontrol.
 
-3
+- Jazyk IFJ11 podporuje řádkové komentáře. Komentář je označen pomocí dvojité pomlčky ("--", ASCII hodnota 45) a za komentář je považováno vše, co následuje až do konce řádku.
 
-4 Struktura jazyka
+- Jazyk IFJ11 podporuje blokové komentáře. Tyto komentáře začínají posloupností symbolů "--[[" a jsou ukončeny dvojicí symbolů "]]". Vnořené blokové komentáře neuvažujte.
+
+4 Struktura jazyka
+------------------
 IFJ11 je strukturovaný programovací jazyk podporující deﬁnice promˇ nných a funkcí e vˇ etnˇ jejich rekurzivního volání. Vstupním bodem ˇídicího programu je hlavní tˇ lo proc e r e gramu (funkce main). 4.1 Základní struktura jazyka
 
 Program se skládá ze sekce deﬁnic funkcí následované hlavním tˇ lem programu. e ˇ Jednotlivé konstrukce jazyka IFJ11 lze zapisovat na jednom ci více ˇádcích. Každý pˇíkaz r r je vždy ukonˇ en znakem ";" (stˇedník, ASCII hodnota 59). c r 4.2 Sekce deﬁnice a deklarace funkcí

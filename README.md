@@ -15,6 +15,10 @@ Stránka s popisem jazyku Lua http://www.lua.org/manual/5.1/manual.html
 
 Zadání *link na wiki, pokud se to podaří vykrást*
 
+Git reference http://gitref.org/
+
+Pro Git http://knihy.nic.cz/files/nic/edice/scott\_chacon\_pro\_git.pdf
+
 
 Složení týmu
 ------------
@@ -46,9 +50,13 @@ Každá úrověň 4 mezery, žádné taby.
     }
 Funkce mají blok až na dalším řádku. Cykly a podmíněné příkazy hned. Else takhle vypadá prďácky.
 
+### Git
+* Nepište nesmysly do zpráv commitů.
+* Master větec musí **pořád** obsahovat jen přeložitelný a funkční kód. Experimentujte, bastlete a ničte jen vlastní větve. Nakonec rebase a merge.
+
 ### Ostatní
-Řádky max 80 znaků, to známe.
-Konce radku unixove (lf)
+* Řádky max 80 znaků, konce jen LF.
+* Pište readme česky (diakritika například).
 
 
 ### README

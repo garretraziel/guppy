@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "ifj11.h"
+#include "guppy.h"
 
 
 /// Zprava napovedy.

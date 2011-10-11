@@ -26,9 +26,9 @@ for test in $CESTA_TESTS; do
         fi
         diff out1.$jmeno out2.$jmeno > /dev/null
         if [ $? -eq 0 ]; then
-            echo "[ ${ZELENA}PASSED${NC} ] in $test"
+            echo -e "[ ${ZELENA}PASSED${NC} ] in $test"
         else
-           echo "[ ${CERVENA}FAILED!${NC} ] in $test"
+            echo -e "[ ${CERVENA}FAILED!${NC} ] in $test"
         fi
         rm -f out1.$jmeno out2.$jmeno
     fi

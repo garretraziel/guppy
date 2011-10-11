@@ -16,4 +16,4 @@ clean:
 	rm *.o $(PROJECT)
 
 zip:
-	tar cvzf $(LOGIN).tar.gz *.c *.h rozdeleni Makefile
+	tar cvzf $(LOGIN).tgz *.c *.h rozdeleni Makefile

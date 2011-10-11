@@ -1,6 +1,6 @@
 #! /bin/sh
 
-CESTA_GUPPY="../bin/guppy"
+CESTA_GUPPY="../src/guppy"
 CESTA_START="./start-program.sh"
 CESTA_TESTS="./src/*"
 CESTA_INPUTS="./src/in"

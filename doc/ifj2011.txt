@@ -57,45 +57,73 @@ and, break, elseif, for, in, not, or, repeat a until.
 
 4 Struktura jazyka
 ------------------
-IFJ11 je strukturovaný programovací jazyk podporující deﬁnice promˇ nných a funkcí e vˇ etnˇ jejich rekurzivního volání. Vstupním bodem ˇídicího programu je hlavní tˇ lo proc e r e gramu (funkce main). 4.1 Základní struktura jazyka
+IFJ11 je strukturovaný programovací jazyk podporující deﬁnice proměnných a funkcí včetně jejich rekurzivního volání. Vstupním bodem řídicího programu je hlavní tělo programu (funkce main).
 
-Program se skládá ze sekce deﬁnic funkcí následované hlavním tˇ lem programu. e ˇ Jednotlivé konstrukce jazyka IFJ11 lze zapisovat na jednom ci více ˇádcích. Každý pˇíkaz r r je vždy ukonˇ en znakem ";" (stˇedník, ASCII hodnota 59). c r 4.2 Sekce deﬁnice a deklarace funkcí
+4.1 Základní struktura jazyka
+-----------------------------
+Program se skládá ze sekce deﬁnic funkcí následované hlavním tělem programu. Jednotlivé konstrukce jazyka IFJ11 lze zapisovat na jednom či více řádcích. Každý příkaz je vždy ukončen znakem ";" (středník, ASCII hodnota 59).
 
-Sekce je tvoˇena deﬁnicemi (které jsou zároveˇ deklaracemi) funkcí. Každá funkce r n musí být deﬁnována právˇ jednou. Deﬁnice funkce musí být vždy k dispozici pˇed prvním e r voláním funkce s výjimkou rekurze, kdy m˚ že funkce volat sama sebe (pˇíkaz volání je u r deﬁnován níže; neuvažujte vzájemnou rekurzi). Deﬁnice funkcí mají následující tvar: • Deﬁnice funkce je konstrukce ve tvaru: function id ( seznam_parametr˚ ) u sekvence_deklarace_promˇ nných e sekvence_pˇíkaz˚ r u
+4.2 Sekce deﬁnice a deklarace funkcí
+------------------------------------
+Sekce je tvořena deﬁnicemi (které jsou zároveň deklaracemi) funkcí. Každá funkce musí být deﬁnována právě jednou. Deﬁnice funkce musí být vždy k dispozici před prvním voláním funkce s výjimkou rekurze, kdy může funkce volat sama sebe (příkaz volání je deﬁnován níže; neuvažujte vzájemnou rekurzi). Deﬁnice funkcí mají následující tvar:
+- Deﬁnice funkce je konstrukce ve tvaru:
+function id ( seznam_parametrů )
+	 sekvence_deklarace_proměnných
+	 sekvence_příkazů
 end
+	- Seznam parametrů je tvořen posloupností identiﬁkátorů oddělených čárkou, přičemž za posledním z nich se čárka neuvádí. Parametry jsou vždy předávány hodnotou.
+	– Tělo funkce je sekvence deklarací proměnných a příkazů. Jejich syntaxe a sémantika je shodná s deklaracemi a příkazy v hlavním těle programu (viz dále).
 
-ˇ – Seznam parametr˚ je tvoˇen posloupností identiﬁkátor˚ oddˇ lených cárkou, u r u e ˇ pˇiˇ emž za posledním z nich se cárka neuvádí. Parametry jsou vždy pˇedávány rc r hodnotou. – Tˇ lo funkce je sekvence deklarací promˇ nných a pˇíkaz˚ . Jejich syntaxe a sée e r u mantika je shodná s deklaracemi a pˇíkazy v hlavním tˇ le programu (viz dále). r e 4.3 Sekce hlavního tˇ la programu e
-
-Hlavní tˇ lo programu je uvozeno hlaviˇ kou funkce main následovanou sekvencí e c deklarací promˇ nných a sekvencí dílˇ ích pˇíkaz˚ (sekvence mohou být i prázdné). Celá e c r u sekvence je ukonˇ ena klíˇ ovým slovem end a stˇedníkem, tedy: c c r
+4.3 Sekce hlavního těla programu
+--------------------------------
+Hlavní tělo programu je uvozeno hlavičkou funkce main následovanou sekvencí deklarací proměnných a sekvencí dílčích příkazů (sekvence mohou být i prázdné). Celá sekvence je ukončena klíčovým slovem end a středníkem, tedy:
 function main ()
-
-sekvence_deklarace_promˇ nných e sekvence_pˇíkaz˚ r u
+	 sekvence_deklarace_proměnných
+	 sekvence_příkazů
 end;
 
-Funkce main musí být poslední deﬁnovanou funkcí v programu. Struktura dílˇ ích deklarací c a pˇíkaz˚ je uvedena v následujících sekcích. r u
+Funkce main musí být poslední deﬁnovanou funkcí v programu. Struktura dílčích deklarací a příkazů je uvedena v následujících sekcích.
 
-4
+4.3.1 Deklarace proměnných
+--------------------------
+Proměnné jazyka IFJ11 jsou pouze lokální. Pro každou dílčí deklaraci proměnné s názvem id se používá následující zápis:
+local id ;
+Proměnné jsou implicitně inicializovány na hodnotu nil. Deklarace proměnných může být spojena i s jejich uživatelskou inicializací, a to následujícím způsobem:
+local id = literál ;
+V rámci jedné funkce nelze deklarovat více proměnných stejného jména. Dále nelze deklarovat proměnnou stejného jména jako některá již deﬁnovaná funkce.
 
-4.3.1
+4.3.2 Syntaxe a sémantika příkazů
+---------------------------------
+Dílčím příkazem se rozumí:
 
-Deklarace promˇ nných e
+- Příkaz pro načtení hodnot:
+id = read( formát );
+Sémantika příkazu je následující: Příkaz načte hodnotu ze standardního vstupu a uloží ji do proměnné id. Datový typ načtené hodnoty a chování funkce jsou určeny prvním parametrem ve formě formátovacího řetězce nebo čísla, a to následovně:
 
-Promˇ nné jazyka IFJ11 jsou pouze lokální. Pro každou dílˇ í deklaraci promˇ nné e c e s názvem id se používá následující zápis: local id ; Promˇ nné jsou implicitnˇ inicializovány na hodnotu nil. Deklarace promˇ nných m˚ že e e e u být spojena i s jejich uživatelskou inicializací, a to následujícím zp˚ sobem: u local id = literál ; V rámci jedné funkce nelze deklarovat více promˇ nných stejného jména. Dále nelze deklae rovat promˇ nnou stejného jména jako nˇ která již deﬁnovaná funkce. e e 4.3.2 Syntaxe a sémantika pˇ íkazu r ˚ Dílˇ ím pˇíkazem se rozumí: c r • Pˇíkaz pro naˇ tení hodnot: r c id = read( formát ); Sémantika pˇíkazu je následující: Pˇíkaz naˇ te hodnotu ze standardního vstupu a r r c uloží ji do promˇ nné id. Datový typ naˇ tené hodnoty a chování funkce jsou urˇ eny e c c ˇ prvním parametrem ve formˇ formátovacího ˇetˇ zce nebo císla, a to následovnˇ : e r e e návratový typ "*n" number "*l" string "*a" string kladné_ˇ íslo string c formát funkce naˇ te císlo c ˇ naˇ te všechny znaky až po konec ˇádku3 c r naˇ te všechny znaky až po EOF c naˇ te daný poˇ et (kladné_ˇ íslo) znak˚ c c c u
+formát               návratový typ     funkce
+"*n"                 number            načte číslo
+"*l"                 string            načte všechny znaky až po konec řádku
+"*a"                 string            načte všechny znaky až po EOF
+kladné_číslo         string            načte daný počet (kladné_číslo) znaků
 
-ˇ ˇ Formát naˇ ítaného císla je shodný s deﬁnicí císelných literál˚ v sekci 4.1. Pro forc u mát naˇ ítaného ˇetˇ zce pak platí deﬁnice ˇetˇ zcového literálu s tím rozdílem, že c r e r e není ohraniˇ en uvozovkami a neuvažujeme escape sekvence. V pˇípadˇ nekorektc r e ních vstupních hodnot je vrácen nil. • Pˇíkaz pro výpis hodnot: r write( výraz1 , výraz2 , . . . , výrazn ); Sémantika pˇíkazu je následující: Postupnˇ vyhodnocuje jednotlivé výrazy (podrobr e nˇ ji popsány v kapitole 5) a vypisuje jejich hodnoty na standardní výstup ihned za e sebe, bez jakýchkoliv oddˇ lovaˇ u a v patˇiˇ ném formátu. Hodnota parametr˚ nesmí e c˚ rc u 4 . Hodnota parametru typu number bude vytištˇ na pomocí být typu nil ani boolean e "%g"5 . • Pˇíkaz pˇiˇazení: r rr id = výraz ; Sémantika pˇíkazu je následující: Pˇíkaz provádí pˇiˇazení hodnoty pravého operandu r r rr do levého operandu. Levý operand musí být vždy pouze promˇ nná (tzv. l-hodnota). e • Podmínˇ ný pˇíkaz: e r if výraz then
-4 Pro 5 Formátovací
+Formát načítaného čísla je shodný s deﬁnicí číselných literálů v sekci 4.1. Pro formát načítaného řetězce pak platí deﬁnice řetězcového literálu s tím rozdílem, že není ohraničen uvozovkami a neuvažujeme escape sekvence. V případě nekorektních vstupních hodnot je vrácen nil.
 
-urˇ ení typu chyby se ˇid’te pokyny v kapitole 5. c r ˇetˇ zec standardní funkce printf jazyka C. r e
+- Příkaz pro výpis hodnot:
+write( výraz1 , výraz2 , . . . , výrazn );
+Sémantika příkazu je následující: Postupně vyhodnocuje jednotlivé výrazy (podrobrněji popsány v kapitole 5) a vypisuje jejich hodnoty na standardní výstup ihned za sebe, bez jakýchkoliv oddělovačů a v patřičném formátu. Hodnota parametrů nesmí být typu nil ani boolean. Hodnota parametru typu number bude vytištěna pomocí  "%g".
 
-5
+- Příkaz přiřazení:
+id = výraz ;
+Sémantika příkazu je následující: Příkaz provádí přiřazení hodnoty pravého operandu do levého operandu. Levý operand musí být vždy pouze proměnná (tzv. l-hodnota).
 
-sekvence_pˇíkaz˚ 1 r u
+- Podmíněný příkaz:
+if výraz then
+   sekvence_příkazů1
 else
-
-sekvence_pˇíkaz˚ 2 r u
+   sekvence_příkazů2
 end;
 
-Sémantika pˇíkazu je následující: Nejprve vyhodnotí daný výraz. Pokud výsledná r hodnota výrazu je rovna hodnotˇ false nebo nil, výraz je považován za neprave divý. Za pravdivý je výraz považován pro všechny ostatní hodnoty jeho výsledku (pozor, i hodnota 0 a prázdný ˇetˇ zec jsou považovány za pravdivé). r e Pokud je hodnota výrazu pravdivá, vykoná se sekvence_pˇíkaz˚ 1 , jinak se vykoná r u sekvence_pˇíkaz˚ 2 . Sekvence_pˇíkaz˚ 1 a sekvence_pˇíkaz˚ 2 jsou opˇ t sekvence dílr u r u r u e ˇ cích pˇíkaz˚ (mohou být i prázdné) deﬁnované v této kapitole. r u • Pˇíkaz cyklu: r while výraz do sekvence_pˇíkaz˚ r u
+Sémantika příkazu je následující: Nejprve vyhodnotí daný výraz. Pokud výsledná hodnota výrazu je rovna hodnotě false nebo nil, výraz je považován za nepravdivý. Za pravdivý je výraz považován pro všechny ostatní hodnoty jeho výsledku (pozor, i hodnota 0 a prázdný řetězec jsou považovány za pravdivé). Pokud je hodnota výrazu pravdivá, vykoná se sekvence_příkazů1, jinak se vykoná sekvence_příkazů2. Sekvence_příkazů1 a sekvence_příkazů2 jsou opět sekvence dílcích pˇíkaz˚ (mohou být i prázdné) deﬁnované v této kapitole. r u • Pˇíkaz cyklu: r while výraz do sekvence_pˇíkaz˚ r u
 end;
 
 Sémantika pˇíkazu cyklu je následující: Pravidla pro urˇ ení pravdivosti výrazu jsou r c stejná jako v pˇípadˇ podmínˇ ného pˇíkazu. Opakuje provádˇ ní sekvence dílˇ ích r e e r e c pˇíkaz˚ (m˚ že být i prázdná) tak dlouho, dokud je hodnota výrazu pravdivá. r u u • Volání vestavˇ né a uživatelem deﬁnované funkce: e výstupní_id = název_funkce(seznam_vstupních_parametr˚ ); u ˇ Seznam_vstupních_parametr˚ je seznam literál˚ a promˇ nných oddˇ lených cárkau u e e mi6 . Stejnˇ jako v jazyce Lua není kontrolován poˇ et zadaných parametr˚ , proe c u tože za chybˇ jící parametry je dosazena hodnota nil a pˇebývající parametry jsou e r ignorovány. Sémantika vestavˇ ných funkcí bude popsána v kapitole 6. Sémantika e volání uživatelem deﬁnovaných funkcí je následující: Pˇíkaz zajistí pˇedání argur r ment˚ hodnotou a pˇedání ˇízení do tˇ la funkce. Po návratu z tˇ la funkce (viz dále) u r r e e dojde k uložení výsledku do promˇ nné výstupní_id a pokraˇ ování bˇ hu programu e c e bezprostˇednˇ za pˇíkazem volání funkce. r e r • Pˇíkaz návratu z funkce: r return výraz; Pˇíkaz m˚ že být použit v tˇ le libovolné funkce. Jeho sémantika je následující: Dor u e jde k vyhodnocení výrazu výraz (získání návratové hodnoty), okamžitému ukonˇ ení c provádˇ ní tˇ la funkce a návratu do místa volání, kam funkce vrátí vypoˇ tenou návrae e c tovou hodnotu. Výjimkou je funkce main, která provede vyhodnocení výrazu a ukonˇ ení interpretace bez ovlivnˇ ní návratové hodnoty interpretu (tj. bezchybnˇ inc e e terpretovaný validní program bude i bez provedení pˇíkazu return vždy vracet 0). r Ukonˇ ení uživatelem deﬁnované funkce bez provedení return vrací nil. c

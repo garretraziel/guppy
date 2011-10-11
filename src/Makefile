@@ -1,14 +1,14 @@
 LOGIN=xmokra00
-PROJECT=ifj11
+PROJECT=guppy
 
 CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra
 
 
-SOURCE_FILES=main.c
+SOURCE_FILES=guppy.c
 
 
-$(PROJECT): main.o
+$(PROJECT): guppy.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
 
 

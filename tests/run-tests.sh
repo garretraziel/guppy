@@ -15,21 +15,21 @@ ZELENA='\033[0;32m'
 
 for test in $CESTA_TESTS; do
     if [ ! -d $test ]; then
-	echo "--- Testing $test"
-	jmeno=`echo $test | gawk '{FS="/";$0=$0;print $NF}'`
-	if [ -f "$CESTA_INPUTS/in.$jmeno" ]; then
-	    $CESTA_START $test > out1.$jmeno < "$CESTA_INPUTS/in.$jmeno"
-	    $CESTA_GUPPY $test > out2.$jmeno < "$CESTA_INPUTS/in.$jmeno"
-	else
-	    $CESTA_START $test > out1.$jmeno
-	    $CESTA_GUPPY $test > out2.$jmeno
-	fi
-	diff out1.$jmeno out2.$jmeno > /dev/null
-	if [ $? -eq 0 ]; then
-	    echo "[ ${ZELENA}PASSED${NC} ] in $test"
-	else
-	    echo "[ ${CERVENA}FAILED!${NC} ] in $test"
-	fi
-	rm -f out1.$jmeno out2.$jmeno
+        echo "--- Testing $test"
+        jmeno=`echo $test | gawk '{FS="/";$0=$0;print $NF}'`
+        if [ -f "$CESTA_INPUTS/in.$jmeno" ]; then
+            $CESTA_START $test > out1.$jmeno < "$CESTA_INPUTS/in.$jmeno"
+            $CESTA_GUPPY $test > out2.$jmeno < "$CESTA_INPUTS/in.$jmeno"
+        else
+            $CESTA_START $test > out1.$jmeno
+            $CESTA_GUPPY $test > out2.$jmeno
+        fi
+        diff out1.$jmeno out2.$jmeno > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "[ ${ZELENA}PASSED${NC} ] in $test"
+        else
+           echo "[ ${CERVENA}FAILED!${NC} ] in $test"
+        fi
+        rm -f out1.$jmeno out2.$jmeno
     fi
 done

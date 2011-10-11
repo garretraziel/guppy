@@ -1,8 +1,20 @@
 #! /bin/sh
 
-NAZEV=`mktemp`
+if [ $# -eq 0 ]; then
+    echo "Je potreba zadat aspon jeden parametr."
+    exit 1
+fi
 
-cat <<EOF>$NAZEV
+for arg in "$@"; do
+
+    if [ ! -f $arg ]; then
+	echo "Soubor $arg neexistuje."
+	exit 1;
+    fi
+    
+    NAZEV=`mktemp`
+
+    cat <<EOF>$NAZEV
 -- Zajisteni zakladni kompatibility IFJ11->Lua
 function read(n)
   return io.read(n);
@@ -40,7 +52,7 @@ function sort (s)
     return nil;
   end;
   -- na nasledujicim radku bylo: n = #s; nicmene tak mi to nejelo
-  n = #s;
+  n = string.len(s);
   repeat
     finished = true;
     for j = n, i+1, -1 do
@@ -57,9 +69,10 @@ function sort (s)
 end
 -- Zde bude nasledovat program jazyka IFJ11
 EOF
-cat $1 >> $NAZEV
+    cat $arg >> $NAZEV
 
-export LUA_INIT=@$NAZEV
-lua -e "main()"
+    export LUA_INIT=@$NAZEV
+    lua -e "main()"
 
-rm $NAZEV
+    rm $NAZEV
+done

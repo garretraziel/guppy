@@ -8,9 +8,11 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra
 SOURCE_FILES=guppy.c
 
 
+lexical-test: lexical.o lexical-test.o
+	$(CC) $(CFLAGS) $^ -o $@
+
 $(PROJECT): guppy.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
-
 
 clean:
 	rm *.o $(PROJECT)

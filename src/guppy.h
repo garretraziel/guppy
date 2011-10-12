@@ -1,6 +1,6 @@
 /*
  * projekt: interpret jazyka IFJ11 
- * soubor: ifj11.h
+ * soubor: guppy.h
  * autori:
  *   xbrabe09 Brabec Lukas
  *   xdujic01 Dujicek Ales

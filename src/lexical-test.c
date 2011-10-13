@@ -39,8 +39,11 @@ int main(void)
 
     string data;
 
+    str_new(&data, STR_DEFAULT);
+
     while((token = get_token(stdin, &data))) {
         printf("%s [%s] \n", TOKENS[token], data.str);
+        str_clean(&data);
     }
 
     return 0;

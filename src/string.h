@@ -1,6 +1,6 @@
 /*
  * projekt: interpret jazyka IFJ11 
- * soubor:  
+ * soubor: string.h
  * autori:
  *   xbrabe09 Brabec Lukas
  *   xdujic01 Dujicek Ales
@@ -15,13 +15,15 @@
 
 typedef struct {
     char *str;
-    int length;
-    int alloc;
+    unsigned int length;
+    unsigned int alloc;
 } string;
 
 
 int str_new(string *, int);
 int str_push(string *, char);
 char *str_read(string *);
+void str_free(string *);
+void str_clean(string *);
 
 #endif

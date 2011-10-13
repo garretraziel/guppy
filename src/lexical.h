@@ -27,12 +27,23 @@ enum {
 
     SEMICOLON,
 
-    OPERATOR,
     PLUS,
     MINUS,
-    ASSIGN,
     DIV,
     MUL,
+    POWER,
+    STRCONCAT,
+
+    ASSIGN,
+    LESS,
+    GREAT,
+    LESS_EQ,
+    GREAT_EQ,
+    TILDA,
+
+    COMMA,
+    LBRAC,
+    RBRAC,    
 
     FUNCTION,
     END,

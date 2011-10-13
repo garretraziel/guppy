@@ -15,7 +15,7 @@ $(PROJECT): guppy.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
 
 clean:
-	rm *.o $(PROJECT)
+	rm *.o $(PROJECT) lexical-test
 
 zip:
 	tar czf $(LOGIN).tgz *.c *.h rozdeleni Makefile

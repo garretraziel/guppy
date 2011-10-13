@@ -11,15 +11,33 @@
 #ifndef IJC_LEXICAL_H
 #define IJC_LEXICAL_H
 
+#include "string.h"
+
+
+// TODO: rozeznani ruznych typu chyb, co mohou nastat (LEX a pamet me napada)
+
 enum {
-    NOTHING,
+    ERROR = 0,
+
+    NOTHING = 0,
+
     NUMBER,
-    OPERATOR,
     STRING,
     IDENTIFIER,
+
     SEMICOLON,
+
+    OPERATOR,
+    PLUS,
+    MINUS,
+    ASSIGN,
+    DIV,
+    MUL,
+
+    FUNCTION,
+    END,
 } TToken;
 
-int get_token(FILE *);
+int get_token(FILE *, string *);
 
 #endif

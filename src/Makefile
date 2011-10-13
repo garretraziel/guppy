@@ -8,7 +8,7 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra
 SOURCE_FILES=guppy.c
 
 
-lexical-test: lexical.o lexical-test.o
+lexical-test: lexical.o lexical-test.o string.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 $(PROJECT): guppy.o

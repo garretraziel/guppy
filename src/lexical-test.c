@@ -16,8 +16,11 @@ const char *TOKENS[] = {
 int main(void)
 {
     int token;
-    while(token = get_token(stdin)) {
-        printf("=> %s \n", TOKENS[token]);
+
+    string data;
+
+    while((token = get_token(stdin, &data))) {
+        printf("%s [%s] \n", TOKENS[token], data.str);
     }
 
     return 0;

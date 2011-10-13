@@ -2,7 +2,7 @@ LOGIN=xmokra00
 PROJECT=guppy
 
 CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 
 SOURCE_FILES=guppy.c

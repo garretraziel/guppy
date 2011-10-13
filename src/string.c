@@ -13,24 +13,49 @@
 #include "string.h"
 
 
+// Inicializace noveho stringu
 int str_new(string *str, int size)
 {
     str->str = malloc(size * sizeof(char));
     if(str->str == NULL)
-        return 0;
+        return 0; // TODO celkem fatalni chyba :( jak to osetrit?
     str->alloc = size;
     str->length = 0;
     str->str[0] = 0;
     return 1;
 }
 
+/// Vlozi dalsi pismeno na konec stringu, propadne zvetsi
 int str_push(string *str, char c)
 {
-    //ptr = realloc(ptr, size)
-    return 0;
+    char *tmp;
+    // pokud neni dost mista, je potreba rozsirit
+    if(str->alloc == str->length + 1) { 
+        tmp = realloc(str->str, str->alloc << 1);
+        if(tmp == NULL)
+            return 0; // TODO celkem fatalni chyba :( jak to osetrit?
+        str->str = tmp;
+        str->alloc <<= 1;
+    }
+    str->str[str->length] = c;
+    str->length += 1;
+    str->str[str->length] = 0;
+    return 1;
 }
 
-char *str_read(string *str)
+/// Uvolneni pameti stringu
+void str_free(string *str)
 {
-    return str->str;
+    free(str->str);
+    str->str = NULL;
+    str->alloc = 0;
+    str->length = 0;
+}
+
+/// Vymazani stringu
+void str_clean(string *str)
+{
+    if(str->alloc > 0)
+        str->str[0] = 0;
+    str->length = 0;
 }

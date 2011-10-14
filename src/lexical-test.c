@@ -22,7 +22,8 @@ const char *TOKENS[] = {
     [GREAT] = "GREAT",
     [LESS_EQ] = "LESS_EQ",
     [GREAT_EQ] = "GREAT_EQ",
-    [TILDA] = "TILDA",
+    [EQUAL] = "EQUAL",
+    [NOT_EQUAL] = "NOT_EQUAL",
 
     [COMMA] = "COMMA",
     [LBRAC] = "LBRAC",

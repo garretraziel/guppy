@@ -36,6 +36,7 @@ enum {
     FSM_EXP,
     FSM_EXP_E,
     FSM_FLOAT,
+    FSM_FLOAT0,
     FSM_GREAT,
     FSM_IDENTIFIER,
     FSM_LBRAC,
@@ -131,7 +132,7 @@ int get_token(FILE *input, string *value)
                 if(isdigit(c))
                     ;
                 else if(c == '.')
-                    state = FSM_FLOAT;
+                    state = FSM_FLOAT0;
                 else if(c == 'E' || c == 'e')
                     state = FSM_EXP_E;
                 else {
@@ -140,8 +141,17 @@ int get_token(FILE *input, string *value)
                 }
                 break;
 
-// FIXME desetinne cislo nesmi mit za teckou hned E
-
+            case FSM_FLOAT0:
+                str_push(value, c);
+                c = fgetc(input);
+                if(isdigit(c))
+                    state = FSM_FLOAT;
+                else {
+                    state = FSM_START;
+                    return ERROR;
+                }
+                break;
+            
             case FSM_FLOAT:
                 str_push(value, c);
                 c = fgetc(input);
@@ -233,12 +243,11 @@ int get_token(FILE *input, string *value)
                         break;
                     }
                 }
-                //push?
                 state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
                 return ERROR;
                 break;
 
-            case FSM_DASH: // TODO
+            case FSM_DASH:
                 c = fgetc(input);
                 if(c == '-')
                     state = FSM_DASH2;

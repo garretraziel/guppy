@@ -5,14 +5,15 @@ CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 
-SOURCE_FILES=guppy.c
+SOURCE_FILES=guppy.c string.c lexical.c
 
-
-lexical-test: lexical.o lexical-test.o string.o
-	$(CC) $(CFLAGS) $^ -o $@
+build: $(PROJECT) lexical-test
 
 $(PROJECT): guppy.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
+
+lexical-test: lexical.o lexical-test.o string.o
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
 	rm *.o $(PROJECT) lexical-test

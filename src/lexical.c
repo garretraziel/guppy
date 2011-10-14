@@ -21,7 +21,12 @@
 /// Stavy konecneho automatu
 enum {
     FSM_COMMA,
+    FSM_COMMENT_LINE,
+    FSM_COMMENT_BLOCK,
+    FSM_COMMENT_BLOCK_END,
     FSM_DASH,
+    FSM_DASH2,
+    FSM_DASH2B,
     FSM_DIV,
     FSM_DOT,
     FSM_EQUALS,
@@ -37,6 +42,7 @@ enum {
     FSM_LESS,
     FSM_MINUS,
     FSM_MUL,
+    FSM_NOT_EQUALS,
     FSM_NUMBER,
     FSM_OPERATOR,
     FSM_PLUS,
@@ -48,7 +54,6 @@ enum {
     FSM_STRING,
     FSM_SEMICOLON,
     FSM_TERMINATE,
-    FSM_TILDA,
 } TFSMStates;
 
 
@@ -87,7 +92,7 @@ int get_token(FILE *input, string *value)
                 else if(c == '>')
                     state = FSM_GREAT;
                 else if(c == '~')
-                    state = FSM_TILDA;
+                    state = FSM_NOT_EQUALS;
                 else if(c == '^')
                     state = FSM_POWER;
                 else if(c == '(')
@@ -128,12 +133,14 @@ int get_token(FILE *input, string *value)
                 else if(c == '.')
                     state = FSM_FLOAT;
                 else if(c == 'E' || c == 'e')
-                    state = FSM_EXP;
+                    state = FSM_EXP_E;
                 else {
                     state = FSM_START;
                     return NUMBER;
                 }
                 break;
+
+// FIXME desetinne cislo nesmi mit za teckou hned E
 
             case FSM_FLOAT:
                 str_push(value, c);
@@ -151,9 +158,7 @@ int get_token(FILE *input, string *value)
             case FSM_EXP_E:
                 str_push(value, c);
                 c = fgetc(input);
-                if(c == '+' || c == '-')
-                    state = FSM_EXP;
-                else if(isdigit(c))
+                if(c == '+' || c == '-' || isdigit(c))
                     state = FSM_EXP;
                 else { 
                     state = FSM_START;
@@ -175,9 +180,10 @@ int get_token(FILE *input, string *value)
                 if(c < 1) {
                     state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
                     return ERROR;
-                } else if(c == '\'')
+                } else if(c == '\\')
                     state = FSM_ESCAPE;
                 else if(c == '"') {
+                    state = FSM_READ;
                     return STRING;
                 } else
                     str_push(value, c);
@@ -185,7 +191,13 @@ int get_token(FILE *input, string *value)
 
             case FSM_ESCAPE:
                 c = fgetc(input);
-                if(c == 'n' || c == 't' || c == '\\' || c == '"') {
+                if(c == 'n') {
+                    state = FSM_STRING;
+                    str_push(value, '\n');
+                } else if(c == 't') {
+                    state = FSM_STRING;
+                    str_push(value, '\t');
+                } else if(c == '\\' || c == '"') {
                     state = FSM_STRING;
                     str_push(value, c);
                 } else if(isdigit(c))
@@ -218,11 +230,71 @@ int get_token(FILE *input, string *value)
                     if(num > 0 && num < 256) {
                         str_push(value, num);
                         state = FSM_STRING;
+                        break;
                     }
                 }
                 //push?
                 state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
                 return ERROR;
+                break;
+
+            case FSM_DASH: // TODO
+                c = fgetc(input);
+                if(c == '-')
+                    state = FSM_DASH2;
+                else {
+                    state = FSM_START;
+                    return MINUS;
+                }
+                break;
+
+            case FSM_DASH2:
+                c = fgetc(input);
+                if(c == '[')
+                    state = FSM_DASH2B;
+                else if(c == '\n')
+                    state = FSM_READ;
+                else
+                    state = FSM_COMMENT_LINE;
+                break;
+
+            case FSM_DASH2B:
+                c = fgetc(input);
+                if(c == '[')
+                    state = FSM_COMMENT_BLOCK;
+                else
+                    state = FSM_COMMENT_LINE;
+                break;
+
+            case FSM_COMMENT_LINE:
+                c = fgetc(input);
+                if(c == '\n')
+                    state = FSM_READ;
+                break;
+
+            case FSM_COMMENT_BLOCK:
+                c = fgetc(input);
+                if(c == ']')
+                    state = FSM_COMMENT_BLOCK_END;
+                break;
+
+            case FSM_COMMENT_BLOCK_END:
+                c = fgetc(input);
+                if(c == ']')
+                    state = FSM_READ;
+                else
+                    state = FSM_COMMENT_BLOCK;
+                break;
+
+            case FSM_EQUALS:
+                c = fgetc(input);
+                if(c == '=') {
+                    state = FSM_READ;
+                    return EQUAL;
+                } else {
+                    state = FSM_START;
+                    return ASSIGN;
+                }
                 break;
 
             case FSM_DOT:
@@ -258,11 +330,11 @@ int get_token(FILE *input, string *value)
                 }
                 break;
 
-            case FSM_TILDA:
+            case FSM_NOT_EQUALS:
                 c = fgetc(input);
                 if(c == '=') {
                     state = FSM_READ;
-                    return TILDA;
+                    return NOT_EQUAL;
                 } else {
                     state = FSM_START;
                     return ERROR;

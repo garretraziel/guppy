@@ -34,6 +34,7 @@ enum {
     FSM_ESCAPE_NUM,
     FSM_ESCAPE_NUM2,
     FSM_EXP,
+    FSM_EXP0,
     FSM_EXP_E,
     FSM_FLOAT,
     FSM_FLOAT0,
@@ -41,16 +42,13 @@ enum {
     FSM_IDENTIFIER,
     FSM_LBRAC,
     FSM_LESS,
-    FSM_MINUS,
     FSM_MUL,
     FSM_NOT_EQUALS,
     FSM_NUMBER,
-    FSM_OPERATOR,
     FSM_PLUS,
     FSM_POWER,
     FSM_RBRAC,
     FSM_READ,
-    FSM_SIGNED_EXP,
     FSM_START,
     FSM_STRING,
     FSM_SEMICOLON,
@@ -169,12 +167,24 @@ int get_token(FILE *input, string *value)
                 str_push(value, c);
                 c = fgetc(input);
                 if(c == '+' || c == '-' || isdigit(c))
-                    state = FSM_EXP;
+                    state = FSM_EXP0;
                 else { 
                     state = FSM_START;
                     return ERROR;
                 }
                 break;
+
+            case FSM_EXP0:
+                str_push(value, c);
+                c = fgetc(input);
+                if(isdigit(c))
+                    state = FSM_FLOAT;
+                else {
+                    state = FSM_EXP;
+                    return ERROR;
+                }
+                break;
+
 
             case FSM_EXP:
                 str_push(value, c);

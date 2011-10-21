@@ -13,6 +13,7 @@
 
 #define STR_DEFAULT 255
 
+/// Struktura pro "nekonecny" string
 typedef struct {
     char *str;
     unsigned int length;
@@ -20,10 +21,19 @@ typedef struct {
 } string;
 
 
+/// Vytvori novou instanci stringu
 int str_new(string *, int);
+
+/// Prida na konec stringu znak
 int str_push(string *, char);
+
+/// Vrati ukazatel na uzitecna data NOTE: tohle smazat, imho zbytecne
 char *str_read(string *);
+
+/// Destruktor
 void str_free(string *);
+
+/// Zkrati string na delku 0
 void str_clean(string *);
 
 #endif

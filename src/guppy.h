@@ -8,9 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-
-#ifndef IFJ_IFJ11_H
-#define IFJ_IFJ11_H
+#ifndef IFJ_GUPPY_H
+#define IFJ_GUPPY_H
 
 /// Navratove kody programu
 enum {ERROR_LEX = 1, ERROR_SYN, ERROR_SEM, ERROR_INT, ERROR_FAIL} EErrors;

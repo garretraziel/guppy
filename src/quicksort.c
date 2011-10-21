@@ -21,34 +21,35 @@ void quicksort(char *str, int a, int b)
 {
     int l = a;
     int r = b;
-    
-    // ukoncujici podminka rekurze
-    if(a + 1 >= b)
-        return;
 
     // TODO: vymyslet lepsi pivot
     int pivot = str[a];
-
     char tmp;
 
     // dokud se neprekrizi ukazatele
-    while(l <= r) {
+    while(l < r) {
         // nalezeni prvku v vymene
-        while(str[l] <= pivot) l++;
-        while(str[r] >= pivot) r--;
-        // vymena
-        tmp = str[l];
-        str[l] = str[r];
-        str[r] = tmp;
-        // rekurzivni dorazeni zbytku
-        quicksort(str, a, r);
-        quicksort(str, l, b);
+        while(str[l] < pivot) l++;
+        while(str[r] > pivot) r--;
+        // pokud nejsou prekrizene, tak vymena
+        if(l <= r) {
+            // vymena
+            tmp = str[l];
+            str[l] = str[r];
+            str[r] = tmp;
+            l++;
+            r--;
+        }
     }
+    if(a < r)
+        quicksort(str, a, r);
+    if(l < b)
+        quicksort(str, l, b);
 }
 
 /// Wrapper funkce pro quicksort
 void sort(string *str)
 {
+    printf("Quick zacina pro [%s]\n", str->str);
     quicksort(str->str, 0, str->length-1);
-    return 0;
 }

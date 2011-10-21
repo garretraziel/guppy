@@ -11,7 +11,7 @@ int main(void)
     while((c = getchar()) != EOF) {
         if(c == '\n'){
             sort(&str);
-            printf("%s", str.str);
+            printf("%s\n-----\n", str.str);
             str_clean(&str);
         } else
             str_push(&str, c);

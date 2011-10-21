@@ -20,7 +20,7 @@ quicksort-test: quicksort.o string.o quicksort-test.o
 
 
 clean:
-	rm *.o $(PROJECT) lexical-test
+	rm *.o $(PROJECT) lexical-test quicksort-test
 
 zip:
 	tar czf $(LOGIN).tgz *.c *.h rozdeleni Makefile

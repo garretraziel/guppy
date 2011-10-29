@@ -55,6 +55,20 @@ enum {
     FSM_TERMINATE,
 } TFSMStates;
 
+const char *LEX_ERRORS[] = {
+    [NOTHING] = "NULL",
+    [-ERROR_X_DIGIT] = "Ocekavana cislice",
+    [-ERROR_UX_CHAR] = "Neocekavany znak",
+    [-ERROR_X_SIGNDIGIT] = "Ocekavano znaminko nebo cislice",
+    [-ERROR_ESC_SEC] = "Neplatna escape sekvence",
+    [-ERROR_OPERATOR] = "Neplatny operator",
+};
+
+// pocitadlo radku
+int line = 1;
+// FIXME:
+//   novy radek ve stringu, to je moznost zakazat
+//   komentare by je mohly pocitat
 
 /// Lexikalni analyzator
 int get_token(FILE *input, string *value)
@@ -72,8 +86,11 @@ int get_token(FILE *input, string *value)
                 c = fgetc(input);
             // nekdy byva potreba nacteni znaku preskocit
             case FSM_START: 
-                if(isspace(c))
+                if(isspace(c)) {
                     state = FSM_READ;
+                    if(c == '\n')
+                        ++line;
+                }
                 else if(isalpha(c) || c == '_')
                     state = FSM_IDENTIFIER;
                 else if(isdigit(c))
@@ -109,9 +126,9 @@ int get_token(FILE *input, string *value)
                 else if(c == ';')
                     state = FSM_SEMICOLON;
                 else if(c == EOF)
-                    state = FSM_TERMINATE;
+                    return NOTHING;
                 else
-                    return ERROR;
+                    return ERROR_UX_CHAR;
                 break;
 
             case FSM_IDENTIFIER:
@@ -146,7 +163,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_FLOAT;
                 else {
                     state = FSM_START;
-                    return ERROR;
+                    return ERROR_X_DIGIT;
                 }
                 break;
             
@@ -172,7 +189,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_EXP;
                 else { 
                     state = FSM_START;
-                    return ERROR;
+                    return ERROR_X_SIGNDIGIT;
                 }
                 break;
 
@@ -183,7 +200,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_EXP;
                 else {
                     state = FSM_START;
-                    return ERROR;
+                    return ERROR_X_DIGIT;
                 }
                 break;
 
@@ -201,7 +218,7 @@ int get_token(FILE *input, string *value)
                 c = fgetc(input);
                 if(c < 1) {
                     state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
-                    return ERROR;
+                    return ERROR_UX_CHAR;
                 } else if(c == '\\')
                     state = FSM_ESCAPE;
                 else if(c == '"') {
@@ -226,7 +243,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_ESCAPE_NUM;
                 else {
                     state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
-                    return ERROR;
+                    return ERROR_ESC_SEC;
                 }
                 break;
 
@@ -241,7 +258,7 @@ int get_token(FILE *input, string *value)
                 }
                 else {
                     state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
-                    return ERROR;
+                    return ERROR_ESC_SEC;
                 }
                 break;
 
@@ -256,7 +273,7 @@ int get_token(FILE *input, string *value)
                     }
                 }
                 state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
-                return ERROR;
+                return ERROR_ESC_SEC;
                 break;
 
             case FSM_DASH:
@@ -325,7 +342,7 @@ int get_token(FILE *input, string *value)
                     return STRCONCAT;
                 } else {
                     state = FSM_START;
-                    return ERROR;
+                    return ERROR_OPERATOR;
                 }
                 break;
 
@@ -358,7 +375,7 @@ int get_token(FILE *input, string *value)
                     return NOT_EQUAL;
                 } else {
                     state = FSM_START;
-                    return ERROR;
+                    return ERROR_OPERATOR;
                 }
                 break;
 
@@ -402,10 +419,6 @@ int get_token(FILE *input, string *value)
             case FSM_COMMA:
                 state = FSM_READ;
                 return COMMA;
-                break;
-
-            case FSM_TERMINATE:
-                return NOTHING;
                 break;
 
             default:

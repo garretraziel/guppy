@@ -43,7 +43,10 @@ int main(void)
     str_new(&data, STR_DEFAULT);
 
     while((token = get_token(stdin, &data))) {
-        printf("%s [%s] \n", TOKENS[token], data.str);
+        if(token > 0)
+            printf("%s [%s] \n", TOKENS[token], data.str);
+        else
+            fprintf(stderr, "CHYBA na radku %d : %s\n", line, LEX_ERRORS[-token]);
         str_clean(&data);
     }
 

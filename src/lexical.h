@@ -14,11 +14,18 @@
 #include "string.h"
 
 
-// TODO: rozeznani ruznych typu chyb, co mohou nastat (LEX a pamet me napada)
-
+/// Vycet navratovych kodu lexikalniho analyzatoru
+// zaporne hodnoty znaci chybu
+// nula znaci EOF teda asi TODO: zjistit / zajistit
+// kladne hodnoty validni token
 enum {
-    ERROR = 0,
+    ERROR_X_DIGIT = -1,
+    ERROR_UX_CHAR = -2,
+    ERROR_X_SIGNDIGIT = -3,
+    ERROR_ESC_SEC = -4,
+    ERROR_OPERATOR = -5,
 
+    ERROR = 0,
     NOTHING = 0,
 
     NUMBER,
@@ -51,6 +58,14 @@ enum {
     END,
 } TToken;
 
+
+/// Chybova hlaseni k lexikalnim chybam
+extern const char *LEX_ERRORS[];
+
+/// Vrati nasledujici token ze souboru
 int get_token(FILE *, string *);
+
+/// globalni pocitadlo radku
+extern int line;
 
 #endif

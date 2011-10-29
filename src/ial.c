@@ -8,13 +8,16 @@
  *   xsedla85 Sedlak Jan
  */
 
-#include "quicksort.h"
+#include <stdlib.h>
+#include "ial.h"
 #include "string.h"
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /** Funkce radici znaky ve stringu metodou quicksort
  *
  * @param *str ukazatel na string, ktery ma byt serazen
- * @param a znak v intervalu <a,b> budou razeny
+ * @param a znaky v intervalu <a,b> budou razeny
  * @param b
  */
 void quicksort(char *str, int a, int b)
@@ -33,7 +36,6 @@ void quicksort(char *str, int a, int b)
         while(str[r] > pivot) r--;
         // pokud nejsou prekrizene, tak vymena
         if(l <= r) {
-            // vymena
             tmp = str[l];
             str[l] = str[r];
             str[r] = tmp;
@@ -41,6 +43,7 @@ void quicksort(char *str, int a, int b)
             r--;
         }
     }
+    // ukoncovaci podminky a rekurze
     if(a < r)
         quicksort(str, a, r);
     if(l < b)
@@ -50,6 +53,15 @@ void quicksort(char *str, int a, int b)
 /// Wrapper funkce pro quicksort
 void sort(string *str)
 {
-    printf("Quick zacina pro [%s]\n", str->str);
     quicksort(str->str, 0, str->length-1);
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// TOOD: tabulka symbolu pomoci BST
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// TODO: vyhledavani podretezce (Knuth-Moris-Pratt)
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

@@ -15,7 +15,7 @@ $(PROJECT): guppy.o
 lexical-test: lexical.o lexical-test.o string.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-quicksort-test: quicksort.o string.o quicksort-test.o
+quicksort-test: ial.o string.o quicksort-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 

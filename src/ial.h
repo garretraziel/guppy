@@ -13,6 +13,19 @@
 
 #include "string.h"
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/// Seradi znaky v retezci vzestupne podle ordinalni hodnoty
 void sort(string *);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// TODO: tabulka symbolu pomoci BST
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// TODO: vyhledavani podretezce (Knuth-Moris-Pratt)
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #endif

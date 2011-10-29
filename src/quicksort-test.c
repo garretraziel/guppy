@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "quicksort.h"
+#include "ial.h"
 #include "string.h"
 
 int main(void)

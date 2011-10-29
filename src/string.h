@@ -27,9 +27,6 @@ int str_new(string *, int);
 /// Prida na konec stringu znak
 int str_push(string *, char);
 
-/// Vrati ukazatel na uzitecna data NOTE: tohle smazat, imho zbytecne
-char *str_read(string *);
-
 /// Destruktor
 void str_free(string *);
 

@@ -25,7 +25,7 @@ int str_new(string *str, int size)
     return 1;
 }
 
-/// Vlozi dalsi pismeno na konec stringu, propadne zvetsi
+/// Vlozi dalsi pismeno na konec stringu, pripadne zvetsi
 int str_push(string *str, char c)
 {
     char *tmp;

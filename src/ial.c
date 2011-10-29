@@ -16,7 +16,7 @@
 
 /** Funkce radici znaky ve stringu metodou quicksort
  *
- * @param *str ukazatel na string, ktery ma byt serazen
+ * @param *str ukazatel na pole znaku, ktery ma byt serazeno
  * @param a znaky v intervalu <a,b> budou razeny
  * @param b
  */
@@ -31,14 +31,16 @@ void quicksort(char *str, int a, int b)
 
     // dokud se neprekrizi ukazatele
     while(l < r) {
-        // nalezeni prvku v vymene
+        // nalezeni prvku k vymene
         while(str[l] < pivot) l++;
         while(str[r] > pivot) r--;
-        // pokud nejsou prekrizene, tak vymena
+        // pokud nejsou prekrizene...
         if(l <= r) {
+            // ...tak vymena...
             tmp = str[l];
             str[l] = str[r];
             str[r] = tmp;
+            // ...a nezapomenout posunout ukazatele
             l++;
             r--;
         }
@@ -50,7 +52,10 @@ void quicksort(char *str, int a, int b)
         quicksort(str, l, b);
 }
 
-/// Wrapper funkce pro quicksort
+/** Wrapper funkce pro quicksort
+ *
+ * @param *str ukazatel na string, jehoz znaky budou razeny
+ */
 void sort(string *str)
 {
     quicksort(str->str, 0, str->length-1);
@@ -58,7 +63,7 @@ void sort(string *str)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TOOD: tabulka symbolu pomoci BST
+// TODO: tabulka symbolu pomoci BST
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

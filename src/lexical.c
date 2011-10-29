@@ -166,8 +166,10 @@ int get_token(FILE *input, string *value)
             case FSM_EXP_E:
                 str_push(value, c);
                 c = fgetc(input);
-                if(c == '+' || c == '-' || isdigit(c))
+                if(c == '+' || c == '-')
                     state = FSM_EXP0;
+                else if (isdigit(c))
+                    state = FSM_EXP;
                 else { 
                     state = FSM_START;
                     return ERROR;
@@ -178,9 +180,9 @@ int get_token(FILE *input, string *value)
                 str_push(value, c);
                 c = fgetc(input);
                 if(isdigit(c))
-                    state = FSM_FLOAT;
-                else {
                     state = FSM_EXP;
+                else {
+                    state = FSM_START;
                     return ERROR;
                 }
                 break;

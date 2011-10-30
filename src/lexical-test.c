@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "lexical.h"
 
@@ -65,8 +66,11 @@ int main(void)
     str_new(&data, STR_DEFAULT);
 
     while((token = get_token(stdin, &data))) {
-        if(token > 0)
+        if(token > 0) {
             printf("%s [%s] \n", TOKENS[token], data.str);
+            if(token == NUMBER)
+                printf("-> %lg\n", strtod(data.str, NULL));
+        }
         else
             fprintf(stderr, "CHYBA na radku %d : %s\n", line, LEX_ERRORS[-token]);
         str_clean(&data);

@@ -58,9 +58,6 @@ const char *LEX_ERRORS[] = {
 
 // pocitadlo radku
 int line = 1;
-// FIXME:
-//   novy radek ve stringu, to je moznost zakazat
-//   blokove komentare by je mohly pocitat
 
 /// Lexikalni analyzator
 int get_token(FILE *input, string *value)

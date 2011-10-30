@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #include <assert.h>
 
@@ -58,6 +59,61 @@ const char *LEX_ERRORS[] = {
 
 // pocitadlo radku
 int line = 1;
+
+
+// kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
+// vraci jeho pripadny kod, nebo IDENTIFIER pokud neni
+int check_keyword(string *str)
+{
+    if(strcmp(str->str, "do") == 0)
+        return DO;
+    if(strcmp(str->str, "else") == 0)
+        return ELSE;
+    if(strcmp(str->str, "end") == 0)
+        return END;
+    if(strcmp(str->str, "false") == 0)
+        return FALSE;
+    if(strcmp(str->str, "function") == 0)
+        return FUNCTION;
+    if(strcmp(str->str, "if") == 0)
+        return IF;
+    if(strcmp(str->str, "local") == 0)
+        return LOCAL;
+    if(strcmp(str->str, "nil") == 0)
+        return NIL;
+    if(strcmp(str->str, "read") == 0)
+        return READ;
+    if(strcmp(str->str, "return") == 0)
+        return RETURN;
+    if(strcmp(str->str, "then") == 0)
+        return THEN;
+    if(strcmp(str->str, "true") == 0)
+        return TRUE;
+    if(strcmp(str->str, "while") == 0)
+        return WHILE;
+    if(strcmp(str->str, "write") == 0)
+        return WRITE;
+    if(strcmp(str->str, "and") == 0)
+        return AND;
+    if(strcmp(str->str, "break") == 0)
+        return BREAK;
+    if(strcmp(str->str, "elseif") == 0)
+        return ELSEIF;
+    if(strcmp(str->str, "for") == 0)
+        return FOR;
+    if(strcmp(str->str, "in") == 0)
+        return IN;
+    if(strcmp(str->str, "not") == 0)
+        return NOT;
+    if(strcmp(str->str, "or") == 0)
+        return OR;
+    if(strcmp(str->str, "repeat") == 0)
+        return REPEAT;
+    if(strcmp(str->str, "until") == 0)
+        return UNTIL;
+    return IDENTIFIER;
+}
+
 
 /// Lexikalni analyzator
 int get_token(FILE *input, string *value)
@@ -141,8 +197,8 @@ int get_token(FILE *input, string *value)
                 c = fgetc(input);
                 if(! (isalnum(c) || c == '_')) {
                     state = FSM_START;
-                    // TODO kontrola klicovych slov
-                    return IDENTIFIER;
+                    // kontrola klicovych slov
+                    return check_keyword(value);
                 }
                 break;
 

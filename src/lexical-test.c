@@ -29,8 +29,30 @@ const char *TOKENS[] = {
     [LBRAC] = "LBRAC",
     [RBRAC] = "RBRAC",    
 
-    [FUNCTION] = "FUNCTION",
+    [DO] = "DO",
+    [ELSE] = "ELSE",
     [END] = "END",
+    [FALSE] = "FALSE",
+    [FUNCTION] = "FUNCTION",
+    [IF] = "IF",
+    [LOCAL] = "LOCAL",
+    [NIL] = "NIL",
+    [READ] = "READ",
+    [RETURN] = "RETURN",
+    [THEN] = "THEN",
+    [TRUE] = "TRUE",
+    [WHILE] = "WHILE",
+    [WRITE] = "WRITE",
+
+    [AND] = "AND",
+    [BREAK] = "BREAK",
+    [ELSEIF] = "ELSEIF",
+    [FOR] = "FOR",
+    [IN] = "IN",
+    [NOT] = "NOT",
+    [OR] = "OR",
+    [REPEAT] = "REPEAT",
+    [UNTIL] = "UNTIL",
 };
 
 

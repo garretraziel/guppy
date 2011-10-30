@@ -222,9 +222,11 @@ int get_token(FILE *input, string *value)
                 }
                 break;
 
+// NOTE: Zminit v dokumentaci, ze jsme zakazali primo vkladat ridici znaky ASCII do retezcu
+
             case FSM_STRING:
                 c = fgetc(input);
-                if(c < 1) {
+                if(c < ASCII_CONTROLL) {
                     state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
                     return ERROR_UX_CHAR;
                 } else if(c == '\\')

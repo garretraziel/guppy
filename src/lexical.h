@@ -14,6 +14,8 @@
 #include "string.h"
 
 
+#define ASCII_CONTROLL 32
+
 /// Vycet navratovych kodu lexikalniho analyzatoru
 // zaporne hodnoty znaci chybu
 // nula znaci EOF teda asi TODO: zjistit / zajistit

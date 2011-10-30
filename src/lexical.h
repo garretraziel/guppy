@@ -56,8 +56,32 @@ enum {
     LBRAC,
     RBRAC,    
 
-    FUNCTION,
+// klicova slova
+    DO,
+    ELSE,
     END,
+    FALSE,
+    FUNCTION,
+    IF,
+    LOCAL,
+    NIL,
+    READ,
+    RETURN,
+    THEN,
+    TRUE,
+    WHILE,
+    WRITE,
+
+// rezervovana slova
+    AND,
+    BREAK,
+    ELSEIF,
+    FOR,
+    IN,
+    NOT,
+    OR,
+    REPEAT,
+    UNTIL,
 } TToken;
 
 

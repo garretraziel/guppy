@@ -20,14 +20,12 @@
 
 /// Stavy konecneho automatu
 enum {
-    FSM_COMMA,
     FSM_COMMENT_LINE,
     FSM_COMMENT_BLOCK,
     FSM_COMMENT_BLOCK_END,
     FSM_DASH,
     FSM_DASH2,
     FSM_DASH2B,
-    FSM_DIV,
     FSM_DOT,
     FSM_EQUALS,
     FSM_ESCAPE,
@@ -40,18 +38,12 @@ enum {
     FSM_FLOAT0,
     FSM_GREAT,
     FSM_IDENTIFIER,
-    FSM_LBRAC,
     FSM_LESS,
-    FSM_MUL,
     FSM_NOT_EQUALS,
     FSM_NUMBER,
-    FSM_PLUS,
-    FSM_POWER,
-    FSM_RBRAC,
     FSM_READ,
     FSM_START,
     FSM_STRING,
-    FSM_SEMICOLON,
     FSM_TERMINATE,
 } TFSMStates;
 
@@ -68,7 +60,7 @@ const char *LEX_ERRORS[] = {
 int line = 1;
 // FIXME:
 //   novy radek ve stringu, to je moznost zakazat
-//   komentare by je mohly pocitat
+//   blokove komentare by je mohly pocitat
 
 /// Lexikalni analyzator
 int get_token(FILE *input, string *value)
@@ -95,12 +87,18 @@ int get_token(FILE *input, string *value)
                     state = FSM_IDENTIFIER;
                 else if(isdigit(c))
                     state = FSM_NUMBER;
-                else if(c == '+')
-                    state = FSM_PLUS;
-                else if(c == '*')
-                    state = FSM_MUL;
-                else if(c == '/')
-                    state = FSM_DIV;
+                else if(c == '+') {
+                    state = FSM_READ;
+                    return PLUS;
+                }
+                else if(c == '*') {
+                    state = FSM_READ;
+                    return MUL;
+                }
+                else if(c == '/') {
+                    state = FSM_READ;
+                    return DIV;
+                }
                 else if(c == '.')
                     state = FSM_DOT;
                 else if(c == '<')
@@ -109,22 +107,32 @@ int get_token(FILE *input, string *value)
                     state = FSM_GREAT;
                 else if(c == '~')
                     state = FSM_NOT_EQUALS;
-                else if(c == '^')
-                    state = FSM_POWER;
-                else if(c == '(')
-                    state = FSM_LBRAC;
-                else if(c == ')')
-                    state = FSM_RBRAC;
-                else if(c == ',')
-                    state = FSM_COMMA;
+                else if(c == '^') {
+                    state = FSM_READ;
+                    return POWER;
+                }
+                else if(c == '(') {
+                    state = FSM_READ;
+                    return LBRAC;
+                }
+                else if(c == ')') {
+                    state = FSM_READ;
+                    return RBRAC;
+                }
+                else if(c == ',') {
+                    state = FSM_READ;
+                    return COMMA;
+                }
                 else if(c == '-')
                     state = FSM_DASH;
                 else if(c == '=')
                     state = FSM_EQUALS;
                 else if(c == '"')
                     state = FSM_STRING;
-                else if(c == ';')
-                    state = FSM_SEMICOLON;
+                else if(c == ';') {
+                    state = FSM_READ;
+                    return SEMICOLON;
+                }
                 else if(c == EOF)
                     return NOTHING;
                 else
@@ -306,22 +314,29 @@ int get_token(FILE *input, string *value)
 
             case FSM_COMMENT_LINE:
                 c = fgetc(input);
-                if(c == '\n')
+                if(c == '\n') {
                     state = FSM_READ;
+                    ++line;
+                }
                 break;
 
             case FSM_COMMENT_BLOCK:
                 c = fgetc(input);
                 if(c == ']')
                     state = FSM_COMMENT_BLOCK_END;
+                else if(c == '\n')
+                    ++line;
                 break;
 
             case FSM_COMMENT_BLOCK_END:
                 c = fgetc(input);
                 if(c == ']')
                     state = FSM_READ;
-                else
+                else {
                     state = FSM_COMMENT_BLOCK;
+                    if(c == '\n')
+                        ++line;
+                }
                 break;
 
             case FSM_EQUALS:
@@ -377,53 +392,6 @@ int get_token(FILE *input, string *value)
                     state = FSM_START;
                     return ERROR_OPERATOR;
                 }
-                break;
-
-// TODO: zkusit nejak smrsknout kod nasledujicich stavu:
-
-            case FSM_SEMICOLON:
-                state = FSM_READ;
-                return SEMICOLON;
-                break;
-
-            case FSM_PLUS:
-                state = FSM_READ;
-                return PLUS;
-                break;
-
-            case FSM_DIV:
-                state = FSM_READ;
-                return DIV;
-                break;
-
-            case FSM_MUL:
-                state = FSM_READ;
-                return MUL;
-                break;
-
-            case FSM_POWER:
-                state = FSM_READ;
-                return POWER;
-                break;
-
-            case FSM_LBRAC:
-                state = FSM_READ;
-                return LBRAC;
-                break;
-
-            case FSM_RBRAC:
-                state = FSM_READ;
-                return RBRAC;
-                break;
-
-            case FSM_COMMA:
-                state = FSM_READ;
-                return COMMA;
-                break;
-
-            default:
-                printf("Not yet implemented! [%c]\n", state);
-                state = FSM_READ;
                 break;
         }
     }

@@ -48,7 +48,6 @@ enum {
     GREAT,
     LESS_EQ,
     GREAT_EQ,
-    TILDA,
     EQUAL,
     NOT_EQUAL,
 

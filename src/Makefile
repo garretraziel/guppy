@@ -5,11 +5,11 @@ CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 
-SOURCE_FILES=guppy.c string.c lexical.c
+SOURCE_FILES=guppy.c string.c lexical.c parser.c
 
 build: dep $(PROJECT) lexical-test quicksort-test knuth-test
 
-$(PROJECT): guppy.o
+$(PROJECT): guppy.o string.o lexical.o parser.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
 
 lexical-test: lexical.o lexical-test.o string.o

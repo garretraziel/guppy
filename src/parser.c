@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "guppy.h"
 #include "lexical.h"
+#include "parser.h"
 
 #define STR_INIT_LEN 16
 

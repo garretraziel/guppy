@@ -21,11 +21,10 @@
 // nula znamena EOF
 // kladne hodnoty validni token
 enum {
-    ERROR_NUMBER = -1,
-    ERROR_UX_CHAR = -2,
-    ERROR_ESC_SEC = -3,
+    ERROR_LEX_NUMBER = -1,
+    ERROR_LEX_UX_CHAR = -2,
+    ERROR_LEX_ESC_SEC = -3,
 
-    ERROR = 0,
     NOTHING = 0,
 
     NUMBER,

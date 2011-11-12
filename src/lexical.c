@@ -50,11 +50,9 @@ enum {
 
 const char *LEX_ERRORS[] = {
     [NOTHING] = "NULL",
-    [-ERROR_X_DIGIT] = "Ocekavana cislice",
+    [-ERROR_NUMBER] = "Neplatny ciselny literal",
     [-ERROR_UX_CHAR] = "Neocekavany znak",
-    [-ERROR_X_SIGNDIGIT] = "Ocekavano znamenko nebo cislice",
     [-ERROR_ESC_SEC] = "Neplatna escape sekvence v retezci",
-    [-ERROR_OPERATOR] = "Neplatny operator",
 };
 
 // globalni pocitadlo radku
@@ -240,7 +238,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_FLOAT;
                 else {
                     state = FSM_START;
-                    return ERROR_X_DIGIT;
+                    return ERROR_NUMBER;
                 }
                 break;
             
@@ -266,7 +264,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_EXP;
                 else { 
                     state = FSM_START;
-                    return ERROR_X_SIGNDIGIT;
+                    return ERROR_NUMBER;
                 }
                 break;
 
@@ -277,7 +275,7 @@ int get_token(FILE *input, string *value)
                     state = FSM_EXP;
                 else {
                     state = FSM_START;
-                    return ERROR_X_DIGIT;
+                    return ERROR_NUMBER;
                 }
                 break;
 
@@ -296,7 +294,7 @@ int get_token(FILE *input, string *value)
             case FSM_STRING:
                 c = fgetc(input);
                 if(c < ASCII_CONTROLL) {
-                    state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
+                    state = FSM_START;
                     return ERROR_UX_CHAR;
                 } else if(c == '\\')
                     state = FSM_ESCAPE;
@@ -321,12 +319,10 @@ int get_token(FILE *input, string *value)
                 } else if(isdigit(c))
                     state = FSM_ESCAPE_NUM;
                 else {
-                    state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
+                    state = FSM_START;
                     return ERROR_ESC_SEC;
                 }
                 break;
-
-// TODO: tu ciselnou escape sekvenci vymyslet lepe
 
             case FSM_ESCAPE_NUM:
                 num = c - '0';
@@ -336,23 +332,23 @@ int get_token(FILE *input, string *value)
                     state = FSM_ESCAPE_NUM2;
                 }
                 else {
-                    state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
+                    state = FSM_STRING;
                     return ERROR_ESC_SEC;
                 }
                 break;
 
-            case FSM_ESCAPE_NUM2: // TODO
+            case FSM_ESCAPE_NUM2:
                 c = fgetc(input);
                 if(isdigit(c)) { 
                     num = num * 10 + c - '0';
                     if(num > 0 && num < 256) {
                         str_push(value, num);
                         state = FSM_STRING;
-                        break;
                     }
+                } else {
+                    state = FSM_START;
+                    return ERROR_ESC_SEC;
                 }
-                state = FSM_STRING; // TODO: zvazit, kam to ma pokracovat
-                return ERROR_ESC_SEC;
                 break;
 
             case FSM_DASH:
@@ -428,7 +424,7 @@ int get_token(FILE *input, string *value)
                     return STRCONCAT;
                 } else {
                     state = FSM_START;
-                    return ERROR_OPERATOR;
+                    return ERROR_UX_CHAR;
                 }
                 break;
 
@@ -461,7 +457,7 @@ int get_token(FILE *input, string *value)
                     return NOT_EQUAL;
                 } else {
                     state = FSM_START;
-                    return ERROR_OPERATOR;
+                    return ERROR_UX_CHAR;
                 }
                 break;
         }

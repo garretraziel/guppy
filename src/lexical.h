@@ -18,14 +18,12 @@
 
 /// Vycet navratovych kodu lexikalniho analyzatoru
 // zaporne hodnoty znaci chybu
-// nula znaci EOF teda asi TODO: zjistit / zajistit
+// nula znamena EOF
 // kladne hodnoty validni token
 enum {
-    ERROR_X_DIGIT = -1,
+    ERROR_NUMBER = -1,
     ERROR_UX_CHAR = -2,
-    ERROR_X_SIGNDIGIT = -3,
-    ERROR_ESC_SEC = -4,
-    ERROR_OPERATOR = -5,
+    ERROR_ESC_SEC = -3,
 
     ERROR = 0,
     NOTHING = 0,

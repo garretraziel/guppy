@@ -76,5 +76,7 @@ int main(void)
         str_clean(&data);
     }
 
+    str_free(&data);
+
     return 0;
 }

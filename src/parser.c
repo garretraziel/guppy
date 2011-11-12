@@ -16,6 +16,29 @@
 
 #define STR_INIT_LEN 16
 
+// TODO chybi generovani vnitrniho kodu
+//  chybi jeho implementace
+
+// Chybova hlseni syntaktickych chyb
+const char *SYN_ERRORS[] = {
+    [0] = "<null>",
+    [-ERROR_SYN_UX_TOKEN] = "Neocekavany token",
+    [-ERROR_SYN_X_EOF] = "Ocekavan konec zdrojoveho souboru",
+    [-ERROR_SYN_X_FUNC] = "Ocekavana definice funkce",
+    [-ERROR_SYN_X_IDENT] = "Ocekavan identifikator",
+    [-ERROR_SYN_X_SMCLN] = "Ocekavan znak ;",
+    [-ERROR_SYN_X_END] = "Ocekavano END",
+    [-ERROR_SYN_X_ASGN] = "Ocekavan operator =",
+    [-ERROR_SYN_X_LBRC] = "Ocekavan znak (",
+    [-ERROR_SYN_X_RBRC] = "Ocekavan znak )",
+    [-ERROR_SYN_X_THEN] = "Ocekavano THEN",
+    [-ERROR_SYN_X_ELSE] = "Ocekavano ELSE",
+    [-ERROR_SYN_X_DO] = "Ocekavano DO",
+    [-ERROR_SYN_X_OPRTR] = "Ocekavan operator",
+};
+
+// TODO: nepozirat lexikalni chyby
+
 // globalni promenne, buh kvuli nim zabiji kotatka, je mi jich lito
 int token;
 string str;
@@ -52,12 +75,12 @@ int program(FILE *in)
     // strednik
     token = get_token(input, &str);
     if(token != SEMICOLON)
-        return 0;
+        return ERROR_SYN_X_SMCLN;
 
     // EOF
     token = get_token(input, &str);
     if(token != NOTHING)
-        return 0;
+        return ERROR_SYN_X_EOF;
 
     return 1;
 }
@@ -87,15 +110,15 @@ int function()
     // function
     token = get_token(input, &str);
     if(token != FUNCTION)
-        return 0;
+        return ERROR_SYN_X_FUNC;
     // identifier
     token = get_token(input, &str);
     if(token != IDENTIFIER)
-        return 0;
+        return ERROR_SYN_X_IDENT;
     // left bracket
     token = get_token(input, &str);
     if(token != LBRAC)
-        return 0;
+        return ERROR_SYN_X_LBRC;
     // formal parametr seq
     x = formal_parametr_seq();
     if(x < 0)
@@ -122,7 +145,7 @@ int formal_parametr_seq()
             // strcit si ho nekam
             return formal_parametr_seq_z();
         default:
-            return 0;
+            return ERROR_SYN_UX_TOKEN;
     }
 }
 
@@ -134,9 +157,13 @@ int formal_parametr_seq_z()
         case RBRAC:
             return 1;
         case COMMA:
+            // identifikator
+            token = get_token(input, &str);
+            if(token != IDENTIFIER)
+                return ERROR_SYN_X_IDENT;
             return formal_parametr_seq_z();
         default:
-            return 0;
+            return ERROR_SYN_UX_TOKEN;
     }
 }
 
@@ -151,6 +178,8 @@ int local_declaration_seq()
     }
     // identifier
     token = get_token(input, &str);
+    if(token != IDENTIFIER)
+        return ERROR_SYN_X_IDENT;
     // local declaration z
     x = local_declaration_z();
     if(x < 0)
@@ -173,7 +202,7 @@ int local_declaration_z()
         // strednik
         token = get_token(input, &str);
         if(token != SEMICOLON)
-            return 0;
+            return ERROR_SYN_X_SMCLN;
         return 1;
     }
     else
@@ -213,7 +242,7 @@ int statement_seq()
         // end
         token = get_token(input, &str);
         if(token != END)
-            return 0;
+            return ERROR_SYN_X_END;
         // statement_seq
         return statement_seq();
     }
@@ -228,7 +257,7 @@ int statement()
             // rovnitko
             token = get_token(input, &str);
             if(token != ASSIGN)
-                return 0;
+                return ERROR_SYN_X_ASGN;
             // assign_z
             return assign_z();
 
@@ -236,15 +265,15 @@ int statement()
             // left bracket
             token = get_token(input, &str);
             if(token != LBRAC)
-                return 0;
+                return ERROR_SYN_X_LBRC;
             // expression list
             x = expression_seq();
             if(x < 0)
-                return 0;
+                return x;
             // right bracket
             token = get_token(input, &str);
             if(token != RBRAC)
-                return 0;
+                return ERROR_SYN_X_RBRC;
 
         case IF:
             // vyraz
@@ -254,7 +283,7 @@ int statement()
             // then
             token = get_token(input, &str);
             if(token != THEN)
-                return 0;
+                return ERROR_SYN_X_THEN;
             // sekvence bez end FIXME
             x = statement_seq();
             if(x < 0)
@@ -262,7 +291,7 @@ int statement()
             // else
             token = get_token(input, &str);
             if(token != ELSE)
-                return 0;
+                return ERROR_SYN_X_ELSE;
             // sekvence prikazu
             x = statement_seq();
             return x;
@@ -275,7 +304,7 @@ int statement()
             // do
             token = get_token(input, &str);
             if(token != DO)
-                return 0;
+                return ERROR_SYN_X_DO;
             // sekvence prikazu
             x = statement_seq();
             return x;
@@ -290,6 +319,9 @@ int statement()
             return 0;
     }
 }
+
+// TODO jeste chybi parametry funkci nejak osefovat
+// a dokoncit co je dolu
 
 int assign_z()
 {
@@ -329,8 +361,7 @@ int operator()
         case NOT_EQUAL:
             return 1;
         default:
-            return 0;
+            return ERROR_SYN_X_OPRTR;
     }
 }
 
-// jeste chybi parametry funkci nejak osefovat

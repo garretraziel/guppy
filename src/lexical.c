@@ -52,17 +52,24 @@ const char *LEX_ERRORS[] = {
     [NOTHING] = "NULL",
     [-ERROR_X_DIGIT] = "Ocekavana cislice",
     [-ERROR_UX_CHAR] = "Neocekavany znak",
-    [-ERROR_X_SIGNDIGIT] = "Ocekavano znaminko nebo cislice",
-    [-ERROR_ESC_SEC] = "Neplatna escape sekvence",
+    [-ERROR_X_SIGNDIGIT] = "Ocekavano znamenko nebo cislice",
+    [-ERROR_ESC_SEC] = "Neplatna escape sekvence v retezci",
     [-ERROR_OPERATOR] = "Neplatny operator",
 };
 
-// pocitadlo radku
+// globalni pocitadlo radku
 int line = 1;
 
 
-// kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
-// vraci jeho pripadny kod, nebo IDENTIFIER pokud neni
+// pro potreby unget_token
+static int buffer = NOTHING;
+static int buffer_valid = 0; // false
+
+/** Funkce kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
+ *
+ * vraci jeho pripadny kod, nebo IDENTIFIER pokud neni
+ * TODO: zoptimalizovat poradi kontroly na shodu
+ */
 int check_keyword(string *str)
 {
     if(strcmp(str->str, "do") == 0)
@@ -115,7 +122,11 @@ int check_keyword(string *str)
 }
 
 
-/// Lexikalni analyzator
+/** Lexikalni analyzator
+ *
+ * @param string slozi k navratu identifikatoru a cisel
+ * vraci ciselnou reprezentaci tokenu
+ */
 int get_token(FILE *input, string *value)
 {
     static int c;
@@ -123,7 +134,13 @@ int get_token(FILE *input, string *value)
 
     int num;
 
-    while(state != FSM_TERMINATE) {
+    // vraceni tokenu z bufferu
+    if(buffer_valid) {
+        buffer_valid = 0;
+        return buffer;
+    }
+
+    for(;;) {
 
         switch(state) {
             // nacitani znaku
@@ -197,8 +214,7 @@ int get_token(FILE *input, string *value)
                 c = fgetc(input);
                 if(! (isalnum(c) || c == '_')) {
                     state = FSM_START;
-                    // kontrola klicovych slov
-                    return check_keyword(value);
+                    return check_keyword(value); // kontrola klicovych slov
                 }
                 break;
 
@@ -453,4 +469,19 @@ int get_token(FILE *input, string *value)
 
     assert(0);
     return NOTHING;
+}
+
+
+/** Vrati token zpet na vstup
+ *
+ * vzdy se smi vratit jen jeden
+ * nesmi se znicit obsah nactenych dat, ty se ukladat nebudou
+ */
+int unget_token(int token)
+{
+    if(buffer_valid)
+        return 0; 
+    buffer_valid = 1;
+    buffer = token;
+    return 1;
 }

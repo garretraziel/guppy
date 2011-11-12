@@ -90,6 +90,9 @@ extern const char *LEX_ERRORS[];
 /// Vrati nasledujici token ze souboru
 int get_token(FILE *, string *);
 
+/// Vrati token na vstup
+int unget_token(int);
+
 /// globalni pocitadlo radku
 extern int line;
 

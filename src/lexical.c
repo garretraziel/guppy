@@ -138,6 +138,9 @@ int get_token(FILE *input, string *value)
         return buffer;
     }
 
+    // buffer se musi vyprazdnit
+    str_clean(value);
+
     for(;;) {
 
         switch(state) {

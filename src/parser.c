@@ -19,6 +19,9 @@
 // TODO chybi generovani vnitrniho kodu
 //  chybi jeho implementace
 
+// TODO: ono to nepozna, ze je konec souboru driv nez ma
+//  povazuje to za neocekavany token
+
 // Chybova hlseni syntaktickych chyb
 const char *SYN_ERRORS[] = {
     [0] = "<null>",
@@ -55,6 +58,7 @@ int statement_seq();
 int statement();
 int assign_z();
 int expression_seq();
+int expression_seq_z();
 int expression();
 int operator();
 
@@ -71,7 +75,7 @@ int program(FILE *in)
     if(x < 0)
         return x;
 
-    // strednik
+    // strednik za posledni funkci
     token = get_token(input, &str);
     if(token != SEMICOLON)
         return (token < 0) ? token : ERROR_SYN_X_SMCLN;
@@ -183,7 +187,8 @@ int local_declaration_seq()
     x = local_declaration_z();
     if(x < 0)
         return x;
-    return 1;
+    // local declaration seq
+    return local_declaration_seq();
 }
 
 int local_declaration_z()
@@ -205,7 +210,7 @@ int local_declaration_z()
         return 1;
     }
     else
-        return 0;
+        return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
 }
 
 int literal()
@@ -230,7 +235,7 @@ int statement_seq()
     token = get_token(input, &str);
     // bud end nebo prikaz
     if(token == END)
-        // konec funkce, to bude asi znamenat skok do caller funkce
+        // konec bloku
         return 1;
     else {
         unget_token(token);
@@ -238,10 +243,10 @@ int statement_seq()
         x = statement();
         if(x < 0)
             return x;
-        // end
+        // strednik
         token = get_token(input, &str);
-        if(token != END)
-            return (token < 0) ? token : ERROR_SYN_X_END;
+        if(token != SEMICOLON)
+            return (token < 0) ? token : ERROR_SYN_X_SMCLN;
         // statement_seq
         return statement_seq();
     }
@@ -267,12 +272,7 @@ int statement()
                 return (token < 0) ? token : ERROR_SYN_X_LBRC;
             // expression list
             x = expression_seq();
-            if(x < 0)
-                return x;
-            // right bracket
-            token = get_token(input, &str);
-            if(token != RBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_RBRC;
+            return x;
 
         case IF:
             // vyraz
@@ -315,7 +315,7 @@ int statement()
             // konec funkce heh
 
         default:
-            return 0;
+            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
 }
 
@@ -324,22 +324,92 @@ int statement()
 
 int assign_z()
 {
+    token = get_token(input, &str);
     // read
+    if(token == READ) {
+        // leva zavorka
+        // parametry
+        // prava zavorka
+        return 1;
+    }
+    // volani funkce
+    else if(token == IDENTIFIER) {
+        // leva zavorka
+        // parametry
+        // prava zavorka
+        return 1;
+    }
     // vyraz
-    // identifier()
-    return 1;
+    else
+        return expression();
 }
 
 // to je asi jen pro write
 int expression_seq()
 {
-    return 1;
+    int x;
+    token = get_token(input, &str);
+    if(token == RBRAC)
+        return 1;
+    x = expression();
+    if(x < 0)
+        return x;
+    return expression_seq_z();
 }
 
+int expression_seq_z()
+{
+    int x;
+    token = get_token(input, &str);
+    if(token == RBRAC)
+        return 1;
+    else if(token == COMMA) {
+        x = expression();
+        if(x < 0)
+            return x;
+        return expression_seq_z();
+    }
+    else
+        return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+}
+
+// tohle je jen nouzovka, preskakuje to
 int expression()
 {
     // tohle vubec netusim, to se resi jinak
-    return 1;
+    // zatim se proste vyraz preskoci a bude se predpokladat jeho spravnost
+    token = get_token(input, &str);
+    switch(token) {
+        // literal
+        case NUMBER:
+        case STRING:
+        case NIL:
+        case FALSE:
+        case TRUE:
+        // ident
+        case IDENTIFIER:
+        // zavorky tam nebudou, zatim, zraly by mi konce funkci
+//        case LBRAC:
+//        case RBRAC:
+        // operatory
+        case PLUS:
+        case MINUS:
+        case DIV:
+        case MUL:
+        case POWER:
+        case STRCONCAT:
+        case LESS:
+        case GREAT:
+        case LESS_EQ:
+        case GREAT_EQ:
+        case EQUAL:
+        case NOT_EQUAL:
+            return expression();
+            break;
+        default:
+            unget_token(token);
+            return 1;
+    }
 }
 
 int operator()

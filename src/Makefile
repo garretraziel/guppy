@@ -7,7 +7,7 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 SOURCE_FILES=guppy.c string.c lexical.c parser.c
 
-build: dep $(PROJECT) lexical-test quicksort-test knuth-test
+build: dep $(PROJECT) lexical-test quicksort-test knuth-test parser-test
 
 $(PROJECT): guppy.o string.o lexical.o parser.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
@@ -19,6 +19,9 @@ quicksort-test: ial.o string.o quicksort-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 knuth-test: ial.o string.o knuth-test.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+parser-test: ial.o string.o lexical.o parser.o parser-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 # automaticke generovani zavislosti

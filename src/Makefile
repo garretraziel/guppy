@@ -28,7 +28,7 @@ dep:
 -include dep.list
 
 clean:
-	rm *.o $(PROJECT) lexical-test quicksort-test
+	rm -f *.o $(PROJECT) lexical-test quicksort-test knuth-test dep.list
 
 zip:
 	tar czf $(LOGIN).tgz *.c *.h rozdeleni Makefile

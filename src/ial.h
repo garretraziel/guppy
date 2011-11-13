@@ -24,7 +24,8 @@ void sort(string *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: vyhledavani podretezce (Knuth-Moris-Pratt)
+/// Vyhleda podretezec v retezci pomoci metody Knuth-Morrison-Pratt
+int find(string *, string *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

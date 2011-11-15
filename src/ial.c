@@ -27,7 +27,7 @@ void quicksort(char *str, int a, int b)
     int r = b;
 
     // TODO: vymyslet lepsi pivot
-    int pivot = str[a];
+    int pivot = str[(a+b)/2];
     char tmp;
 
     // dokud se neprekrizi ukazatele

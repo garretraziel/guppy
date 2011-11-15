@@ -110,11 +110,11 @@ int *find_prefix2(char *str, int len)
 
     if (tabulka == NULL) return NULL;
 
-    tabulka[0] = 0;
+    tabulka[0] = -1;
 
     for (int k = 1; k<len; k++) {
 	int r = tabulka[k-1];
-	while (r>0 && str[r]!=str[k-1]) r = tabulka[r];
+	while (r>-1 && str[r]!=str[k-1]) r = tabulka[r];
 	tabulka[k] = r+1;
     }
 
@@ -166,10 +166,10 @@ int find_kmp2(char *str1, int len1, char *str2, int len2)
     int j = 0;
 
     while (i<len1 && j<len2) {
-	if (j == -1 || str1[i] == str2[j]) {
+	if ((j == -1) || (str1[i] == str2[j])) {
 	    i++; j++;
 	} else {
-	    j = tabulka[i];
+	    j = tabulka[j];
 	}
     }
 

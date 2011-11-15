@@ -26,6 +26,8 @@ void sort(string *);
 
 /// Vyhleda podretezec v retezci pomoci metody Knuth-Morrison-Pratt
 int find(string *, string *);
+
+//TODO: deprecated, odstranit
 int find2(string *, string *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

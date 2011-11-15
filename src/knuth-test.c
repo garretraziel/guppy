@@ -18,8 +18,8 @@ int main(void)
   while((c = getchar()) != EOF) {
     if(c == '\n'){
       if (nacteno == 1) {
-	printf("%d-----\n",find(&str,&str2));
-	printf("A co nam rekne pan JMH... %d-----\n",find2(&str,&str2));
+	printf("%d-----\n",find2(&str,&str2));
+	printf("A co nam rekne pan JMH... %d-----\n",find(&str,&str2));
 	str_clean(&str);
 	str_clean(&str2);
 	nacitani = &str;

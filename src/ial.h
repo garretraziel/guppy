@@ -26,6 +26,7 @@ void sort(string *);
 
 /// Vyhleda podretezec v retezci pomoci metody Knuth-Morrison-Pratt
 int find(string *, string *);
+int find2(string *, string *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

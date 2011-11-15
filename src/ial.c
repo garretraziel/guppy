@@ -77,27 +77,48 @@ void sort(string *str)
  */
 int *find_prefix(char *str, int len)
 {
-  int *tabulka = malloc(sizeof(int)*(len+1)); /// pro zjednoduseni nechame misto i pro '\0'
+    int *tabulka = malloc(sizeof(int)*(len+1)); /// pro zjednoduseni nechame misto i pro '\0'
 
-  if (tabulka == NULL) {
-    return NULL;
-  }
+    if (tabulka == NULL) {
+	return NULL;
+    }
+    
+    int i = 0;
+    int j = tabulka[0] = -1;
+    
+    while (i < len) {
+	while (j > -1 && str[i] != str[j])
+	    j = tabulka[j];
+	i++;
+	j++;
+	if (str[i] == str[j])
+	    tabulka[i] = tabulka[j];
+	else
+	    tabulka[i] = j;
+    }
+    
+    return tabulka;
+}
 
-  int i = 0;
-  int j = tabulka[0] = -1;
+///FIXME: toto bude asi vysledny pouzity KMP algoritmus, ale zatim je to
+// horsi jak cerna magie, pancto cerna magie aspon muze fungovat.
+// ve zkratce je to opsany pochybny pascalovsky zapis, kde se vse cisluje
+// od jednicky (i nula je cislovana od jednicky) a proto v nem nikdy nic nefunguje
+int *find_prefix2(char *str, int len)
+{
+    int *tabulka = malloc(sizeof(int)*len);
 
-  while (i < len) {
-    while (j > -1 && str[i] != str[j])
-      j = tabulka[j];
-    i++;
-    j++;
-    if (str[i] == str[j])
-      tabulka[i] = tabulka[j];
-    else
-      tabulka[i] = j;
-  }
-  
-  return tabulka;
+    if (tabulka == NULL) return NULL;
+
+    tabulka[0] = 0;
+
+    for (int k = 1; k<len; k++) {
+	int r = tabulka[k-1];
+	while (r>0 && str[r]!=str[k-1]) r = tabulka[r];
+	tabulka[k] = r+1;
+    }
+
+    return tabulka;
 }
 
 /** Funkce, ktera pro zadany string najde zadany podstring pomoci Knuth-Morrison-Prattovy metody
@@ -112,26 +133,48 @@ int *find_prefix(char *str, int len)
  */
 int find_kmp(char *str1, int len1, char *str2, int len2)
 {
-  int *tabulka = find_prefix(str2, len2);
-
-  if (tabulka == NULL) return -2; //TODO: vracet opravdovou chybu
-
-  int i = 0;
-  int j = 0;
-
-  while (j < len1) {
-    while (i > -1 && str2[i] != str1[j])
-      i = tabulka[i];
-    i++;
-    j++;
-    if (i >= len2) {
-      free(tabulka);
-      return j-i;
+    int *tabulka = find_prefix(str2, len2);
+    
+    if (tabulka == NULL) return -2; //TODO: vracet opravdovou chybu
+    
+    int i = 0;
+    int j = 0;
+    
+    while (j < len1) {
+	while (i > -1 && str2[i] != str1[j])
+	    i = tabulka[i];
+	i++;
+	j++;
+	if (i >= len2) {
+	    free(tabulka);
+	    return j-i;
+	}
     }
-  }
+    
+    free(tabulka);
+    return -1;
+}
 
-  free(tabulka);
-  return -1;
+///TODO: jak jsem jiz napsal v poslednim komentari zde^^^
+int find_kmp2(char *str1, int len1, char *str2, int len2)
+{
+    int *tabulka = find_prefix2(str2, len2);
+
+    if (tabulka == NULL) return -2;
+
+    int i = 0;
+    int j = 0;
+
+    while (i<len1 && j<len2) {
+	if (j == -1 || str1[i] == str2[j]) {
+	    i++; j++;
+	} else {
+	    j = tabulka[i];
+	}
+    }
+
+    if (j >= len2) return i - len2;
+    else return -1;
 }
 
 /** Wrapper funkce find
@@ -147,6 +190,17 @@ int find(string *str1, string *str2)
   if (strcmp(str2->str,"") == 0) return 0;
   if (strcmp(str1->str,"") == 0) return -1; //TODO: vraci false
   int pozice = find_kmp(str1->str, str1->length, str2->str, str2->length);
+  if (pozice == -1) return -1; //TODO: vraci false
+  else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
+  else return pozice+1;
+}
+
+///TODO: tady uz nemam co rict
+int find2(string *str1, string *str2)
+{
+  if (strcmp(str2->str,"") == 0) return 0;
+  if (strcmp(str1->str,"") == 0) return -1; //TODO: vraci false
+  int pozice = find_kmp2(str1->str, str1->length, str2->str, str2->length);
   if (pozice == -1) return -1; //TODO: vraci false
   else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
   else return pozice+1;

@@ -59,3 +59,25 @@ void str_clean(string *str)
         str->str[0] = 0;
     str->length = 0;
 }
+
+/// Vrati substring ze stringu podle zadanych indexu
+/// POZOR: ocekava indexy v C, pole od 0. o prevod do
+/// toho pseudocislovani by se mela postarat wrapper funkce
+char *substr_c(char *str, int len, int from, int to)
+{
+    int len2 = abs(from-to) + 2; //TODO: toto neplati pro zaporne indexy a jeste buhvi pro co vsechno
+
+    char *retstr = malloc(sizeof(char)*len2);
+
+    if (retstr == NULL) return NULL;
+
+
+    ///TODO: tady probehne reseni "nestandardnich" situaci
+    
+    int j = 0;
+    for (int i = from; i<to; i++) {
+	///TODO: toto proste dopsat, kopirovat a soustredit se na konce poli
+    }
+    
+    return retstr;
+}

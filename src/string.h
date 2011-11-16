@@ -33,4 +33,9 @@ void str_free(string *);
 /// Zkrati string na delku 0
 void str_clean(string *);
 
+/// Vrati substring ze stringu podle zadanych indexu
+/// POZOR: ocekava indexy v C, pole od 0. o prevod do
+/// toho pseudocislovani by se mela postarat wrapper funkce
+char *substr_c(char *, int, int, int);
+
 #endif

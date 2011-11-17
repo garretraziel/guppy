@@ -9,6 +9,9 @@
  */
 
 #include <stdlib.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 
 #include "string.h"
 
@@ -65,19 +68,47 @@ void str_clean(string *str)
 /// toho pseudocislovani by se mela postarat wrapper funkce
 char *substr_c(char *str, int len, int from, int to)
 {
-    int len2 = abs(from-to) + 2; //TODO: toto neplati pro zaporne indexy a jeste buhvi pro co vsechno
+    int x = from;
+    int y = to;
 
-    char *retstr = malloc(sizeof(char)*len2);
+    //TODO: vymyslet a osetrit vsechny hovadiny, treba prvni index mensi jak druhy a podobne
+    if (from < 0) {
+	x = len + from; // prepocitam index pro zaporne cislo
+    }
+
+    if (to < 0) {
+	y = len + to; // prepocitam index pro zaporne cislo
+    }
+
+    if (y < x) { // jeste musim mit mensi index jako prvni
+	int temp = x;
+	x = y;
+	y = temp;
+    }
+
+    if (y >= len) y = len - 1;
+
+    int retlen = y - x;
+
+    //TODO: zkontrolovat jestli opravdu alokuju spravne
+    char *retstr = malloc(sizeof(char)*(retlen+2)); // jeden kvuli \0, druhy kvuli tomu, ze y ukazuje jeste do retezce
 
     if (retstr == NULL) return NULL;
-
-
-    ///TODO: tady probehne reseni "nestandardnich" situaci
     
     int j = 0;
-    for (int i = from; i<to; i++) {
-	///TODO: toto proste dopsat, kopirovat a soustredit se na konce poli
+    for (int i = x; i<=y; i++) {
+	if (str[i] == '\0') {
+	    /// pro jistotu, sem by se program nemel dostat
+#ifdef DEBUG
+	    fprintf(stderr,"Warning: substr by vyjel ze stringu.\n");
+#endif
+	    retstr[j] = '\0';
+	    return retstr;
+	}
+	retstr[j++] = str[i];
     }
+
+    retstr[j] = '\0';
     
     return retstr;
 }

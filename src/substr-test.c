@@ -37,6 +37,54 @@ int main(void)
     printf("Retezec od -6 do -1 vcetne, melo by byt \"world!\": %s\n",  vysledek);
     free(vysledek);
 
+    vysledek = substr_c(retezec, len, 5, 4);
+
+    printf("Retezec od 5 do 4 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec, len, -4, -5);
+
+    printf("Retezec od -4 do -5 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec, len, -1, 3);
+
+    printf("Retezec od -1 do 3 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec, len, 10, -6);
+
+    printf("Retezec od 10 do -6 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
+    char *retezec2 = "abc";
+    len = strlen(retezec2);
+
+    vysledek = substr_c(retezec2, len, -4, -4);
+
+    printf("Retezec od -4 do -4 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec2, len, -3, -3);
+
+    printf("Retezec od -3 do -3 vcetne, melo by byt \"a\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec2, len, -4, -3);
+
+    printf("Retezec od -4 do -3 vcetne, melo by byt \"a\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec2, len, 2, 5);
+
+    printf("Retezec od 2 do 5 vcetne, melo by byt \"c\": %s\n",  vysledek);
+    free(vysledek);
+
+    vysledek = substr_c(retezec2, len, 4, 4);
+
+    printf("Retezec od 4 do 4 vcetne, melo by byt \"\": %s\n",  vysledek);
+    free(vysledek);
+
 
     return 0;
 }

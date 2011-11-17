@@ -15,6 +15,8 @@
 
 #include "string.h"
 
+// interni funkce, zjisti, zda jsou indexy spravne
+int index_sane(int x, int y, int len);
 
 // Inicializace noveho stringu
 int str_new(string *str, int size)
@@ -68,30 +70,47 @@ void str_clean(string *str)
 /// toho pseudocislovani by se mela postarat wrapper funkce
 char *substr_c(char *str, int len, int from, int to)
 {
+    char *retstr;
+    /// zkontroluji, zda jsou zadany spravne argumenty
+    if (!index_sane(from, to, len)) {
+	retstr = malloc(sizeof(char));
+	if (retstr == NULL) return NULL;
+	retstr[0] = '\0';
+	return retstr;
+    }
+
+    // nyni uz vim, ze argumenty jsou spravne, tak mohu v klidu vypisovat
     int x = from;
     int y = to;
 
     //TODO: vymyslet a osetrit vsechny hovadiny, treba prvni index mensi jak druhy a podobne
     if (from < 0) {
 	x = len + from; // prepocitam index pro zaporne cislo
+	if (x < 0) x = 0;
     }
 
     if (to < 0) {
 	y = len + to; // prepocitam index pro zaporne cislo
+	if (y < 0) {
+#ifdef DEBUG
+	    fpritnf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
+#endif
+	    y = 0;
+	}
     }
 
-    if (y < x) { // jeste musim mit mensi index jako prvni
-	int temp = x;
-	x = y;
-	y = temp;
-    }
+    /* if (y < x) { // jeste musim mit mensi index jako prvni ///FIXME: nejspis neni potreba !! */
+    /* 	int temp = x; */
+    /* 	x = y; */
+    /* 	y = temp; */
+    /* } */
 
     if (y >= len) y = len - 1;
 
-    int retlen = y - x;
+    int retlen = y - x + 1; // velikost x az y vcetne
 
     //TODO: zkontrolovat jestli opravdu alokuju spravne
-    char *retstr = malloc(sizeof(char)*(retlen+2)); // jeden kvuli \0, druhy kvuli tomu, ze y ukazuje jeste do retezce
+    retstr = malloc(sizeof(char)*(retlen+1)); // jeden kvuli \0
 
     if (retstr == NULL) return NULL;
     
@@ -111,4 +130,19 @@ char *substr_c(char *str, int len, int from, int to)
     retstr[j] = '\0';
     
     return retstr;
+}
+
+// interni funkce, zjisti, zda jsou indexy spravne
+int index_sane(int x, int y, int len)
+{
+    if (x >= 0 && y >= 0 && x > y) return 0; // napriklad substring("neco",5,4)
+    if (x < 0 && y < 0 && x > y) return 0; // napriklad substring("neco",-2,-3)
+    if (x < 0 && y >= 0 && (x + len) > y) return 0; // napriklad substring("neco",-1, 2) //TODO: zkontrolovat, treba jestli se muzou i rovnat a tak
+    if (x >= 0 && y < 0 && x > (y + len)) return 0; // napriklad substring("neco",3,-2) //TODO: taktez
+    if (x < 0 && y < 0 && (x + len) < 0 && (y + len) < 0) return 0;
+    if (x >= len) return 0;
+
+    //TODO: zkontrolovat, zda nemaji byt nejaka dalsi pravidla
+    
+    return 1;
 }

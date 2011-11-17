@@ -34,7 +34,7 @@ int str_new(string *str, int size)
 /// Vytvori novy string a rovnou do nej ulozi nejaky pocatecni obsah
 int str_init(string *str, const char *data)
 {
-    str->str = malloc(sizeof(strlen(data)+1));
+    str->str = malloc(sizeof(char)*(strlen(data)+1));
     if(str->str == NULL)
         return 0;
     strcpy(str->str, data);
@@ -123,7 +123,7 @@ char *substr_c(char *str, int len, int from, int to)
     int retlen = y - x + 1; // velikost x az y vcetne
 
     //TODO: zkontrolovat jestli opravdu alokuju spravne
-    retstr = malloc(sizeof(char)*(retlen+1)); // jeden kvuli \0
+    retstr = malloc(sizeof(char)*(retlen+1)); // jeden kvuli 0 
 
     if (retstr == NULL) return NULL;
     

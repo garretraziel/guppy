@@ -34,11 +34,12 @@ int str_new(string *str, int size)
 /// Vytvori novy string a rovnou do nej ulozi nejaky pocatecni obsah
 int str_init(string *str, const char *data)
 {
-    str->str = strdup(data);
+    str->str = malloc(sizeof(strlen(data)+1));
     if(str->str == NULL)
         return 0;
+    strcpy(str->str, data);
     str->alloc = strlen(str->str) + 1;
-    str->length = 0;
+    str->length = strlen(str->str);
     return 1;
 }
 

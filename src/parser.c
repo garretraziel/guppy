@@ -83,6 +83,8 @@ int program(FILE *in)
     // prvni funkce
     if(token == FUNCTION)
         x = function();
+    else
+        return (token < 0) ? token : ERROR_SYN_X_FUNC;
     if(x < 0)
         return x;
 

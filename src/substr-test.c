@@ -6,9 +6,13 @@
 
 int main(void)
 {
+    
+
     char *retezec = "Hello, world!";
     char *vysledek;
     int len = strlen(retezec);
+
+    
 
     printf("Pracuji se retezcem: \"%s\"\n",retezec);
 

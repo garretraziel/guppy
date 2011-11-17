@@ -145,6 +145,11 @@ int function()
     if(x < 0)
         return x;
 
+    // right bracket
+    if(token != RBRAC)
+        return (token < 0) ? token : ERROR_SYN_X_RBRC;
+    token = get_token(input, &str);
+
     // local declaration seq
     x = local_declaration_seq();
     if(x < 0)

@@ -13,6 +13,11 @@ void Error(const char *fmt, ...)
     va_end(args);
 }
 
+const char **ERROR_MSG[] = {
+    [1] = LEX_ERRORS,
+    [2] = SYN_ERRORS,
+};
+
 int main(void)
 {
 
@@ -22,7 +27,7 @@ int main(void)
     // lexikalni se testuji jinde
     // semanticke jeste testovat neumim
     if(x < 0)
-        Error("Na radku %d: %s\n", line, SYN_ERRORS[(-x)%100]);
+        Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);
     
     // casem se napise nejake to udelatko na vsechny chyby
 

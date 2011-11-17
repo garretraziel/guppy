@@ -73,10 +73,10 @@ char *substr_c(char *str, int len, int from, int to)
     char *retstr;
     /// zkontroluji, zda jsou zadany spravne argumenty
     if (!index_sane(from, to, len)) {
-	retstr = malloc(sizeof(char));
-	if (retstr == NULL) return NULL;
-	retstr[0] = '\0';
-	return retstr;
+        retstr = malloc(sizeof(char));
+        if (retstr == NULL) return NULL;
+        retstr[0] = '\0';
+        return retstr;
     }
 
     // nyni uz vim, ze argumenty jsou spravne, tak mohu v klidu vypisovat
@@ -85,18 +85,18 @@ char *substr_c(char *str, int len, int from, int to)
 
     //TODO: vymyslet a osetrit vsechny hovadiny, treba prvni index mensi jak druhy a podobne
     if (from < 0) {
-	x = len + from; // prepocitam index pro zaporne cislo
-	if (x < 0) x = 0;
+        x = len + from; // prepocitam index pro zaporne cislo
+        if (x < 0) x = 0;
     }
 
     if (to < 0) {
-	y = len + to; // prepocitam index pro zaporne cislo
-	if (y < 0) {
+        y = len + to; // prepocitam index pro zaporne cislo
+        if (y < 0) {
 #ifdef DEBUG
-	    fpritnf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
+            fpritnf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
 #endif
-	    y = 0;
-	}
+            y = 0;
+        }
     }
 
     /* if (y < x) { // jeste musim mit mensi index jako prvni ///FIXME: nejspis neni potreba !! */
@@ -116,15 +116,15 @@ char *substr_c(char *str, int len, int from, int to)
     
     int j = 0;
     for (int i = x; i<=y; i++) {
-	if (str[i] == '\0') {
-	    /// pro jistotu, sem by se program nemel dostat
+        if (str[i] == '\0') {
+        /// pro jistotu, sem by se program nemel dostat
 #ifdef DEBUG
-	    fprintf(stderr,"Warning: substr by vyjel ze stringu.\n");
+            fprintf(stderr,"Warning: substr by vyjel ze stringu.\n");
 #endif
-	    retstr[j] = '\0';
-	    return retstr;
-	}
-	retstr[j++] = str[i];
+            retstr[j] = '\0';
+            return retstr;
+        }
+        retstr[j++] = str[i];
     }
 
     retstr[j] = '\0';

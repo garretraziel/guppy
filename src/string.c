@@ -36,7 +36,7 @@ int str_init(string *str, const char *data)
 {
     str->str = strdup(data);
     if(str->str == NULL)
-	return 0;
+        return 0;
     str->alloc = strlen(str->str) + 1;
     str->length = 0;
     return 1;
@@ -162,10 +162,10 @@ int index_sane(int x, int y, int len)
 /// Wrapper, ktery se stara o prevod guppy_string -> c_string a take o cislovani mezi
 char *substr(string *str, int x, int y)
 {
-	if (x == 0 || y == 0) return NULL; //TODO: co mam delat v tomto pripade?
+    if (x == 0 || y == 0) return NULL; //TODO: co mam delat v tomto pripade?
 
-	x = x < 0? x : x - 1; //TODO: toto zkontrolovat. ale asi je to dobre, C je o jedna pozadu, ale se zapornymi indexy jsou oba styly stejne
-	y = y < 0? y : y - 1;
+    x = x < 0? x : x - 1; //TODO: toto zkontrolovat. ale asi je to dobre, C je o jedna pozadu, ale se zapornymi indexy jsou oba styly stejne
+    y = y < 0? y : y - 1;
 
-	return substr_c(str->str, str->length, x, y);
+    return substr_c(str->str, str->length, x, y);
 }

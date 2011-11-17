@@ -22,7 +22,7 @@ int main(void)
     // lexikalni se testuji jinde
     // semanticke jeste testovat neumim
     if(x < 0)
-        Error("Na radku %d: %s\n", line, SYN_ERRORS[-x]);
+        Error("Na radku %d: %s\n", line, SYN_ERRORS[(-x)%100]);
     
     // casem se napise nejake to udelatko na vsechny chyby
 

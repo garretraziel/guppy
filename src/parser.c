@@ -25,19 +25,19 @@
 // Chybova hlseni syntaktickych chyb
 const char *SYN_ERRORS[] = {
     [0] = "<null>",
-    [-ERROR_SYN_UX_TOKEN] = "Neocekavany token",
-    [-ERROR_SYN_X_EOF] = "Ocekavan konec zdrojoveho souboru",
-    [-ERROR_SYN_X_FUNC] = "Ocekavana definice funkce",
-    [-ERROR_SYN_X_IDENT] = "Ocekavan identifikator",
-    [-ERROR_SYN_X_SMCLN] = "Ocekavan znak ;",
-    [-ERROR_SYN_X_END] = "Ocekavano END",
-    [-ERROR_SYN_X_ASGN] = "Ocekavan operator =",
-    [-ERROR_SYN_X_LBRC] = "Ocekavan znak (",
-    [-ERROR_SYN_X_RBRC] = "Ocekavan znak )",
-    [-ERROR_SYN_X_THEN] = "Ocekavano THEN",
-    [-ERROR_SYN_X_ELSE] = "Ocekavano ELSE",
-    [-ERROR_SYN_X_DO] = "Ocekavano DO",
-    [-ERROR_SYN_X_OPRTR] = "Ocekavan operator",
+    [(-ERROR_SYN_UX_TOKEN) % 100] = "Neocekavany token",
+    [(-ERROR_SYN_X_EOF) % 100] = "Ocekavan konec zdrojoveho souboru",
+    [(-ERROR_SYN_X_FUNC) % 100] = "Ocekavana definice funkce",
+    [(-ERROR_SYN_X_IDENT) % 100] = "Ocekavan identifikator",
+    [(-ERROR_SYN_X_SMCLN) % 100] = "Ocekavan znak ;",
+    [(-ERROR_SYN_X_END) % 100] = "Ocekavano END",
+    [(-ERROR_SYN_X_ASGN) % 100] = "Ocekavan operator =",
+    [(-ERROR_SYN_X_LBRC) % 100] = "Ocekavan znak (",
+    [(-ERROR_SYN_X_RBRC) % 100] = "Ocekavan znak )",
+    [(-ERROR_SYN_X_THEN) % 100] = "Ocekavano THEN",
+    [(-ERROR_SYN_X_ELSE) % 100] = "Ocekavano ELSE",
+    [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
+    [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
 };
 
 
@@ -81,10 +81,9 @@ int program(FILE *in)
     token = get_token(input, &str);
 
     // prvni funkce
-    if(token == FUNCTION)
-        x = function();
-    else
+    if(token != FUNCTION)
         return (token < 0) ? token : ERROR_SYN_X_FUNC;
+    x = function();
     if(x < 0)
         return x;
 

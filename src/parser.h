@@ -12,19 +12,19 @@
 #define IFJ_PARSER_H
 
 enum {
-    ERROR_SYN_UX_TOKEN = -1,
-    ERROR_SYN_X_SMCLN = -2,
-    ERROR_SYN_X_EOF = -3,
-    ERROR_SYN_X_FUNC = -4,
-    ERROR_SYN_X_IDENT = -5,
-    ERROR_SYN_X_END = -6,
-    ERROR_SYN_X_ASGN = -7,
-    ERROR_SYN_X_LBRC = -8,
-    ERROR_SYN_X_RBRC = -9,
-    ERROR_SYN_X_THEN = -10,
-    ERROR_SYN_X_ELSE = -11,
-    ERROR_SYN_X_DO = -12,
-    ERROR_SYN_X_OPRTR = -13,
+    ERROR_SYN_UX_TOKEN = -201,
+    ERROR_SYN_X_SMCLN = -202,
+    ERROR_SYN_X_EOF = -203,
+    ERROR_SYN_X_FUNC = -204,
+    ERROR_SYN_X_IDENT = -205,
+    ERROR_SYN_X_END = -206,
+    ERROR_SYN_X_ASGN = -207,
+    ERROR_SYN_X_LBRC = -208,
+    ERROR_SYN_X_RBRC = -209,
+    ERROR_SYN_X_THEN = -210,
+    ERROR_SYN_X_ELSE = -211,
+    ERROR_SYN_X_DO = -212,
+    ERROR_SYN_X_OPRTR = -213,
 } ESynErrors;
 
 // Zpracuje pocatacni neterminalni symbol

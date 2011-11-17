@@ -62,10 +62,8 @@ int literal_identifier_list_a();
 int literal_identifier_list_z();
 
 int expression_seq();
-int expression_seq_a();
 int expression_seq_z();
 int expression();
-int operator();
 
 
 // P -> DF DFS ; EOF
@@ -500,37 +498,31 @@ int literal_identifier_list_z()
 // // // // // // // // // // // // // // // // // // // // // // // // //
 // Co je dal uz nefunguje ani zatim nema:
 
+// ES -> E ESz
 int expression_seq()
 {
     int x;
-    token = get_token(input, &str);
-    if(token == RBRAC)
-        return 1;
     x = expression();
     if(x < 0)
         return x;
     return expression_seq_z();
 }
 
-int expression_seq_a()
-{
-    return 1;
-}
-
+// ESz -> , E Elz
+// ESz -> epsilon
 int expression_seq_z()
 {
     int x;
-    token = get_token(input, &str);
-    if(token == RBRAC)
-        return 1;
-    else if(token == COMMA) {
+    if(token == COMMA) {
+        token = get_token(input, &str);
         x = expression();
         if(x < 0)
             return x;
         return expression_seq_z();
     }
+    // epsilon
     else
-        return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+        return 1;
 }
 
 // tohle je jen nouzovka, preskakuje to
@@ -568,27 +560,5 @@ int expression()
             break;
         default:
             return 1;
-    }
-}
-
-int operator()
-{
-    switch(token) {
-        case PLUS:
-        case MINUS:
-        case DIV:
-        case MUL:
-        case POWER:
-        case STRCONCAT:
-        case LESS:
-        case GREAT:
-        case LESS_EQ:
-        case GREAT_EQ:
-        case EQUAL:
-        case NOT_EQUAL:
-            token = get_token(input, &str);
-            return 1;
-        default:
-            return (token < 0) ? token : ERROR_SYN_X_OPRTR;
     }
 }

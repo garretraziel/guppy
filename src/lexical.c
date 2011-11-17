@@ -50,9 +50,9 @@ enum {
 
 const char *LEX_ERRORS[] = {
     [NOTHING] = "NULL",
-    [-ERROR_LEX_NUMBER] = "Neplatny ciselny literal",
-    [-ERROR_LEX_UX_CHAR] = "Neocekavany znak",
-    [-ERROR_LEX_ESC_SEC] = "Neplatna escape sekvence v retezci",
+    [(-ERROR_LEX_NUMBER) % 100] = "Neplatny ciselny literal",
+    [(-ERROR_LEX_UX_CHAR) % 100] = "Neocekavany znak",
+    [(-ERROR_LEX_ESC_SEC) % 100] = "Neplatna escape sekvence v retezci",
 };
 
 // globalni pocitadlo radku

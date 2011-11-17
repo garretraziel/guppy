@@ -72,7 +72,7 @@ int main(void)
                 printf("-> %lg\n", strtod(data.str, NULL));
         }
         else
-            fprintf(stderr, "CHYBA na radku %d : %s\n", line, LEX_ERRORS[-token]);
+            fprintf(stderr, "CHYBA na radku %d : %s\n", line, LEX_ERRORS[(-token)%100]);
         str_clean(&data);
     }
 

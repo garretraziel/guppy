@@ -470,7 +470,7 @@ int literal_identifier_list_a()
         x = literal_identifier_list_z();
         if(x < 0)
             return 0;
-        return literal_identifier_list_a;
+        return literal_identifier_list_a();
     }
     else
         return 1;

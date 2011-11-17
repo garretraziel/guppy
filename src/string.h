@@ -24,6 +24,9 @@ typedef struct {
 /// Vytvori novou instanci stringu
 int str_new(string *, int);
 
+/// Vytvori novy string a rovnou do nej ulozi nejaky pocatecni obsah
+int str_init(string *, const char *);
+
 /// Prida na konec stringu znak
 int str_push(string *, char);
 
@@ -32,5 +35,13 @@ void str_free(string *);
 
 /// Zkrati string na delku 0
 void str_clean(string *);
+
+/// Vrati substring ze stringu podle zadanych indexu
+/// POZOR: ocekava indexy v C, pole od 0. o prevod do
+/// toho pseudocislovani by se mela postarat wrapper funkce
+char *substr_c(char *, int, int, int);
+
+/// Vrati substring ze stringu podle zadanych indexu
+char *substr(string *, int, int);
 
 #endif

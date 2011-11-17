@@ -7,7 +7,7 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
 SOURCE_FILES=guppy.c string.c lexical.c parser.c
 
-build: dep $(PROJECT) lexical-test quicksort-test knuth-test parser-test
+build: dep $(PROJECT) lexical-test quicksort-test knuth-test substr-test parser-test
 
 rebuild: clean build
 
@@ -25,6 +25,8 @@ knuth-test: ial.o string.o knuth-test.o
 
 parser-test: ial.o string.o lexical.o parser.o parser-test.o
 	$(CC) $(CFLAGS) $^ -o $@
+substr-test: ial.o string.o substr-test.o
+	$(CC) $(CFLAGS) $^ -o $@
 
 # automaticke generovani zavislosti
 dep: 
@@ -33,7 +35,7 @@ dep:
 -include dep.list
 
 clean:
-	rm -f *.o $(PROJECT) lexical-test quicksort-test knuth-test parser-test dep.list
+	rm -f *.o $(PROJECT) lexical-test quicksort-test knuth-test parser-test substr-test dep.list
 
 zip:
 	tar czf $(LOGIN).tgz *.c *.h rozdeleni Makefile

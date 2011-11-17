@@ -9,6 +9,8 @@ SOURCE_FILES=guppy.c string.c lexical.c
 
 build: dep $(PROJECT) lexical-test quicksort-test knuth-test
 
+rebuild: clean build
+
 $(PROJECT): guppy.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
 

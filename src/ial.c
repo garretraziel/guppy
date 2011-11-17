@@ -88,9 +88,9 @@ int *find_prefix(char *str, int len)
     tabulka[0] = -1;
 
     for (int k = 1; k<len; k++) {
-	int r = tabulka[k-1];
-	while (r>-1 && str[r]!=str[k-1]) r = tabulka[r];
-	tabulka[k] = r+1;
+        int r = tabulka[k-1];
+        while (r>-1 && str[r]!=str[k-1]) r = tabulka[r];
+        tabulka[k] = r+1;
     }
 
     return tabulka;
@@ -116,11 +116,11 @@ int find_kmp(char *str1, int len1, char *str2, int len2)
     int j = 0;
 
     while (i<len1 && j<len2) {
-	if ((j == -1) || (str1[i] == str2[j])) {
-	    i++; j++;
-	} else {
-	    j = tabulka[j];
-	}
+        if ((j == -1) || (str1[i] == str2[j])) {
+            i++; j++;
+        } else {
+            j = tabulka[j];
+        }
     }
 
     free(tabulka);
@@ -139,12 +139,12 @@ int find_kmp(char *str1, int len1, char *str2, int len2)
  */
 int find(string *str1, string *str2)
 {
-  if (strcmp(str2->str,"") == 0) return 0;
-  if (strcmp(str1->str,"") == 0) return -1; //TODO: vraci false
-  int pozice = find_kmp(str1->str, str1->length, str2->str, str2->length);
-  if (pozice == -1) return -1; //TODO: vraci false
-  else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
-  else return pozice+1;
+    if (str2->length == 0) return 0;
+    if (str1->length == 0) return -1; //TODO: vraci false
+    int pozice = find_kmp(str1->str, str1->length, str2->str, str2->length);
+    if (pozice == -1) return -1; //TODO: vraci false
+    else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
+    else return pozice+1;
 }
 
 //FIXME: nasledujici funkce je deprecated. az si budu jist s p. JMH, smazu to
@@ -153,21 +153,21 @@ int *find_prefix2(char *str, int len)
     int *tabulka = malloc(sizeof(int)*(len+1)); /// pro zjednoduseni nechame misto i pro '\0'
 
     if (tabulka == NULL) {
-	return NULL;
+        return NULL;
     }
     
     int i = 0;
     int j = tabulka[0] = -1;
     
     while (i < len) {
-	while (j > -1 && str[i] != str[j])
-	    j = tabulka[j];
-	i++;
-	j++;
-	if (str[i] == str[j])
-	    tabulka[i] = tabulka[j];
-	else
-	    tabulka[i] = j;
+        while (j > -1 && str[i] != str[j])
+            j = tabulka[j];
+        i++;
+        j++;
+        if (str[i] == str[j])
+            tabulka[i] = tabulka[j];
+        else
+            tabulka[i] = j;
     }
     
     return tabulka;
@@ -184,14 +184,14 @@ int find_kmp2(char *str1, int len1, char *str2, int len2)
     int j = 0;
     
     while (j < len1) {
-	while (i > -1 && str2[i] != str1[j])
-	    i = tabulka[i];
-	i++;
-	j++;
-	if (i >= len2) {
-	    free(tabulka);
-	    return j-i;
-	}
+        while (i > -1 && str2[i] != str1[j])
+            i = tabulka[i];
+        i++;
+        j++;
+        if (i >= len2) {
+            free(tabulka);
+            return j-i;
+        }
     }
     
     free(tabulka);
@@ -201,11 +201,11 @@ int find_kmp2(char *str1, int len1, char *str2, int len2)
 //FIXME: nasledujici funkce je deprecated. az si budu jist s p. JMH, smazu to
 int find2(string *str1, string *str2)
 {
-  if (strcmp(str2->str,"") == 0) return 0;
-  if (strcmp(str1->str,"") == 0) return -1; //TODO: vraci false
-  int pozice = find_kmp2(str1->str, str1->length, str2->str, str2->length);
-  if (pozice == -1) return -1; //TODO: vraci false
-  else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
-  else return pozice+1;
+    if (str2->length == 0) return 0;
+    if (str1->length == 0) return -1; //TODO: vraci false
+    int pozice = find_kmp2(str1->str, str1->length, str2->str, str2->length);
+    if (pozice == -1) return -1; //TODO: vraci false
+    else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
+    else return pozice+1;
 }
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

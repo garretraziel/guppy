@@ -24,9 +24,9 @@ const char HELP_MSG[] =
 
 // Chybove zpravy
 const char *GEN_ERRORS[] = {
-    [(-ERROR_GEN_PARAM) % 100] = "Chybny pocet parametru.\n\n",
-    [(-ERROR_GEN_FILE) % 100] = "Nepodarilo se otevrit soubor %s\n",
-    [(-ERROR_GEN_MEM) % 100] = "Nedostatek pameti\n",
+    [(-ERROR_GEN_PARAM) % 100] = "Chybny pocet parametru.\n",
+    [(-ERROR_GEN_FILE) % 100] = "Nepodarilo se otevrit soubor %s",
+    [(-ERROR_GEN_MEM) % 100] = "Nedostatek pameti",
 };
 
 
@@ -45,7 +45,12 @@ void Error(int errcode, ...)
 {
     va_list args;
     va_start(args, errcode);
-    vfprintf(stderr, ERROR_MSG[(-errcode) / 100][(-errcode) % 100], args);
+    fprintf(stderr, "CHYBA: ");
+    int type = (-errcode) / 100;
+    if(type < ERROR_GEN)
+        fprintf(stderr, "Na radku %d: ", line);
+    vfprintf(stderr, ERROR_MSG[type][(-errcode) % 100], args);
+    fprintf(stderr, "\n");
     va_end(args);
 }
 
@@ -63,6 +68,13 @@ int main(int argc, char *argv[])
         Error(ERROR_GEN_FILE, argv[1]);
         return ERROR_GEN;
     }
+
+    int x = program(file);
+    if(x < 0) {
+        Error(x);
+        return (-x) / 100;
+    }
+
     fclose(file);
 
     return 0;

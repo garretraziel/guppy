@@ -57,30 +57,45 @@ int literal();
 int statement_seq();
 int statement();
 int assign_z();
+int literal_identifier_list();
+int literal_identifier_list_a();
+int literal_identifier_list_z();
+
 int expression_seq();
+int expression_seq_a();
 int expression_seq_z();
 int expression();
 int operator();
 
 
-// program -> definice_funkci ; EOF
+// P -> DF DFS ; EOF
 int program(FILE *in)
 {
     input = in;
     int x;
-    str_new(&str, STR_INIT_LEN); // TODO kontrolovat
+    if(str_new(&str, STR_INIT_LEN) == 0)
+        return 0; // TODO generovat chybu
 
-    // definice funkci
+    // nacteni uplne prvniho tokenu
+    // to ma byt predem, ale to by musel byt token uplne globalni
+    token = get_token(input, &str);
+
+    // prvni funkce
+    if(token == FUNCTION)
+        x = function();
+    if(x < 0)
+        return x;
+
+    // ostatni funkce
     x = functions_seq();
     if(x < 0)
         return x;
 
     // strednik za posledni funkci
-    token = get_token(input, &str);
     if(token != SEMICOLON)
         return (token < 0) ? token : ERROR_SYN_X_SMCLN;
 
-    // EOF
+    // EOF (ukoncivac dolar)
     token = get_token(input, &str);
     if(token != NOTHING)
         return (token < 0) ? token : ERROR_SYN_X_EOF;
@@ -88,134 +103,153 @@ int program(FILE *in)
     return 1;
 }
 
-//
+// DFS -> DF DFS
+// DFS -> epsilon
 int functions_seq()
 {
     int x;
-    // funkce
-    x = function();
-    if(x < 0)
-        return x;
 
-    // definice_funkci_z, bud dalsi funkce nebo cokoliv dalsiho FIXME
-    token = get_token(input, &str);
-    unget_token(token);
-    if(token == FUNCTION)
-        return functions_seq();
-    else
-       return 1;
+    // funkce
+    if(token == FUNCTION) {
+        x = function();
+        if(x < 0)
+            return x;
+        x = functions_seq();
+        return x;
+    }
+    else // epsilon
+        return 1;
 }
 
-//
+// DF -> function id ( FPS ) SDS SPS end
 int function()
 {
     int x;
     // function
-    token = get_token(input, &str);
     if(token != FUNCTION)
         return (token < 0) ? token : ERROR_SYN_X_FUNC;
-    // identifier
     token = get_token(input, &str);
+
+    // identifier
     if(token != IDENTIFIER)
         return (token < 0) ? token : ERROR_SYN_X_IDENT;
-    // left bracket
     token = get_token(input, &str);
+
+    // left bracket
     if(token != LBRAC)
         return (token < 0) ? token : ERROR_SYN_X_LBRC;
+    token = get_token(input, &str);
+
     // formal parametr seq
     x = formal_parametr_seq();
     if(x < 0)
         return x;
+
     // local declaration seq
     x = local_declaration_seq();
     if(x < 0)
         return x;
+
     // statement seq
     x = statement_seq();
     if(x < 0)
         return x;
+
+    // end
+    if(token != END)
+        return (token < 0) ? token : ERROR_SYN_X_END;
+    token = get_token(input, &str);
+
     return 1;
 }
 
-//
+// FPS -> id FPz
+// epsilon
 int formal_parametr_seq()
 {
-    token = get_token(input, &str);
-    switch(token) {
-        case RBRAC:
-            return 1;
-        case IDENTIFIER:
-            // strcit si ho nekam
-            return formal_parametr_seq_z();
-        default:
-            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+    // identifikator
+    if(token == IDENTIFIER) {
+        token = get_token(input, &str);
+        return formal_parametr_seq_z();
     }
+    else // epsilon
+        return 1;
 }
 
-//
+// FPz -> , id FPz
+// FPz -> epsilon
 int formal_parametr_seq_z()
 {
-    token = get_token(input, &str);
-    switch(token) {
-        case RBRAC:
-            return 1;
-        case COMMA:
-            // identifikator
-            token = get_token(input, &str);
-            if(token != IDENTIFIER)
-                return (token < 0) ? token : ERROR_SYN_X_IDENT;
-            return formal_parametr_seq_z();
-        default:
-            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+    // carka
+    if(token == COMMA) {
+        token = get_token(input, &str);
+        // identifikator
+        if(token != IDENTIFIER)
+            return (token < 0) ? token : ERROR_SYN_X_IDENT;
+        token = get_token(input, &str);
+        return formal_parametr_seq_z();
     }
+    else // epsilon
+        return 1;
 }
 
+// SDS -> local id SDSz SDS
+// SDS -> epsilon
 int local_declaration_seq()
 {
     int x;
-    // nic nebo local
-    token = get_token(input, &str);
-    if(token != LOCAL) {
-        unget_token(token);
-        return 1;
+    // local
+    if(token == LOCAL) {
+        token = get_token(input, &str);
+        // identifier
+        if(token != IDENTIFIER)
+            return (token < 0) ? token : ERROR_SYN_X_IDENT;
+        token = get_token(input, &str);
+        // local declaration z
+        x = local_declaration_z();
+        if(x < 0)
+            return x;
+        // local declaration seq
+        return local_declaration_seq();
     }
-    // identifier
-    token = get_token(input, &str);
-    if(token != IDENTIFIER)
-        return (token < 0) ? token : ERROR_SYN_X_IDENT;
-    // local declaration z
-    x = local_declaration_z();
-    if(x < 0)
-        return x;
-    // local declaration seq
-    return local_declaration_seq();
+    else // epsilon
+        return 1;
 }
 
+// SDSz -> = LIT ;
+// SDSz -> ;
 int local_declaration_z()
 {
     int x;
-    // strednik nebo rovnitko
-    token = get_token(input, &str);
-    if(token == SEMICOLON)
-        // ulozit na stack s nil?
+    // strednik
+    if(token == SEMICOLON) {
+        token = get_token(input, &str);
         return 1;
+    }
+    // rovnitko
     else if(token == ASSIGN) {
+        token = get_token(input, &str);
+        // literal
         x = literal();
         if(x < 0)
             return x;
         // strednik
-        token = get_token(input, &str);
         if(token != SEMICOLON)
             return (token < 0) ? token : ERROR_SYN_X_SMCLN;
+        token = get_token(input, &str);
         return 1;
     }
     else
         return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
 }
 
+// LIT -> num
+// LIT -> str
+// LIT -> nil
+// LIT -> true
+// LIT -> false
 int literal()
 {
-    token = get_token(input, &str);
     switch(token) {
         case NUMBER:
         case STRING:
@@ -223,92 +257,121 @@ int literal()
         case TRUE:
         case FALSE:
             // ulozit na stack s hodnotou
+            token = get_token(input, &str);
             return 1;
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
 }
 
+// SPS -> S ; SPS
+// SPS -> epsilon
 int statement_seq()
 {
     int x;
-    token = get_token(input, &str);
-    // bud end nebo prikaz
-    if(token == END)
-        // konec bloku
-        return 1;
-    else {
-        unget_token(token);
-        // statement
-        x = statement();
-        if(x < 0)
-            return x;
-        // strednik
-        token = get_token(input, &str);
-        if(token != SEMICOLON)
-            return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-        // statement_seq
-        return statement_seq();
+    switch(token) {
+        case IDENTIFIER:
+        case WRITE:
+        case IF:
+        case WHILE:
+        case RETURN:
+            // statement
+            x = statement();
+            if(x < 0)
+                return x;
+            // strednik
+            if(token != SEMICOLON)
+                return (token < 0) ? token : ERROR_SYN_X_SMCLN;
+            token = get_token(input, &str);
+            // statement_seq
+            return statement_seq();
+            break;
+        default:
+            return 1;
+            break;
     }
 }
 
+// S -> id = Az
+// S -> write ( EL )
+// S -> if E then SPS else SPS end
+// S -> while E do SPS end
+// S -> ret E
 int statement()
 {
     int x;
-    token = get_token(input, &str);
     switch(token) {
         case IDENTIFIER:
-            // rovnitko
             token = get_token(input, &str);
+            // rovnitko
             if(token != ASSIGN)
                 return (token < 0) ? token : ERROR_SYN_X_ASGN;
+            token = get_token(input, &str);
             // assign_z
             return assign_z();
 
         case WRITE:
-            // left bracket
             token = get_token(input, &str);
+            // left bracket
             if(token != LBRAC)
                 return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            token = get_token(input, &str);
             // expression list
             x = expression_seq();
-            return x;
+            if(x < 0)
+                return x;
+            // right bracket
+            if(token != LBRAC)
+                return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            token = get_token(input, &str);
+            return 1;
 
         case IF:
+            token = get_token(input, &str);
             // vyraz
             x = expression();
             if(x < 0)
                 return x;
             // then
-            token = get_token(input, &str);
             if(token != THEN)
                 return (token < 0) ? token : ERROR_SYN_X_THEN;
-            // sekvence bez end FIXME
+            token = get_token(input, &str);
+            // prikazy
             x = statement_seq();
             if(x < 0)
                 return x;
             // else
-            token = get_token(input, &str);
             if(token != ELSE)
                 return (token < 0) ? token : ERROR_SYN_X_ELSE;
+            token = get_token(input, &str);
             // sekvence prikazu
             x = statement_seq();
-            return x;
+            // end
+            if(token != END)
+                return (token < 0) ? token : ERROR_SYN_X_END;
+            token = get_token(input, &str);
+            return 1;
 
         case WHILE:
+            token = get_token(input, &str);
             // vyraz
             x = expression();
             if(x < 0)
                 return x;
             // do
-            token = get_token(input, &str);
             if(token != DO)
                 return (token < 0) ? token : ERROR_SYN_X_DO;
+            token = get_token(input, &str);
             // sekvence prikazu
             x = statement_seq();
-            return x;
+            // end
+            if(token != END)
+                return (token < 0) ? token : ERROR_SYN_X_END;
+            token = get_token(input, &str);
+            return 1;
 
         case RETURN:
+            token = get_token(input, &str);
             // vyraz
             x = expression();
             return x;
@@ -319,24 +382,44 @@ int statement()
     }
 }
 
-// TODO jeste chybi parametry funkci nejak osefovat
-// a dokoncit co je dolu
-
+// Az -> read ( LIT )
+// Az -> E // TODO
+// Az -> id ( LIL )
 int assign_z()
 {
-    token = get_token(input, &str);
+    int x;
     // read
     if(token == READ) {
+        token = get_token(input, &str);
         // leva zavorka
-        // parametry
+        if(token != LBRAC)
+            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+        token = get_token(input, &str);
+        // jeden parametr (string nebo cislo) FIXME
+        if(token != STRING && token != NUMBER)
+            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+        token = get_token(input, &str);
         // prava zavorka
+        if(token != RBRAC)
+            return (token < 0) ? token : ERROR_SYN_X_RBRC;
+        token = get_token(input, &str);
         return 1;
     }
     // volani funkce
     else if(token == IDENTIFIER) {
+        token = get_token(input, &str);
         // leva zavorka
+        if(token != LBRAC)
+            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+        token = get_token(input, &str);
         // parametry
+        x = literal_identifier_list(); // TODO
+        if(x < 0)
+            return x;
         // prava zavorka
+        if(token != RBRAC)
+            return (token < 0) ? token : ERROR_SYN_X_RBRC;
+        token = get_token(input, &str);
         return 1;
     }
     // vyraz
@@ -344,7 +427,72 @@ int assign_z()
         return expression();
 }
 
-// to je asi jen pro write
+// LIL -> LIT LILa
+// LIL -> id LILa
+// LIL -> epsilon
+int literal_identifier_list()
+{
+    int x;
+    switch(token) {
+        // literal
+        case NUMBER:
+        case STRING:
+        case NIL:
+        case TRUE:
+        case FALSE:
+            x = literal();
+            if(x < 0)
+                return x;
+            return literal_identifier_list_a();
+        case IDENTIFIER:
+            token = get_token(input, &str);
+            return literal_identifier_list_a();
+        default:
+            return 1;
+    }
+
+}
+
+// LILa -> , LILz LILa
+// LILa -> epsilon
+int literal_identifier_list_a()
+{
+    int x;
+    if(token == COMMA) {
+        token = get_token(input, &str);
+        x = literal_identifier_list_z();
+        if(x < 0)
+            return 0;
+        return literal_identifier_list_a;
+    }
+    else
+        return 1;
+}
+
+// LILz -> LIT
+// LILz -> id
+int literal_identifier_list_z()
+{
+    switch(token) {
+        case NUMBER:
+        case STRING:
+        case NIL:
+        case TRUE:
+        case FALSE:
+            return literal();
+        case IDENTIFIER:
+            token = get_token(input, &str);
+            return 1;
+            break;
+        default:
+            return 1;
+    }
+
+}
+
+// // // // // // // // // // // // // // // // // // // // // // // // //
+// Co je dal uz nefunguje ani zatim nema:
+
 int expression_seq()
 {
     int x;
@@ -355,6 +503,11 @@ int expression_seq()
     if(x < 0)
         return x;
     return expression_seq_z();
+}
+
+int expression_seq_a()
+{
+    return 1;
 }
 
 int expression_seq_z()
@@ -376,9 +529,8 @@ int expression_seq_z()
 // tohle je jen nouzovka, preskakuje to
 int expression()
 {
-    // tohle vubec netusim, to se resi jinak
     // zatim se proste vyraz preskoci a bude se predpokladat jeho spravnost
-    token = get_token(input, &str);
+    // nesmi v nem byt zavorky
     switch(token) {
         // literal
         case NUMBER:
@@ -388,7 +540,7 @@ int expression()
         case TRUE:
         // ident
         case IDENTIFIER:
-        // zavorky tam nebudou, zatim, zraly by mi konce funkci
+        // zavorky 
 //        case LBRAC:
 //        case RBRAC:
         // operatory
@@ -404,17 +556,16 @@ int expression()
         case GREAT_EQ:
         case EQUAL:
         case NOT_EQUAL:
+            token = get_token(input, &str);
             return expression();
             break;
         default:
-            unget_token(token);
             return 1;
     }
 }
 
 int operator()
 {
-    token = get_token(input, &str);
     switch(token) {
         case PLUS:
         case MINUS:
@@ -428,6 +579,7 @@ int operator()
         case GREAT_EQ:
         case EQUAL:
         case NOT_EQUAL:
+            token = get_token(input, &str);
             return 1;
         default:
             return (token < 0) ? token : ERROR_SYN_X_OPRTR;

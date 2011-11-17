@@ -102,6 +102,7 @@ int program(FILE *in)
     if(token != NOTHING)
         return (token < 0) ? token : ERROR_SYN_X_EOF;
 
+    str_free(&str);
     return 1;
 }
 

@@ -59,10 +59,6 @@ const char *LEX_ERRORS[] = {
 int line = 1;
 
 
-// pro potreby unget_token
-static int buffer = NOTHING;
-static int buffer_valid = 0; // false
-
 /** Funkce kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
  *
  * vraci jeho pripadny kod, nebo IDENTIFIER pokud neni
@@ -131,12 +127,6 @@ int get_token(FILE *input, string *value)
     static int state = FSM_READ;
 
     int num;
-
-    // vraceni tokenu z bufferu
-    if(buffer_valid) {
-        buffer_valid = 0;
-        return buffer;
-    }
 
     // buffer se musi vyprazdnit
     str_clean(value);
@@ -468,19 +458,4 @@ int get_token(FILE *input, string *value)
 
     assert(0);
     return NOTHING;
-}
-
-
-/** Vrati token zpet na vstup
- *
- * vzdy se smi vratit jen jeden
- * nesmi se znicit obsah nactenych dat, ty se ukladat nebudou
- */
-int unget_token(int token)
-{
-    if(buffer_valid)
-        return 0; 
-    buffer_valid = 1;
-    buffer = token;
-    return 1;
 }

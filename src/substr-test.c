@@ -4,123 +4,56 @@
 #include "ial.h"
 #include "string.h"
 
+
+void substr_test(string str, char*str2, int from, int to, const char *expect, int len)
+{
+    char *vysledek, *vysledek2;
+
+    vysledek = substr(&str, from, to);
+    vysledek2 = substr_c(str2, len, (from<0)?from:(from-1), (to<0)?to:(to-1));
+
+    printf("Retezec od %d do %d vcetne\n"
+           " melo by byt \"%s\" \n"
+           " vyslo       \"%s\" \n"
+           " a taky      \"%s\" \n", from, to, expect, vysledek, vysledek2);
+    free(vysledek);
+    free(vysledek2);
+}
+
+
 int main(void)
 {
-    char *vysledek;
 
     string str;
     str_init(&str, "Hello, world!");
     char *str2 = "Hello, world!";
     int len = strlen(str2);
 
-    char *vysledek2;
-    
-
     printf("Pracuji se retezcem: \"%s\"\n",str.str);
 
-    vysledek = substr(&str, 1, 6);
-    vysledek2 = substr_c(str2, len, 0, 5);
-
-    printf("Retezec od 1 do 6 vcetne, melo by byt \"Hello,\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 8, 12);
-    vysledek2 = substr_c(str2, len, 7, 11);
-
-    printf("Retezec od 8 do 12 vcetne, melo by byt \"world\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 1, 13);
-    vysledek2 = substr_c(str2, len, 0, 12);
-
-    printf("Retezec od 1 do 13 vcetne, melo by byt \"Hello, world!\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 1, 20);
-    vysledek2 = substr_c(str2, len, 0, 20);
-
-    printf("Retezec od 1 do 20 vcetne, melo by byt \"Hello, world!\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, -6, -1);
-    vysledek2 = substr_c(str2, len, -6, -1);
-
-    printf("Retezec od -6 do -1 vcetne, melo by byt \"world!\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 5, 4);
-    vysledek2 = substr_c(str2, len, 5, 4);
-
-    printf("Retezec od 5 do 4 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, -4, -5);
-    vysledek2 = substr_c(str2, len, -4, -5);
-
-    printf("Retezec od -4 do -5 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, -1, 3);
-    vysledek2 = substr_c(str2, len, -1, 3);
-
-    printf("Retezec od -1 do 3 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 10, -6);
-    vysledek2 = substr_c(str2, len, 10, -6);
-
-    printf("Retezec od 10 do -6 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
+    substr_test(str, str2, 1, 6, "Hello,", len);
+    substr_test(str, str2, 8, 12, "world", len);
+    substr_test(str, str2, 1, 13, "Hello, world!", len);
+    substr_test(str, str2, 1, 20, "Hello, world!", len);
+    substr_test(str, str2, -6, -1, "world!", len);
+    substr_test(str, str2, 5, 4, "", len);
+    substr_test(str, str2, -4, -5, "", len);
+    substr_test(str, str2, -1, 3, "", len);
+    substr_test(str, str2, 10, -6, "", len);
 
     str_free(&str);
     str_init(&str,"abc");
 
     str2 = "abc";
     len = strlen(str2);
+    
+    printf("\nPracuji se retezcem: \"%s\"\n",str.str);
 
-    vysledek = substr(&str, -4, -4);
-    vysledek2 = substr_c(str2, len, -4, -4);
-
-    printf("Retezec od -4 do -4 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, -3, -3);
-    vysledek2 = substr_c(str2, len, -3, -3);
-
-    printf("Retezec od -3 do -3 vcetne, melo by byt \"a\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, -4, -3);
-    vysledek2 = substr_c(str2, len, -4, -3);
-
-    printf("Retezec od -4 do -3 vcetne, melo by byt \"a\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 3, 6);
-    vysledek2 = substr_c(str2, len, 2, 5);
-
-    printf("Retezec od 3 do 6 vcetne, melo by byt \"c\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
-
-    vysledek = substr(&str, 4, 4);
-    vysledek2 = substr_c(str2, len, 3, 3);
-
-    printf("Retezec od 4 do 4 vcetne, melo by byt \"\": %s a %s\n",  vysledek, vysledek2);
-    free(vysledek);
-    free(vysledek2);
+    substr_test(str, str2, -4, -4, "", len);
+    substr_test(str, str2, -3, -3, "a", len);
+    substr_test(str, str2, -4, -3, "a", len);
+    substr_test(str, str2, 3, 6, "c", len);
+    substr_test(str, str2, 4, 4, "", len);
 
     str_free(&str);
 

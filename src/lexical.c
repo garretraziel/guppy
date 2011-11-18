@@ -45,7 +45,6 @@ enum {
     FSM_READ,
     FSM_START,
     FSM_STRING,
-    FSM_TERMINATE,
 } TFSMStates;
 
 const char *LEX_ERRORS[] = {
@@ -492,9 +491,13 @@ int get_token(FILE *input, string *value)
                     return ERROR_LEX_UX_CHAR;
                 }
                 break;
-        }
-    }
 
-    assert(0);
-    return NOTHING;
+#ifdef DEBUG
+            // konecny automat by nemel vypadnout do jineho stavu
+            default:
+                assert(0);
+                break;
+#endif
+        } /* switch */
+    } /* for */
 }

@@ -38,8 +38,8 @@ int str_init(string *str, const char *data)
     if(str->str == NULL)
         return 0;
     strcpy(str->str, data);
-    str->alloc = strlen(str->str) + 1;
     str->length = strlen(str->str);
+    str->alloc = str->length + 1;
     return 1;
 }
 

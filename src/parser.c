@@ -326,8 +326,8 @@ int statement()
             if(x < 0)
                 return x;
             // right bracket
-            if(token != LBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            if(token != RBRAC)
+                return (token < 0) ? token : ERROR_SYN_X_RBRC;
             token = get_token(input, &str);
             return 1;
 

@@ -4,28 +4,22 @@ PROJECT=guppy
 CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
 
+.PHONY: rebuild build dep clean zip
 
-SOURCE_FILES=guppy.c string.c lexical.c parser.c
+SOURCE_FILES=guppy.c string.c lexical.c parser.c ial.c
 
-build: dep $(PROJECT) lexical-test quicksort-test knuth-test substr-test parser-test
+build: dep $(PROJECT) knuth-test parser-test
 
 rebuild: clean build
 
 $(PROJECT): guppy.o string.o lexical.o parser.o
 	$(CC) $(CFLAGS) $(SOURCE_FILES) -o $@
 
-lexical-test: lexical.o lexical-test.o string.o
-	$(CC) $(CFLAGS) $^ -o $@
-
-quicksort-test: ial.o string.o quicksort-test.o
-	$(CC) $(CFLAGS) $^ -o $@
 
 knuth-test: ial.o string.o knuth-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 parser-test: ial.o string.o lexical.o parser.o parser-test.o
-	$(CC) $(CFLAGS) $^ -o $@
-substr-test: ial.o string.o substr-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 # automaticke generovani zavislosti

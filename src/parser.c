@@ -351,6 +351,8 @@ int statement()
             token = get_token(input, &str);
             // sekvence prikazu
             x = statement_seq();
+            if(x < 0)
+                return x;
             // end
             if(token != END)
                 return (token < 0) ? token : ERROR_SYN_X_END;
@@ -369,6 +371,8 @@ int statement()
             token = get_token(input, &str);
             // sekvence prikazu
             x = statement_seq();
+            if(x < 0)
+                return x;
             // end
             if(token != END)
                 return (token < 0) ? token : ERROR_SYN_X_END;

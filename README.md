@@ -17,7 +17,7 @@ Zadání *link na wiki, pokud se to podaří vykrást*
 
 Git reference http://gitref.org/
 
-Pro Git http://knihy.nic.cz/files/nic/edice/scott\_chacon\_pro\_git.pdf
+Pro Git http://knihy.nic.cz/files/nic/edice/scott_chacon_pro_git.pdf
 
 
 Složení týmu

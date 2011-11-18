@@ -419,7 +419,8 @@ int assign_z()
         token = get_token(input, &str);
         // leva zavorka
         if(token != LBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+//            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            return (token < 0) ? token : expression();
         token = get_token(input, &str);
         // parametry
         x = literal_identifier_list(); // TODO

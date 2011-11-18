@@ -66,52 +66,91 @@ int line = 1;
  */
 int check_keyword(string *str)
 {
-    if(strcmp(str->str, "do") == 0)
-        return DO;
-    if(strcmp(str->str, "else") == 0)
-        return ELSE;
-    if(strcmp(str->str, "end") == 0)
-        return END;
-    if(strcmp(str->str, "false") == 0)
-        return FALSE;
-    if(strcmp(str->str, "function") == 0)
-        return FUNCTION;
-    if(strcmp(str->str, "if") == 0)
-        return IF;
-    if(strcmp(str->str, "local") == 0)
-        return LOCAL;
-    if(strcmp(str->str, "nil") == 0)
-        return NIL;
-    if(strcmp(str->str, "read") == 0)
-        return READ;
-    if(strcmp(str->str, "return") == 0)
-        return RETURN;
-    if(strcmp(str->str, "then") == 0)
-        return THEN;
-    if(strcmp(str->str, "true") == 0)
-        return TRUE;
-    if(strcmp(str->str, "while") == 0)
-        return WHILE;
-    if(strcmp(str->str, "write") == 0)
-        return WRITE;
-    if(strcmp(str->str, "and") == 0)
-        return AND;
-    if(strcmp(str->str, "break") == 0)
-        return BREAK;
-    if(strcmp(str->str, "elseif") == 0)
-        return ELSEIF;
-    if(strcmp(str->str, "for") == 0)
-        return FOR;
-    if(strcmp(str->str, "in") == 0)
-        return IN;
-    if(strcmp(str->str, "not") == 0)
-        return NOT;
-    if(strcmp(str->str, "or") == 0)
-        return OR;
-    if(strcmp(str->str, "repeat") == 0)
-        return REPEAT;
-    if(strcmp(str->str, "until") == 0)
-        return UNTIL;
+    if(str->str[0] == 'a') {
+        if(strcmp(str->str, "and") == 0)
+            return AND;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'b') {
+        if(strcmp(str->str, "break") == 0)
+            return BREAK;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'd') {
+        if(strcmp(str->str, "do") == 0)
+            return DO;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'e') {
+        if(strcmp(str->str, "else") == 0)
+            return ELSE;
+        if(strcmp(str->str, "end") == 0)
+            return END;
+        if(strcmp(str->str, "elseif") == 0)
+            return ELSEIF;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'f') {
+        if(strcmp(str->str, "false") == 0)
+            return FALSE;
+        if(strcmp(str->str, "function") == 0)
+            return FUNCTION;
+        if(strcmp(str->str, "for") == 0)
+            return FOR;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'i') {
+        if(strcmp(str->str, "if") == 0)
+            return IF;
+        if(strcmp(str->str, "in") == 0)
+            return IN;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'l') {
+        if(strcmp(str->str, "local") == 0)
+            return LOCAL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'n') {
+        if(strcmp(str->str, "not") == 0)
+            return NOT;
+        if(strcmp(str->str, "nil") == 0)
+            return NIL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'o') {
+        if(strcmp(str->str, "or") == 0)
+            return OR;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'r') {
+        if(strcmp(str->str, "read") == 0)
+            return READ;
+        if(strcmp(str->str, "return") == 0)
+            return RETURN;
+        if(strcmp(str->str, "repeat") == 0)
+            return REPEAT;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 't') {
+        if(strcmp(str->str, "then") == 0)
+            return THEN;
+        if(strcmp(str->str, "true") == 0)
+            return TRUE;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'u') {
+        if(strcmp(str->str, "until") == 0)
+            return UNTIL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'w') {
+        if(strcmp(str->str, "while") == 0)
+            return WHILE;
+        if(strcmp(str->str, "write") == 0)
+            return WRITE;
+        return IDENTIFIER;
+    }
     return IDENTIFIER;
 }
 

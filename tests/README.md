@@ -19,5 +19,4 @@ Testovací sada. Bere soubory ze vstupní složky (defaultně ./src, jsou to pro
 Ostatní
 -------
 
-Viz [https://github.com/garretraziel/guppy/wiki/Automatick%C3%A9-testy](Wiki).
-
+Viz [Wiki](https://github.com/garretraziel/guppy/wiki/Automatické-testy).

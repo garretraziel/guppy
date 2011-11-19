@@ -23,13 +23,10 @@ int main(void)
 
     int x = program(stdin);
     
-    // predpoklada se, ze chyby jsou jen syntakticke
-    // lexikalni se testuji jinde
-    // semanticke jeste testovat neumim
-    if(x < 0)
+    if(x < 0) {
         Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);
+        return -x/100;
+    }
     
-    // casem se napise nejake to udelatko na vsechny chyby
-
     return 0;
 }

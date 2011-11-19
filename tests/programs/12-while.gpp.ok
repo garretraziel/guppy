@@ -1,0 +1,6 @@
+function main()
+    local x = 5;
+    while x > 0 do
+        write(x);
+    end;
+end;

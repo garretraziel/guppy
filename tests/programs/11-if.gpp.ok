@@ -1,0 +1,13 @@
+function main()
+    local x = 12;
+    if x > 3 then
+        write("true");
+    else
+        write("false");
+    end;
+    if x < 3 then
+        write("true");
+    else
+        write("false");
+    end;
+end;

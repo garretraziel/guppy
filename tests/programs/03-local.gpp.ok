@@ -1,0 +1,3 @@
+function main ()
+    local a = "hello world";
+end;

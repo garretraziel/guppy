@@ -18,6 +18,7 @@
 #include "lexical.h"
 #include "string.h"
 
+#define LNG_KEYWORD 8 /// udava delku nejdelsiho klicoveho slova, "function"
 
 /// Stavy konecneho automatu
 enum {
@@ -65,6 +66,8 @@ int line = 1;
  */
 int check_keyword(string *str)
 {
+    if(str->length > LNG_KEYWORD) return IDENTIFIER;
+    
     if(str->str[0] == 'a') {
         if(strcmp(str->str, "and") == 0)
             return AND;

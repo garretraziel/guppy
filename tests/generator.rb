@@ -20,18 +20,13 @@ private
     def function_
         "function #{identifier_} ( #{formal_parameters_} ) \n" +
           "#{locals_}" +
-          "#{statement_seq_}" +
-        "end\n"
+          "#{statement_seq_ 1}" +
+        "end\n\n"
     end
 
     def identifier_
-        i = ""
-        r = rand(27)
-        if r == 26
-            i += "_"
-        else
-            i += ('a'.ord + r).chr
-        end
+        # prvni znak musi byt takovy, aby to nahodou nevyslo na klicove slovo
+        i = "z"
         begin
             r = rand(37)
             if r > 26
@@ -77,20 +72,32 @@ private
         end
     end
 
-    def statement_seq_
+    def statement_seq_ n
+        return "" if n > 3
         case rand(5)
             when 0 then ""
-            else "  #{statement_};\n#{statement_seq_}"
+            else "#{statement_ n};\n#{statement_seq_ n}"
         end
     end
 
-    def statement_
+    def statement_ n
         case rand(10)
-            when 0..2 then "write(#{expression_list_})"
-            when 3 then "if #{expression_} then\n#{statement_seq_}\nelse\n#{statement_seq_}\n  end"
-            when 4 then "while #{expression_} do\n#{statement_seq_}\n  end"
-            when 5..7 then "return #{expression_}"
-            when 8..9 then "#{identifier_} = read(\"#{identifier_}\")"
+            when 0..2 then
+                "  "*n + "write(#{expression_list_})"
+            when 3 then
+                "  "*n + "if #{expression_} then\n" +
+                "#{statement_seq_ n+1}" +
+                "  "*n + "else\n" +
+                "#{statement_seq_ n+1}" +
+                "  "*n + "end"
+            when 4 then
+                "  "*n + "while #{expression_} do\n" +
+                "#{statement_seq_ n+1}\n" +
+                "  "*n + "end"
+            when 5..7 then
+                "  "*n + "return #{expression_}"
+            when 8..9 then
+                "  "*n + "#{identifier_} = read(\"#{identifier_}\")"
         end
     end
 

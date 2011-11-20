@@ -13,6 +13,7 @@
 
 #include "lexical.h"
 #include "parser.h"
+#include "guppy.h"
 
 #define STR_INIT_LEN 16
 
@@ -72,7 +73,7 @@ int program(FILE *in)
     input = in;
     int x;
     if(str_new(&str, STR_INIT_LEN) == 0)
-        return 0; // TODO generovat chybu
+        return ERROR_GEN_MEM;
 
     // nacteni uplne prvniho tokenu
     // to ma byt predem, ale to by musel byt token uplne globalni

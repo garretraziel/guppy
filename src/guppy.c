@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
     int x = program(file);
     if(x < 0) {
         Error(x);
+        fclose(file);
         return (-x) / 100;
     }
 

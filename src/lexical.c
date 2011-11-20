@@ -237,8 +237,10 @@ int get_token(FILE *input, string *value)
                 }
                 else if(c == EOF)
                     return NOTHING;
-                else
+                else {
+                    state = FSM_READ;
                     return ERROR_LEX_UX_CHAR;
+                }
                 break;
 
             case FSM_IDENTIFIER:

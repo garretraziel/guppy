@@ -80,25 +80,35 @@ int program(FILE *in)
     token = get_token(input, &str);
 
     // prvni funkce
-    if(token != FUNCTION)
+    if(token != FUNCTION) {
+        str_free(&str);
         return (token < 0) ? token : ERROR_SYN_X_FUNC;
+    }
     x = function();
-    if(x < 0)
+    if(x < 0) {
+        str_free(&str);
         return x;
+    }
 
     // ostatni funkce
     x = functions_seq();
-    if(x < 0)
+    if(x < 0) {
+        str_free(&str);
         return x;
+    }
 
     // strednik za posledni funkci
-    if(token != SEMICOLON)
+    if(token != SEMICOLON) {
+        str_free(&str);
         return (token < 0) ? token : ERROR_SYN_X_SMCLN;
+    }
 
     // EOF (ukoncivac dolar)
     token = get_token(input, &str);
-    if(token != NOTHING)
+    if(token != NOTHING) {
+        str_free(&str);
         return (token < 0) ? token : ERROR_SYN_X_EOF;
+    }
 
     str_free(&str);
     return 1;

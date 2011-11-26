@@ -20,7 +20,7 @@ fi
 
 
 # tyhle testy maji skoncit OK
-for file in programs/*ok; do
+for file in programs/0-syn-*; do
     echo "Testuji  $file "
     ./parser-test < $file && yell "\e[32mOK\e[0m" || yell "\e[31mFAIL\e[0m"
 done
@@ -28,7 +28,15 @@ done
 printf "* * * * * * * * * * * * \n"
 
 # tyhle naopak maji koncit chybou
-for file in programs/*fail; do
-    echo "Testuji  $file "
-    ./parser-test < $file && yell "\e[31mFAIL\e[0m" || yell "\e[32mOK\e[0m"
+# 1-2 protoze to jsou lexikalni a syntakticke chyby, to je jedine, co to pozna
+for i in {1..2}; do
+    for file in programs/$i-syn-*; do
+        echo "Testuji  $file "
+        ./parser-test < $file
+        if [ "$?" -eq "$i" ]; then
+            yell "\e[32mOK\e[0m"
+        else
+            yell "\e[31mFAIL\e[0m"
+        fi
+    done
 done

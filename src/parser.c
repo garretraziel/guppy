@@ -48,7 +48,6 @@ int literal_identifier_list_z();
 
 int expression_seq();
 int expression_seq_z();
-int expression();
 
 
 // P -> DF DFS ; EOF

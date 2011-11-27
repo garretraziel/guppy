@@ -4,6 +4,7 @@
 #include "parser.h"
 #include "lexical.h"
 #include "expr.c"
+#include "defines.h"
 
 void Error(const char *fmt, ...)
 {
@@ -14,16 +15,11 @@ void Error(const char *fmt, ...)
     va_end(args);
 }
 
-const char **ERROR_MSG[] = {
-    [1] = LEX_ERRORS,
-    [2] = SYN_ERRORS,
-    [3] = SEM_ERRORS,
-};
 
 int main(void)
 {
 
-    int x = expression(stdin);
+    int x = expression();
     
     if(x < 0) {
         Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);

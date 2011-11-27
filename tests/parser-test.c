@@ -4,6 +4,7 @@
 #include "parser.h"
 #include "lexical.h"
 #include "defines.h"
+#include "expr.h"
 
 void Error(const char *fmt, ...)
 {

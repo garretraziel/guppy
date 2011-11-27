@@ -20,7 +20,7 @@ extern int token;
 extern string str;
 extern FILE *input;
 
-int ParseExpr(void)
+int expression(void)
 {
     return 0;
 }

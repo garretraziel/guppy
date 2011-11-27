@@ -17,6 +17,6 @@ enum {
     EQ, // equal
 } VTabValues;
 
-int ParseExpr(void);
+int expression(void);
 
 #endif

@@ -14,6 +14,7 @@
 #include "lexical.h"
 #include "parser.h"
 #include "guppy.h"
+#include "expr.h"
 
 #define STR_INIT_LEN 16
 
@@ -524,7 +525,7 @@ int expression_seq()
     return expression_seq_z();
 }
 
-// ESz -> , E Elz
+// ESz -> , E ESz
 // ESz -> epsilon
 int expression_seq_z()
 {
@@ -539,42 +540,4 @@ int expression_seq_z()
     // epsilon
     else
         return 1;
-}
-
-// tohle je jen nouzovka, preskakuje to
-int expression()
-{
-    // zatim se proste vyraz preskoci a bude se predpokladat jeho spravnost
-    // nesmi v nem byt zavorky
-    switch(token) {
-        // literal
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case FALSE:
-        case TRUE:
-        // ident
-        case IDENTIFIER:
-        // zavorky 
-//        case LBRAC:
-//        case RBRAC:
-        // operatory
-        case PLUS:
-        case MINUS:
-        case DIV:
-        case MUL:
-        case POWER:
-        case STRCONCAT:
-        case LESS:
-        case GREAT:
-        case LESS_EQ:
-        case GREAT_EQ:
-        case EQUAL:
-        case NOT_EQUAL:
-            token = get_token(input, &str);
-            return expression();
-            break;
-        default:
-            return 1;
-    }
 }

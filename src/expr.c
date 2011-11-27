@@ -49,7 +49,13 @@ enum {
     E_AND,
     E_OR,
     E_NOT, */ // Tohle je do rozsireni, zatim nic
-    E_MARK, // Znacka zacatku handle ( < do zasobniku )
+
+    // Znacka zacatku handle ( < do zasobniku )
+    E_MARK, 
+
+    // jeste jsou potreba neterminaly
+    E_NET_E,
+    E_NET_P,
 } ESymbols;
 
 
@@ -193,44 +199,53 @@ int s_oobely_boo(Stack *stack, int t)
 
 int expression(void)
 {
+    int a, b;
     Stack stack;
-
-    // TODO: mozna je potreba prepocitavat token do podoby, jakou papa tohle
-    // protoze tohle potrebuje mit i reprezentaci < do stacku
-    // a taky neterminalu
-    // to si jeste uzijem
-
-    int a; // aktualni vstup
-    int b; // nejvrchnejsi terminal na zasobniku
-
     s_init(&stack);
 
     // Takhle to zacina, da se dolar na zasobnik
-    s_push(&stack, /* DOLAR */ 0);
+    s_push(&stack, E_DOLLAR);
 
-    // veliky cyklus
     do {
-        switch( /*tabulka[b][a]*/ 0 ) {
-            case '=':
+        a = tranlatetoken[token];  // aktualni vstup
+        b = stack.active->type;    // nejvrchnejsi terminal na zasobniku
+        switch( prec_table[b][a] ) {
+            case EQ:
+                // push(a)
                 s_push(&stack, a);
+                // precist novy token
                 get_token(input, &str);
-                a = token;
+                a = translatetoken[token];
                 break;
-            case '<':
-                // s_alter
+
+            case LT:
+                // b na zasobniku vymenit za b<
+                // push(a)
                 s_push(&stack, a);
+                // precist novy token
                 get_token(input, &str);
-                a = token;
+                a = translatetoken[token];
                 break;
-            case '>':
+
+            case GT:
                 // aplikace pravidla, tohle bude nejslozitejsi
+                // pokud je na zasobiku <y a existuje pravidlo r: A -> y
+                    // pak vymenit <y za A
+                    // a pouzit to pravidlo
+                // jinak chyba
                 break;
+
+            case OO:
             default:
+                // jinak chyba
                 return ERROR_SEM_X;
                 break;
-        }
-    } while( 0 && ! (a == /*DOLAR*/ 0 && b == /*DOLAR*/ 0) ); // tadlenc to ma koncit
+        } /* switch */
+    } while(a != E_DOLLAR || b != E_DOLLAR);
 
     // asi jeste poklidit zasobnicek
+    // TODO: pokud se vraci chyba, mel by se taky poklidit zasobnik atd.
+    // pouzijem goto at to stoji za to?
+
     return 0;
 }

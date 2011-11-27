@@ -21,6 +21,126 @@ extern string str;
 extern FILE *input;
 
 
+// Symboly se kterymi pracuje zasobnikovy automat
+enum {
+    E_POW,
+    E_MUL,
+    E_DIV,
+    E_PLUS,
+    E_MINUS,
+    E_STRCONCAT,
+    E_LESS,
+    E_GREAT,
+    E_LESSEQ,
+    E_GREATEQ,
+    E_NOTEQ,
+    E_EQUAL,
+    E_IDENT,
+    E_NUM,
+    E_STR,
+    E_BOOL,
+    E_NIL,
+    E_LBRAC,
+    E_RBRAC,
+    E_COMMA,
+    E_DOLLAR,
+/*    E_MOD,
+    E_STRLEN,
+    E_AND,
+    E_OR,
+    E_NOT, */ // Tohle je do rozsireni, zatim nic
+    E_MARK, // Znacka zacatku handle ( < do zasobniku )
+} ESymbols;
+
+
+// Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
+const int tranlatetoken[] = {
+// nektere tokeny primo odpovidaji symbolu do zasobniku
+    [NUMBER] = E_NUM,
+    [STRING] = E_STR,
+    [IDENTIFIER] = E_IDENT,
+    [PLUS] = E_PLUS,
+    [MINUS] = E_MINUS,
+    [DIV] = E_DIV,
+    [MUL] = E_MUL,
+    [POWER] = E_POW,
+    [STRCONCAT] = E_STRCONCAT,
+    [LESS] = E_LESS,
+    [GREAT] = E_GREAT,
+    [LESS_EQ] = E_LESSEQ,
+    [GREAT_EQ] = E_GREATEQ,
+    [EQUAL] = E_EQUAL,
+    [NOT_EQUAL] = E_NOTEQ,
+    [COMMA] = E_COMMA,
+    [LBRAC] = E_LBRAC,
+    [RBRAC] = E_RBRAC,    
+    [FALSE] = E_BOOL,
+    [TRUE] = E_BOOL,
+    [NIL] = E_NIL,
+// z ostatnich jsou ukoncovace
+    [NOTHING] = E_DOLLAR,
+    [ASSIGN] = E_DOLLAR,
+    [SEMICOLON] = E_DOLLAR,
+    [DO] = E_DOLLAR,
+    [ELSE] = E_DOLLAR,
+    [END] = E_DOLLAR,
+    [FUNCTION] = E_DOLLAR,
+    [IF] = E_DOLLAR,
+    [LOCAL] = E_DOLLAR,
+    [READ] = E_DOLLAR,
+    [RETURN] = E_DOLLAR,
+    [THEN] = E_DOLLAR,
+    [WHILE] = E_DOLLAR,
+    [WRITE] = E_DOLLAR,
+    [BREAK] = E_DOLLAR,
+    [ELSEIF] = E_DOLLAR,
+    [FOR] = E_DOLLAR,
+    [IN] = E_DOLLAR,
+    [REPEAT] = E_DOLLAR,
+    [UNTIL] = E_DOLLAR,
+    [AND] = E_DOLLAR, // TODO ROZSIRENI
+    [OR] = E_DOLLAR, // TODO ROZSIRENI
+    [NOT] = E_DOLLAR, // TODO ROZSIRENI
+    // strlen a modulo vubec nemaji token
+};
+
+
+// Precedencni tabulka
+int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka <
+       /*    ^   *   /   +   -   ..  <   >   <=  >=  ~=  ==  id  nu  st  bl  ni  (   )   ,   $   */
+/* ^    */ { OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO,  },
+/* ^    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
+/* *    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
+/* /    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
+/* +    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
+/* -    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
+/* ..   */ { LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, LT, OO, LT, OO, OO, LT, GT, GT, GT, },
+/* <    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* >    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* <=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* >=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* ~=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* ==   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* id   */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* num  */ { GT, GT, GT, GT, GT, OO, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* str  */ { OO, OO, OO, OO, OO, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* bool */ { OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* nil  */ { OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* (    */ { LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, OO, LT, OO, },
+/* )    */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, OO, GT, },
+/* ,    */ { LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, OO, GT, LT, GT, },
+/* $    */ { LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, OO, LT, OO, },
+/* %    */
+/* #    */
+/* and  */
+/* or   */
+/* not  */
+};
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 // Polozka zasobniku
 typedef struct node {
     int type;
@@ -70,6 +190,8 @@ int s_oobely_boo(Stack *stack, int t)
 
 
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 int expression(void)
 {
     Stack stack;
@@ -89,7 +211,7 @@ int expression(void)
 
     // veliky cyklus
     do {
-        switch( /*tabulka[a][b]*/ 0 ) {
+        switch( /*tabulka[b][a]*/ 0 ) {
             case '=':
                 s_push(&stack, a);
                 get_token(input, &str);

@@ -15,6 +15,7 @@ enum {
     LT, // less than
     GT, // greater than
     EQ, // equal
+    OO, // nic
 } VTabValues;
 
 int expression(void);

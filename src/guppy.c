@@ -14,30 +14,13 @@
 #include "guppy.h"
 #include "lexical.h"
 #include "parser.h"
+#include "defines.h"
 
 /// Zprava napovedy.
 const char HELP_MSG[] =
     "ifj11 - interpret jazyka ifj11\n"
     "pouziti:\n"
     "    ifj11 SOUBOR \n";
-
-
-// Chybove zpravy
-const char *GEN_ERRORS[] = {
-    [(-ERROR_GEN_PARAM) % 100] = "Chybny pocet parametru.\n",
-    [(-ERROR_GEN_FILE) % 100] = "Nepodarilo se otevrit soubor %s",
-    [(-ERROR_GEN_MEM) % 100] = "Nedostatek pameti",
-};
-
-
-// Pole vsech chybovych zprav
-const char **ERROR_MSG[] = {
-    [ERROR_LEX] = LEX_ERRORS,
-    [ERROR_SYN] = SYN_ERRORS,
-//    [ERROR_SEM] = SEM_ERRORS,  TODO: odkomentovat, az budou
-//    [ERROR_INT] = INT_ERRORS,  TODO: odkomentovat, az budou
-    [ERROR_GEN] = GEN_ERRORS,
-};
 
 
 /// Funkce vypisuje chybova hlaseni

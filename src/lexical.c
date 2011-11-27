@@ -17,6 +17,7 @@
 #include "guppy.h"
 #include "lexical.h"
 #include "string.h"
+#include "defines.h"
 
 #define LNG_KEYWORD 8 /// udava delku nejdelsiho klicoveho slova, "function"
 
@@ -47,13 +48,6 @@ enum {
     FSM_START,
     FSM_STRING,
 } TFSMStates;
-
-const char *LEX_ERRORS[] = {
-    [NOTHING] = "NULL",
-    [(-ERROR_LEX_NUMBER) % 100] = "Neplatny ciselny literal",
-    [(-ERROR_LEX_UX_CHAR) % 100] = "Neocekavany znak",
-    [(-ERROR_LEX_ESC_SEC) % 100] = "Neplatna escape sekvence v retezci",
-};
 
 // globalni pocitadlo radku
 int line = 1;

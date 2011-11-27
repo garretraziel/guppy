@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "lexical.h"
+#include "defines.h"
 
 void Error(const char *fmt, ...)
 {
@@ -12,11 +13,6 @@ void Error(const char *fmt, ...)
     vfprintf(stderr, fmt, args);
     va_end(args);
 }
-
-const char **ERROR_MSG[] = {
-    [1] = LEX_ERRORS,
-    [2] = SYN_ERRORS,
-};
 
 int main(void)
 {

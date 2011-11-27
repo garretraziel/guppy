@@ -14,6 +14,7 @@
 #include "lexical.h"
 #include "parser.h"
 #include "guppy.h"
+#include "defines.h"
 
 #define STR_INIT_LEN 16
 
@@ -22,24 +23,6 @@
 
 // TODO: ono to nepozna, ze je konec souboru driv nez ma
 //  povazuje to za neocekavany token
-
-// Chybova hlseni syntaktickych chyb
-const char *SYN_ERRORS[] = {
-    [0] = "<null>",
-    [(-ERROR_SYN_UX_TOKEN) % 100] = "Neocekavany token",
-    [(-ERROR_SYN_X_EOF) % 100] = "Ocekavan konec zdrojoveho souboru",
-    [(-ERROR_SYN_X_FUNC) % 100] = "Ocekavana definice funkce",
-    [(-ERROR_SYN_X_IDENT) % 100] = "Ocekavan identifikator",
-    [(-ERROR_SYN_X_SMCLN) % 100] = "Ocekavan znak ;",
-    [(-ERROR_SYN_X_END) % 100] = "Ocekavano END",
-    [(-ERROR_SYN_X_ASGN) % 100] = "Ocekavan operator =",
-    [(-ERROR_SYN_X_LBRC) % 100] = "Ocekavan znak (",
-    [(-ERROR_SYN_X_RBRC) % 100] = "Ocekavan znak )",
-    [(-ERROR_SYN_X_THEN) % 100] = "Ocekavano THEN",
-    [(-ERROR_SYN_X_ELSE) % 100] = "Ocekavano ELSE",
-    [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
-    [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
-};
 
 
 // globalni promenne, buh kvuli nim zabiji kotatka, je mi jich lito

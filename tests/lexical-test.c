@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "lexical.h"
+#include "defines.h"
 
 
 const char *TOKENS[] = {
@@ -56,6 +58,14 @@ const char *TOKENS[] = {
     [UNTIL] = "UNTIL",
 };
 
+void Error(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    fprintf(stderr, "CHYBA: ");
+    vfprintf(stderr, fmt, args);
+    va_end(args);
+}
 
 int main(void)
 {
@@ -72,7 +82,7 @@ int main(void)
                 printf("-> %lg\n", strtod(data.str, NULL));
         }
         else
-            fprintf(stderr, "CHYBA na radku %d : %s\n", line, LEX_ERRORS[(-token)%100]);
+            Error("Na radku %d: %s\n", line, ERROR_MSG[(-token)/100][(-token)%100]);
         str_clean(&data);
     }
 

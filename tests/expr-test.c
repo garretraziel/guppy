@@ -3,7 +3,7 @@
 
 #include "parser.h"
 #include "lexical.h"
-#include "expr.c"
+#include "expr.h"
 #include "defines.h"
 
 void Error(const char *fmt, ...)

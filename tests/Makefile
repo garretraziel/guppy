@@ -3,7 +3,7 @@ CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -I../src/ -L../src
 
 .PHONY: build rebuild clean
 
-build: lexical-test quicksort-test substr-test knuth-test parser-test
+build: lexical-test quicksort-test substr-test knuth-test parser-test expr-test
 
 rebuild: clean build
 

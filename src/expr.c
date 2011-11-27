@@ -60,7 +60,7 @@ enum {
 
 
 // Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
-const int tranlatetoken[] = {
+const int translatetoken[] = {
 // nektere tokeny primo odpovidaji symbolu do zasobniku
     [NUMBER] = E_NUM,
     [STRING] = E_STR,
@@ -207,7 +207,7 @@ int expression(void)
     s_push(&stack, E_DOLLAR);
 
     do {
-        a = tranlatetoken[token];  // aktualni vstup
+        a = translatetoken[token];  // aktualni vstup
         b = stack.active->type;    // nejvrchnejsi terminal na zasobniku
         switch( prec_table[b][a] ) {
             case EQ:

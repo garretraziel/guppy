@@ -27,7 +27,7 @@ enum {
     ERROR_SYN_X_OPRTR = -213,
 } ESynErrors;
 
-// Zpracuje pocatacni neterminalni symbol
+// Zpracuje pocatecni neterminalni symbol
 int program(FILE *);
 
 extern const char *SYN_ERRORS[];

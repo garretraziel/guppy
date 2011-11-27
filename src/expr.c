@@ -9,7 +9,18 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+#include "string.h"
 
 #include "expr.h"
 
 // :-D
+
+extern int token;
+extern string str;
+extern FILE *input;
+
+int ParseExpr(void)
+{
+    return 0;
+}

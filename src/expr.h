@@ -13,8 +13,10 @@
 
 enum {
     LT, // less than
-    GT, // great than
+    GT, // greater than
     EQ, // equal
 } VTabValues;
+
+int ParseExpr(void);
 
 #endif

@@ -25,3 +25,6 @@ knuth-test: ../src/ial.o ../src/string.o knuth-test.o
 parser-test: ../src/ial.o ../src/string.o ../src/lexical.o ../src/parser.o parser-test.o
 	$(CC) $(CFLAGS) $^ -o $@
 
+expr-test: ../src/expr.o expr-test.o
+	$(CC) $(CFLAGS) $^ -o $@
+

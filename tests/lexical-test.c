@@ -69,13 +69,10 @@ void Error(const char *fmt, ...)
 
 int main(void)
 {
-    int token;
-
     str_new(&str, STR_DEFAULT);
-
     input = stdin;
 
-    while((token = get_token())) {
+    while(get_token(), token) {
         if(token > 0) {
             printf("%s [%s] \n", TOKENS[token], str.str);
             if(token == NUMBER)

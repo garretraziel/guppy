@@ -205,39 +205,39 @@ int s_oobely_boo(Stack *stack, int t)
 //smazani zasobniku
 int s_clean(Stack * stack)
 {
-	Node * tmp;
-	while(stack->top != NULL){
-		tmp = stack->top;
-		stack->top = tmp->next;
-		free(tmp);
-	}
-	return 1;
+    Node * tmp;
+    while(stack->top != NULL){
+        tmp = stack->top;
+        stack->top = tmp->next;
+        free(tmp);
+    }
+    return 1;
 }
 //vrchol zasobniku
 int s_top(Stack * stack)
 {
-	//FIXME prazdny zasobnik
-	return stack->top->type;
+    //FIXME prazdny zasobnik
+    return stack->top->type;
 }
 
 
 int prec_handle(Stack * stack)
 {
-	//zasobnik musi byt neprazdny a obsahovat <y
-	if(stack->top != NULL &&
-	   stack->top->next != NULL && 
-	   stack->top->next->type == E_MARK ){
-		   
-		   
-		//na zasobniku je <y
-		//existuje pravidlo r: A -> y
-		
-		//kontrola?
-		
-		return 1;
-		
-	} else
-		return 0;
+    //zasobnik musi byt neprazdny a obsahovat <y
+    if(stack->top != NULL &&
+        stack->top->next != NULL && 
+        stack->top->next->type == E_MARK ){
+        
+        
+        //na zasobniku je <y
+        //existuje pravidlo r: A -> y
+        
+        //kontrola?
+        
+        return 1;
+        
+    } else
+        return 0;
 }
 
 
@@ -284,14 +284,14 @@ int expression(void)
                     // a pouzit to pravidlo
                 // jinak chyba
                 if(prec_handle(&stack)){
-					s_pop(&stack); // za y
-					s_pop(&stack); // za <
-		
-					//s_push(stack, E_NET_*);
-				} else {
-					
-					//return ERROR_SEM_X; ??
-				}
+                    s_pop(&stack); // za y
+                    s_pop(&stack); // za <
+    
+                    //s_push(stack, E_NET_*);
+                } else {
+                    
+                    //return ERROR_SEM_X; ??
+                }
                 break;
 
             case OO:

@@ -511,5 +511,4 @@ static inline int get_token__(void)
 void get_token(void)
 {
     token = get_token__();
-    return token;
 }

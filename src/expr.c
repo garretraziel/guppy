@@ -348,10 +348,10 @@ int expression(void)
                 s_push(&stack, a);
                 // precist novy token
                 get_token();
-		if (token < 0) { // nacetl jsem neco spatneho
-		    s_clean(&stack);
-		    return token;
-		}
+                    if (token < 0) { // nacetl jsem neco spatneho
+                    s_clean(&stack);
+                    return token;
+                }
                 a = translatetoken[token];
                 break;
 
@@ -362,10 +362,10 @@ int expression(void)
                 s_push(&stack, a);
                 // precist novy token
                 get_token();
-		if (token < 0) { // nacetl jsem neco spatneho
-		    s_clean(&stack);
-		    return token;
-		}
+                    if (token < 0) { // nacetl jsem neco spatneho
+                    s_clean(&stack);
+                    return token;
+                }
                 a = translatetoken[token];
                 break;
 

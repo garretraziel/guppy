@@ -217,7 +217,7 @@ int s_oobely_boo(Stack *stack, int t)
     // potreba najit nejake pravidlo a nahradit to, to bude jeste svanda
     
     /* Pravidla bez volani fci: 
-     * 1: E -> i //i je z {E_NUM, E_STR, E_BOOL, E_IDENT}
+     * 1: E -> i //i je z {E_NUM, E_STR, E_BOOL, E_IDENT, E_NIL}
      * 2: E -> (E)
      * 3: E -> E^E
      * 4: E -> E * E
@@ -248,6 +248,7 @@ int s_oobely_boo(Stack *stack, int t)
             case E_STR:
             case E_BOOL:
             case E_IDENT:
+            case E_NIL:
                 if(state == _START){ // 1 je pocatecni stav
                     op = stack->top->type;
                     s_pop(stack);

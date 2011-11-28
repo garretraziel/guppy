@@ -347,7 +347,7 @@ int expression(void)
                 // push(a)
                 s_push(&stack, a);
                 // precist novy token
-                get_token(input, &str);
+                get_token();
                 a = translatetoken[token];
                 break;
 
@@ -357,7 +357,7 @@ int expression(void)
                 // push(a)
                 s_push(&stack, a);
                 // precist novy token
-                get_token(input, &str);
+                get_token();
                 a = translatetoken[token];
                 break;
 

@@ -71,22 +71,22 @@ int main(void)
 {
     int token;
 
-    string data;
+    str_new(&str, STR_DEFAULT);
 
-    str_new(&data, STR_DEFAULT);
+    input = stdin;
 
-    while((token = get_token(stdin, &data))) {
+    while((token = get_token())) {
         if(token > 0) {
-            printf("%s [%s] \n", TOKENS[token], data.str);
+            printf("%s [%s] \n", TOKENS[token], str.str);
             if(token == NUMBER)
-                printf("-> %lg\n", strtod(data.str, NULL));
+                printf("-> %lg\n", strtod(str.str, NULL));
         }
         else
             Error("Na radku %d: %s\n", line, ERROR_MSG[(-token)/100][(-token)%100]);
-        str_clean(&data);
+        str_clean(&str);
     }
 
-    str_free(&data);
+    str_free(&str);
 
     return 0;
 }

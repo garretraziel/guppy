@@ -52,6 +52,10 @@ enum {
 // globalni pocitadlo radku
 int line = 1;
 
+// globalni promenne, buh kvuli nim zabiji kotatka, je mi jich lito
+int token;
+string str;
+FILE *input;
 
 /** Funkce kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
  *
@@ -156,7 +160,7 @@ int check_keyword(string *str)
  * @param string slozi k navratu identifikatoru a cisel
  * vraci ciselnou reprezentaci tokenu
  */
-int get_token(FILE *input, string *value)
+int get_token(void)
 {
     static int c;
     static int state = FSM_READ;
@@ -164,7 +168,7 @@ int get_token(FILE *input, string *value)
     int num;
 
     // buffer se musi vyprazdnit
-    str_clean(value);
+    str_clean(&str);
 
     for(;;) {
 
@@ -238,16 +242,16 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_IDENTIFIER:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(! (isalnum(c) || c == '_')) {
                     state = FSM_START;
-                    return check_keyword(value); // kontrola klicovych slov
+                    return check_keyword(&str); // kontrola klicovych slov
                 }
                 break;
 
             case FSM_NUMBER:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     ;
@@ -262,7 +266,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_FLOAT0:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     state = FSM_FLOAT;
@@ -273,7 +277,7 @@ int get_token(FILE *input, string *value)
                 break;
             
             case FSM_FLOAT:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     ;
@@ -286,7 +290,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_EXP_E:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(c == '+' || c == '-')
                     state = FSM_EXP0;
@@ -299,7 +303,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_EXP0:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     state = FSM_EXP;
@@ -311,7 +315,7 @@ int get_token(FILE *input, string *value)
 
 
             case FSM_EXP:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(! isdigit(c)) {
                     state = FSM_START;
@@ -332,20 +336,20 @@ int get_token(FILE *input, string *value)
                     state = FSM_READ;
                     return STRING;
                 } else
-                    str_push(value, c);
+                    str_push(&str, c);
                 break;
 
             case FSM_ESCAPE:
                 c = fgetc(input);
                 if(c == 'n') {
                     state = FSM_STRING;
-                    str_push(value, '\n');
+                    str_push(&str, '\n');
                 } else if(c == 't') {
                     state = FSM_STRING;
-                    str_push(value, '\t');
+                    str_push(&str, '\t');
                 } else if(c == '\\' || c == '"') {
                     state = FSM_STRING;
-                    str_push(value, c);
+                    str_push(&str, c);
                 } else if(isdigit(c))
                     state = FSM_ESCAPE_NUM;
                 else {
@@ -372,7 +376,7 @@ int get_token(FILE *input, string *value)
                 if(isdigit(c)) { 
                     num = num * 10 + c - '0';
                     if(num > 0 && num < 256) {
-                        str_push(value, num);
+                        str_push(&str, num);
                         state = FSM_STRING;
                     }
                 } else {

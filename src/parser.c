@@ -26,10 +26,6 @@
 //  povazuje to za neocekavany token
 
 
-// globalni promenne, buh kvuli nim zabiji kotatka, je mi jich lito
-int token;
-string str;
-FILE *input;
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
 int functions_seq();
@@ -60,7 +56,7 @@ int program(FILE *in)
 
     // nacteni uplne prvniho tokenu
     // to ma byt predem, ale to by musel byt token uplne globalni
-    token = get_token(input, &str);
+    token = get_token();
 
     // prvni funkce
     if(token != FUNCTION) {
@@ -87,7 +83,7 @@ int program(FILE *in)
     }
 
     // EOF (ukoncivac dolar)
-    token = get_token(input, &str);
+    token = get_token();
     if(token != NOTHING) {
         str_free(&str);
         return (token < 0) ? token : ERROR_SYN_X_EOF;
@@ -122,17 +118,17 @@ int function()
     // function
     if(token != FUNCTION)
         return (token < 0) ? token : ERROR_SYN_X_FUNC;
-    token = get_token(input, &str);
+    token = get_token();
 
     // identifier
     if(token != IDENTIFIER)
         return (token < 0) ? token : ERROR_SYN_X_IDENT;
-    token = get_token(input, &str);
+    token = get_token();
 
     // left bracket
     if(token != LBRAC)
         return (token < 0) ? token : ERROR_SYN_X_LBRC;
-    token = get_token(input, &str);
+    token = get_token();
 
     // formal parametr seq
     x = formal_parametr_seq();
@@ -142,7 +138,7 @@ int function()
     // right bracket
     if(token != RBRAC)
         return (token < 0) ? token : ERROR_SYN_X_RBRC;
-    token = get_token(input, &str);
+    token = get_token();
 
     // local declaration seq
     x = local_declaration_seq();
@@ -157,7 +153,7 @@ int function()
     // end
     if(token != END)
         return (token < 0) ? token : ERROR_SYN_X_END;
-    token = get_token(input, &str);
+    token = get_token();
 
     return 1;
 }
@@ -168,7 +164,7 @@ int formal_parametr_seq()
 {
     // identifikator
     if(token == IDENTIFIER) {
-        token = get_token(input, &str);
+        token = get_token();
         return formal_parametr_seq_z();
     }
     else // epsilon
@@ -181,11 +177,11 @@ int formal_parametr_seq_z()
 {
     // carka
     if(token == COMMA) {
-        token = get_token(input, &str);
+        token = get_token();
         // identifikator
         if(token != IDENTIFIER)
             return (token < 0) ? token : ERROR_SYN_X_IDENT;
-        token = get_token(input, &str);
+        token = get_token();
         return formal_parametr_seq_z();
     }
     else // epsilon
@@ -199,11 +195,11 @@ int local_declaration_seq()
     int x;
     // local
     if(token == LOCAL) {
-        token = get_token(input, &str);
+        token = get_token();
         // identifier
         if(token != IDENTIFIER)
             return (token < 0) ? token : ERROR_SYN_X_IDENT;
-        token = get_token(input, &str);
+        token = get_token();
         // local declaration z
         x = local_declaration_z();
         if(x < 0)
@@ -222,12 +218,12 @@ int local_declaration_z()
     int x;
     // strednik
     if(token == SEMICOLON) {
-        token = get_token(input, &str);
+        token = get_token();
         return 1;
     }
     // rovnitko
     else if(token == ASSIGN) {
-        token = get_token(input, &str);
+        token = get_token();
         // literal
         x = literal();
         if(x < 0)
@@ -235,7 +231,7 @@ int local_declaration_z()
         // strednik
         if(token != SEMICOLON)
             return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-        token = get_token(input, &str);
+        token = get_token();
         return 1;
     }
     else
@@ -256,7 +252,7 @@ int literal()
         case TRUE:
         case FALSE:
             // ulozit na stack s hodnotou
-            token = get_token(input, &str);
+            token = get_token();
             return 1;
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
@@ -281,7 +277,7 @@ int statement_seq()
             // strednik
             if(token != SEMICOLON)
                 return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-            token = get_token(input, &str);
+            token = get_token();
             // statement_seq
             return statement_seq();
             break;
@@ -301,20 +297,20 @@ int statement()
     int x;
     switch(token) {
         case IDENTIFIER:
-            token = get_token(input, &str);
+            token = get_token();
             // rovnitko
             if(token != ASSIGN)
                 return (token < 0) ? token : ERROR_SYN_X_ASGN;
-            token = get_token(input, &str);
+            token = get_token();
             // assign_z
             return assign_z();
 
         case WRITE:
-            token = get_token(input, &str);
+            token = get_token();
             // left bracket
             if(token != LBRAC)
                 return (token < 0) ? token : ERROR_SYN_X_LBRC;
-            token = get_token(input, &str);
+            token = get_token();
             // expression list
             x = expression_seq();
             if(x < 0)
@@ -322,11 +318,11 @@ int statement()
             // right bracket
             if(token != RBRAC)
                 return (token < 0) ? token : ERROR_SYN_X_RBRC;
-            token = get_token(input, &str);
+            token = get_token();
             return 1;
 
         case IF:
-            token = get_token(input, &str);
+            token = get_token();
             // vyraz
             x = expression();
             if(x < 0)
@@ -334,7 +330,7 @@ int statement()
             // then
             if(token != THEN)
                 return (token < 0) ? token : ERROR_SYN_X_THEN;
-            token = get_token(input, &str);
+            token = get_token();
             // prikazy
             x = statement_seq();
             if(x < 0)
@@ -342,7 +338,7 @@ int statement()
             // else
             if(token != ELSE)
                 return (token < 0) ? token : ERROR_SYN_X_ELSE;
-            token = get_token(input, &str);
+            token = get_token();
             // sekvence prikazu
             x = statement_seq();
             if(x < 0)
@@ -350,11 +346,11 @@ int statement()
             // end
             if(token != END)
                 return (token < 0) ? token : ERROR_SYN_X_END;
-            token = get_token(input, &str);
+            token = get_token();
             return 1;
 
         case WHILE:
-            token = get_token(input, &str);
+            token = get_token();
             // vyraz
             x = expression();
             if(x < 0)
@@ -362,7 +358,7 @@ int statement()
             // do
             if(token != DO)
                 return (token < 0) ? token : ERROR_SYN_X_DO;
-            token = get_token(input, &str);
+            token = get_token();
             // sekvence prikazu
             x = statement_seq();
             if(x < 0)
@@ -370,11 +366,11 @@ int statement()
             // end
             if(token != END)
                 return (token < 0) ? token : ERROR_SYN_X_END;
-            token = get_token(input, &str);
+            token = get_token();
             return 1;
 
         case RETURN:
-            token = get_token(input, &str);
+            token = get_token();
             // vyraz
             x = expression();
             return x;
@@ -393,29 +389,29 @@ int assign_z()
     int x;
     // read
     if(token == READ) {
-        token = get_token(input, &str);
+        token = get_token();
         // leva zavorka
         if(token != LBRAC)
             return (token < 0) ? token : ERROR_SYN_X_LBRC;
-        token = get_token(input, &str);
+        token = get_token();
         // jeden parametr (string nebo cislo) FIXME
         if(token != STRING && token != NUMBER)
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
-        token = get_token(input, &str);
+        token = get_token();
         // prava zavorka
         if(token != RBRAC)
             return (token < 0) ? token : ERROR_SYN_X_RBRC;
-        token = get_token(input, &str);
+        token = get_token();
         return 1;
     }
     // volani funkce
     else if(token == IDENTIFIER) {
-        token = get_token(input, &str);
+        token = get_token();
         // leva zavorka
         if(token != LBRAC)
 //            return (token < 0) ? token : ERROR_SYN_X_LBRC;
             return (token < 0) ? token : expression();
-        token = get_token(input, &str);
+        token = get_token();
         // parametry
         x = literal_identifier_list(); // TODO
         if(x < 0)
@@ -423,7 +419,7 @@ int assign_z()
         // prava zavorka
         if(token != RBRAC)
             return (token < 0) ? token : ERROR_SYN_X_RBRC;
-        token = get_token(input, &str);
+        token = get_token();
         return 1;
     }
     // vyraz
@@ -449,7 +445,7 @@ int literal_identifier_list()
                 return x;
             return literal_identifier_list_a();
         case IDENTIFIER:
-            token = get_token(input, &str);
+            token = get_token();
             return literal_identifier_list_a();
         default:
             return 1;
@@ -463,7 +459,7 @@ int literal_identifier_list_a()
 {
     int x;
     if(token == COMMA) {
-        token = get_token(input, &str);
+        token = get_token();
         x = literal_identifier_list_z();
         if(x < 0)
             return 0;
@@ -485,7 +481,7 @@ int literal_identifier_list_z()
         case FALSE:
             return literal();
         case IDENTIFIER:
-            token = get_token(input, &str);
+            token = get_token();
             return 1;
             break;
         default:
@@ -513,7 +509,7 @@ int expression_seq_z()
 {
     int x;
     if(token == COMMA) {
-        token = get_token(input, &str);
+        token = get_token();
         x = expression();
         if(x < 0)
             return x;

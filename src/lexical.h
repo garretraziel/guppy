@@ -76,9 +76,16 @@ enum {
 
 
 /// Vrati nasledujici token ze souboru
-int get_token(FILE *, string *);
+int get_token(void);
 
 /// globalni pocitadlo radku
 extern int line;
+
+/// globalni reprezentace prave nacteneho tokenu
+extern int token;
+extern string str;
+
+/// vstupni soubor
+extern FILE *input;
 
 #endif

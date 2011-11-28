@@ -23,27 +23,29 @@ extern FILE *input;
 
 // Symboly se kterymi pracuje zasobnikovy automat
 enum {
-    E_IDENT,    //0
-    E_NUM,
-    E_STR,      //2
-    E_BOOL,
-    E_NIL,      //4
-    
-    E_LBRAC,    //5
-    
-    E_POW,      //6
+    E_POW,  
+
     E_MUL,
     E_DIV,
     E_PLUS,
     E_MINUS,
+
     E_STRCONCAT,
+
     E_LESS,
     E_GREAT,
     E_LESSEQ,
     E_GREATEQ,
-    E_EQUAL,
     E_NOTEQ,
+    E_EQUAL,
+
+    E_IDENT,    
+    E_NUM,
+    E_STR,      
+    E_BOOL,
+    E_NIL,      
     
+    E_LBRAC,           
     E_RBRAC,
     E_COMMA,
     E_DOLLAR, 

@@ -23,7 +23,15 @@ extern FILE *input;
 
 // Symboly se kterymi pracuje zasobnikovy automat
 enum {
-    E_POW,
+    E_IDENT,    //0
+    E_NUM,
+    E_STR,      //2
+    E_BOOL,
+    E_NIL,      //4
+    
+    E_LBRAC,    //5
+    
+    E_POW,      //6
     E_MUL,
     E_DIV,
     E_PLUS,
@@ -33,17 +41,12 @@ enum {
     E_GREAT,
     E_LESSEQ,
     E_GREATEQ,
-    E_NOTEQ,
     E_EQUAL,
-    E_IDENT,
-    E_NUM,
-    E_STR,
-    E_BOOL,
-    E_NIL,
-    E_LBRAC,
+    E_NOTEQ,
+    
     E_RBRAC,
     E_COMMA,
-    E_DOLLAR,
+    E_DOLLAR, 
 /*    E_MOD,
     E_STRLEN,
     E_AND,
@@ -58,6 +61,7 @@ enum {
     E_NET_P,
 } ESymbols;
 
+#define is_terminal(e_sym)((e_sym < E_MARK)? 1 : 0)
 
 // Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
 const int translatetoken[] = {
@@ -163,6 +167,8 @@ int s_init(Stack *stack)
 {
     stack->top = NULL;
     stack->active = NULL;
+    
+    return 1;
 }
 
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
@@ -175,23 +181,33 @@ int s_push(Stack *stack, int t)
     new->res = NULL;
     new->next  = stack->top;
     stack->top = new;
-    if( /* t je terminal */ 0 )
+    if(is_terminal(t))
         stack->active = new;
     return 1;
 }
 
 void s_pop(Stack *stack){
-	if(stack == NULL)
-		return;
-		
-	Node *tmp = stack->top;
-	stack->top = tmp->next;
-	free(tmp);
+    Node *tmp = stack->top;
+    stack->top = tmp->next;
+    free(tmp);
 }
 
 // Zamena symbolu x za x< na zasobniku (reakce na <)
 int s_alter(Stack *stack, int t)
 {
+    Node * new = malloc(sizeof(Node));
+    if(new == NULL)
+        return 0;
+
+    new->type = stack->active->type;
+    new->res = NULL;
+    new->next = stack->active->next;
+    stack->active->next = new;
+    if(stack->active == stack->top){
+        stack->top = new;
+    }
+    stack->active->type = E_MARK;
+    //na chvilu se rozbije active
     return 1;
 }
 
@@ -199,7 +215,100 @@ int s_alter(Stack *stack, int t)
 int s_oobely_boo(Stack *stack, int t)
 {
     // potreba najit nejake pravidlo a nahradit to, to bude jeste svanda
-    return 1;
+    
+    /* Pravidla bez volani fci: 
+     * 1: E -> i //i je z {E_NUM, E_STR, E_BOOL, E_IDENT}
+     * 2: E -> (E)
+     * 3: E -> E^E
+     * 4: E -> E * E
+     * 5: E -> E / E
+     * 6: E -> E + E
+     * 7: E -> E - E
+     * 8: E -> E .. E
+     * 9: E -> E < E
+     *10: E -> E > E
+     *11: E -> E <= E
+     *12: E -> E >= E
+     *13: E -> E == E
+     *14: E -> E ~= E
+     */
+    enum stavy{
+    _OKAY=-1,
+    _ERR,   
+    _START,  
+    _FIRST_E, 
+    _OP
+    };
+    
+    int state = 1;
+    int op = 0;
+    while(stack->top->type != E_MARK && state > _ERR){
+        switch(stack->top->type){
+            case E_NUM:
+            case E_STR:
+            case E_BOOL:
+            case E_IDENT:
+                if(state == _START){ // 1 je pocatecni stav
+                    op = stack->top->type;
+                    s_pop(stack);
+                    state = _OKAY;
+                } else
+                    state = _ERR; //chyba
+            break;
+            
+            case E_NET_E:
+                if(state == _START){ //jeste jsem nenacetl
+                    s_pop(stack);
+                    state = _FIRST_E; //prvni E nacteno
+                } else
+                if(state == _OP){ //operator byl nacten 
+                    s_pop(stack);
+                    state = _OKAY;
+                } else
+                    state = _ERR; //chyba
+                    
+            case E_LBRAC:
+                if(state == _FIRST_E){
+                    op = stack->top->type;
+                    s_pop(stack);
+                    state = _OKAY; //koncovy stav
+                } else 
+                    state = _ERR; //chyba
+            break;
+            
+            default: //ostatni terminaly
+                if(state == _FIRST_E){ // jen kdyz uz jsem nacetl jeden neterminal
+                    op = stack->top->type; //ulozim si operator
+                    s_pop(stack);
+                    state = _OP;
+                } else 
+                    state = _ERR;
+            break;
+            
+        }
+        
+    }
+    
+    if(state == -1 && stack->top->type == E_MARK){
+        s_pop(stack); //odstrani < ze zasobniku
+    
+        switch(op){
+            case E_IDENT:
+            case E_NUM:
+            case E_STR:
+            case E_BOOL:
+            case E_NIL:
+                return 1; //pravidlo 1: E->i
+            break; //asi zbytecne
+
+            default:
+                return op-3; //vraci pravdilo 2 - 14
+            break;
+        }
+        
+    } else {
+        return 0;
+    }
 }
 
 //smazani zasobniku
@@ -213,34 +322,6 @@ int s_clean(Stack * stack)
     }
     return 1;
 }
-//vrchol zasobniku
-int s_top(Stack * stack)
-{
-    //FIXME prazdny zasobnik
-    return stack->top->type;
-}
-
-
-int prec_handle(Stack * stack)
-{
-    //zasobnik musi byt neprazdny a obsahovat <y
-    if(stack->top != NULL &&
-        stack->top->next != NULL && 
-        stack->top->next->type == E_MARK ){
-        
-        
-        //na zasobniku je <y
-        //existuje pravidlo r: A -> y
-        
-        //kontrola?
-        
-        return 1;
-        
-    } else
-        return 0;
-}
-
-
 
 
 
@@ -268,8 +349,8 @@ int expression(void)
                 break;
 
             case LT:
-                // b na zasobniku vymenit za b<, tj, pushnuti <
-                s_push(&stack, E_MARK);
+                // b na zasobniku vymenit za b<
+                s_alter(&stack, 0); // druhy parametr ??
                 // push(a)
                 s_push(&stack, a);
                 // precist novy token
@@ -283,15 +364,7 @@ int expression(void)
                     // pak vymenit <y za A
                     // a pouzit to pravidlo
                 // jinak chyba
-                if(prec_handle(&stack)){
-                    s_pop(&stack); // za y
-                    s_pop(&stack); // za <
-    
-                    //s_push(stack, E_NET_*);
-                } else {
-                    
-                    //return ERROR_SEM_X; ??
-                }
+                
                 break;
 
             case OO:
@@ -303,7 +376,7 @@ int expression(void)
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
     // asi jeste poklidit zasobnicek
-    // s_clean(&stack);
+    s_clean(&stack);
     //
     // TODO: pokud se vraci chyba, mel by se taky poklidit zasobnik atd.
     // pouzijem goto at to stoji za to?

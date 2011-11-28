@@ -63,7 +63,7 @@ enum {
     E_NET_P,
 } ESymbols;
 
-#define is_terminal(e_sym)((e_sym < E_MARK)? 1 : 0)
+#define is_terminal(e_sym)(e_sym < E_MARK)
 
 // Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
 const int translatetoken[] = {

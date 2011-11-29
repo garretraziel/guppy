@@ -195,7 +195,7 @@ void s_pop(Stack *stack){
 }
 
 // Zamena symbolu x za x< na zasobniku (reakce na <)
-int s_alter(Stack *stack, int t)
+static int s_alter(Stack *stack)
 {
     Node * new = malloc(sizeof(Node));
     if(new == NULL)
@@ -214,7 +214,7 @@ int s_alter(Stack *stack, int t)
 }
 
 // Aplikace pravidla (reakce na >)
-int s_oobely_boo(Stack *stack, int t)
+static int s_oobely_boo(Stack *stack)
 {
     // potreba najit nejake pravidlo a nahradit to, to bude jeste svanda
     
@@ -357,7 +357,7 @@ int expression(void)
 
             case LT:
                 // b na zasobniku vymenit za b<
-                s_alter(&stack, 0); // druhy parametr ??
+                s_alter(&stack);
                 // push(a)
                 s_push(&stack, a);
                 // precist novy token
@@ -374,6 +374,8 @@ int expression(void)
                 // pokud je na zasobiku <y a existuje pravidlo r: A -> y
                     // pak vymenit <y za A
                     // a pouzit to pravidlo
+                // na tohle melo byt puvodne oobely_boo
+                s_oobely_boo(&stack);
                 // jinak chyba
                 
                 break;

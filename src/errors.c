@@ -20,7 +20,6 @@ const char *LEX_ERRORS[] = {
 
 // [2] Chybova hlseni syntaktickych chyb
 const char *SYN_ERRORS[] = {
-    [0] = "<null>",
     [(-ERROR_SYN_UX_TOKEN) % 100] = "Neocekavany token",
     [(-ERROR_SYN_X_EOF) % 100] = "Ocekavan konec zdrojoveho souboru",
     [(-ERROR_SYN_X_FUNC) % 100] = "Ocekavana definice funkce",
@@ -34,6 +33,7 @@ const char *SYN_ERRORS[] = {
     [(-ERROR_SYN_X_ELSE) % 100] = "Ocekavano ELSE",
     [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
     [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
+    [(-ERROR_SYN_EXP_FAIL) % 100] = "Neplatny vyraz",
 };
 
 

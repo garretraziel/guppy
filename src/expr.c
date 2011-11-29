@@ -380,8 +380,8 @@ int expression(void)
 
             case OO:
             default:
-                // jinak chyba
-                return ERROR_SEM_X;
+                // jinak syntakticka chyba
+                return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
     } while(a != E_DOLLAR || b != E_DOLLAR);

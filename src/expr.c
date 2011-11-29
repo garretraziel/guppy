@@ -23,32 +23,32 @@ extern FILE *input;
 
 // Symboly se kterymi pracuje zasobnikovy automat
 enum {
-    E_POW,  
+    E_POW, //0 
 
     E_MUL,
-    E_DIV,
+    E_DIV, //2
     E_PLUS,
-    E_MINUS,
+    E_MINUS, //4
 
     E_STRCONCAT,
 
-    E_LESS,
+    E_LESS, //6
     E_GREAT,
-    E_LESSEQ,
+    E_LESSEQ, //8
     E_GREATEQ,
-    E_NOTEQ,
+    E_NOTEQ, //10
     E_EQUAL,
 
-    E_IDENT,    
+    E_IDENT, //12
     E_NUM,
-    E_STR,      
+    E_STR,  // 14
     E_BOOL,
-    E_NIL,      
+    E_NIL,  // 16
     
     E_LBRAC,           
-    E_RBRAC,
+    E_RBRAC, // 18
     E_COMMA,
-    E_DOLLAR, 
+    E_DOLLAR, //20
 /*    E_MOD,
     E_STRLEN,
     E_AND,
@@ -56,7 +56,7 @@ enum {
     E_NOT, */ // Tohle je do rozsireni, zatim nic
 
     // Znacka zacatku handle ( < do zasobniku )
-    E_MARK, 
+    E_MARK, //21
 
     // jeste jsou potreba neterminaly
     E_NET_E,
@@ -192,6 +192,11 @@ void s_pop(Stack *stack){
     Node *tmp = stack->top;
     stack->top = tmp->next;
     free(tmp);
+    tmp = stack->top;
+    while(!is_terminal(tmp->type)){
+	tmp = tmp->next;
+    }
+    stack->active = tmp;
 }
 
 // Zamena symbolu x za x< na zasobniku (reakce na <)
@@ -205,12 +210,22 @@ static int s_alter(Stack *stack)
     new->res = NULL;
     new->next = stack->active->next;
     stack->active->next = new;
-    if(stack->active == stack->top){
-        stack->top = new;
-    }
+ //   if(stack->active == stack->top){
+ //       stack->top = new;
+ //   }
     stack->active->type = E_MARK;
     //na chvilu se rozbije active
     return 1;
+}
+
+void s_dump(Stack *stack)
+{
+	Node * tmp = stack->top;
+	while(tmp!=NULL){
+		printf("%d ",tmp->type);
+		tmp=tmp->next;
+	}
+	printf("\n");
 }
 
 // Aplikace pravidla (reakce na >)
@@ -233,21 +248,30 @@ static int s_oobely_boo(Stack *stack)
      *12: E -> E >= E
      *13: E -> E == E
      *14: E -> E ~= E
+     *15: E -> E_IDENT ( )
+     *16: E -> E_IDENT ( E P
+     *17: P -> )
+     *18: P -> , E P
      */
     enum stavy{
     _OKAY=-1,
-    _ERR,   
+    _ERR=0,   
     _START,  
     _FIRST_E, 
-    _OP
+    _OP,
+    _F_OPEN,
     };
-    
     int state = 1;
     int op = 0;
+    if(stack->top->type == E_DOLLAR) {
+        //toto tady asi nebude
+	return 0;
+    }
     while(stack->top->type != E_MARK && state > _ERR){
         switch(stack->top->type){
-            case E_NUM:
             case E_STR:
+		    //tady bude workaround pro string literaly
+            case E_NUM:
             case E_BOOL:
             case E_IDENT:
             case E_NIL:
@@ -255,6 +279,8 @@ static int s_oobely_boo(Stack *stack)
                     op = stack->top->type;
                     s_pop(stack);
                     state = _OKAY;
+		    //s_push(stack, E_NET_E); //aplikace pravidla na zasobniku
+		    printf("E->i\n");
                 } else
                     state = _ERR; //chyba
             break;
@@ -267,50 +293,60 @@ static int s_oobely_boo(Stack *stack)
                 if(state == _OP){ //operator byl nacten 
                     s_pop(stack);
                     state = _OKAY;
+		    //s_push(stack, E_NET_E);
+		    printf("E->E %d E\n", op);
                 } else
                     state = _ERR; //chyba
-                    
+            break; //KOKOT JSEM, na toto nezapominat    
+
             case E_LBRAC:
                 if(state == _FIRST_E){
                     op = stack->top->type;
                     s_pop(stack);
                     state = _OKAY; //koncovy stav
+                    //s_push(stack, E_NET_E); // E->(E)
+		    printf("E->(E)\n");
                 } else 
                     state = _ERR; //chyba
             break;
-            
+
             default: //ostatni terminaly
                 if(state == _FIRST_E){ // jen kdyz uz jsem nacetl jeden neterminal
                     op = stack->top->type; //ulozim si operator
                     s_pop(stack);
                     state = _OP;
-                } else 
+                } else { 
                     state = _ERR;
+		}
             break;
             
         }
         
     }
-    
-    if(state == -1 && stack->top->type == E_MARK){
+   
+    if(state == _OKAY && stack->top->type == E_MARK){
         s_pop(stack); //odstrani < ze zasobniku
-    
+  	 
         switch(op){
             case E_IDENT:
             case E_NUM:
             case E_STR:
             case E_BOOL:
             case E_NIL:
-                return 1; //pravidlo 1: E->i
+		s_push(stack, E_NET_E);
+		//s_dump(stack);
+                return op; //pravidlo 1: E->i
             break; //asi zbytecne
 
             default:
-                return op-3; //vraci pravdilo 2 - 14
+		s_push(stack, E_NET_E);
+		//s_dump(stack);
+                return op; //vraci pravdilo 2 - 14
             break;
         }
         
     } else {
-        return 0;
+        return -1;
     }
 }
 
@@ -375,9 +411,12 @@ int expression(void)
                     // pak vymenit <y za A
                     // a pouzit to pravidlo
                 // na tohle melo byt puvodne oobely_boo
-                s_oobely_boo(&stack);
+                if(s_oobely_boo(&stack) != -1)
+			b = stack.active->type; //potreba pro ukonceni cyklu
+		else {
+			return ERROR_SYN_EXP_FAIL;
+		}
                 // jinak chyba
-                
                 break;
 
             case OO:
@@ -393,6 +432,5 @@ int expression(void)
     //
     // TODO: pokud se vraci chyba, mel by se taky poklidit zasobnik atd.
     // pouzijem goto at to stoji za to?
-
-    return 0;
+    return 1;
 }

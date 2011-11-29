@@ -1,14 +1,17 @@
 CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -I../src/ -L../src
 
-.PHONY: build rebuild clean
+.PHONY: build rebuild clean guppy
 
-build: lexical-test quicksort-test substr-test knuth-test parser-test expr-test
+build: guppy lexical-test quicksort-test substr-test knuth-test parser-test expr-test
 
 rebuild: clean build
 
 clean:
 	rm -f *.o lexical-test quicksort-test knuth-test parser-test substr-test expr-test
+
+guppy:
+	make -C ../src/ -f ../src/Makefile
 
 lexical-test: ../src/lexical.o ../src/string.o ../src/errors.o lexical-test.o
 	$(CC) $(CFLAGS) $^ -o $@

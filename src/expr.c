@@ -348,7 +348,7 @@ int expression(void)
                 s_push(&stack, a);
                 // precist novy token
                 get_token();
-                    if (token < 0) { // nacetl jsem neco spatneho
+                if (token < 0) { // nacetl jsem neco spatneho
                     s_clean(&stack);
                     return token;
                 }
@@ -362,7 +362,7 @@ int expression(void)
                 s_push(&stack, a);
                 // precist novy token
                 get_token();
-                    if (token < 0) { // nacetl jsem neco spatneho
+                if (token < 0) { // nacetl jsem neco spatneho
                     s_clean(&stack);
                     return token;
                 }

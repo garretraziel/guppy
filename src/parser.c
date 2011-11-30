@@ -386,7 +386,6 @@ int statement()
 // Az -> id ( LIL )
 int assign_z()
 {
-    int x;
     // read
     if(token == READ) {
         get_token();

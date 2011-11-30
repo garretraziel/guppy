@@ -173,6 +173,18 @@ int s_init(Stack *stack)
     return 1;
 }
 
+//smazani zasobniku
+int s_clean(Stack * stack)
+{
+    Node * tmp;
+    while(stack->top != NULL){
+        tmp = stack->top;
+        stack->top = tmp->next;
+        free(tmp);
+    }
+    return 1;
+}
+
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
 int s_push(Stack *stack, int t)
 {
@@ -218,13 +230,24 @@ static int s_alter(Stack *stack)
     return 1;
 }
 
+//jen pro debug
 void s_dump(Stack *stack)
 {
+        Stack s_tmp;
+        s_init(&s_tmp);
+        char * type[] = {"^","*","/","+","-","..","<",">","<=",">=","~=","==",
+                         "i","n","s","b","nil","(",")", ",","$", "{","E","P"};
 	Node * tmp = stack->top;
 	while(tmp!=NULL){
-		printf("%d ",tmp->type);
-		tmp=tmp->next;
+	    s_push(&s_tmp, tmp->type);
+            tmp = tmp->next;
 	}
+        tmp = s_tmp.top;
+        while(tmp!=NULL){
+            printf(" %s ",type[tmp->type]);
+            tmp = tmp->next;
+        }
+        s_clean(&s_tmp);
 	printf("\n");
 }
 
@@ -268,6 +291,7 @@ static int s_oobely_boo(Stack *stack)
 	return 0;
     }
     while(stack->top->type != E_MARK && state > _ERR){
+        s_dump(stack);
         switch(stack->top->type){
             case E_STR:
 		    //tady bude workaround pro string literaly
@@ -334,13 +358,13 @@ static int s_oobely_boo(Stack *stack)
             case E_BOOL:
             case E_NIL:
 		s_push(stack, E_NET_E);
-		//s_dump(stack);
+		s_dump(stack);
                 return op; //pravidlo 1: E->i
             break; //asi zbytecne
 
             default:
 		s_push(stack, E_NET_E);
-		//s_dump(stack);
+		s_dump(stack);
                 return op; //vraci pravdilo 2 - 14
             break;
         }
@@ -350,17 +374,7 @@ static int s_oobely_boo(Stack *stack)
     }
 }
 
-//smazani zasobniku
-int s_clean(Stack * stack)
-{
-    Node * tmp;
-    while(stack->top != NULL){
-        tmp = stack->top;
-        stack->top = tmp->next;
-        free(tmp);
-    }
-    return 1;
-}
+
 
 
 

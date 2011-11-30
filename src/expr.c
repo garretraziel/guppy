@@ -431,6 +431,7 @@ int expression(void)
                 if(s_oobely_boo(&stack) != -1)
                     b = stack.active->type; //potreba pro ukonceni cyklu
                 else {
+                    s_clean(&stack);
                     return ERROR_SYN_EXP_FAIL;
                 }
                 // jinak chyba
@@ -445,15 +446,13 @@ int expression(void)
                     continue;
                 }
                 // jinak syntakticka chyba
+                s_clean(&stack);
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
-    // asi jeste poklidit zasobnicek
+    // uvolneni zasobniku, vzdycky tam zbyde E_DOLLAR
     s_clean(&stack);
-    //
-    // TODO: pokud se vraci chyba, mel by se taky poklidit zasobnik atd.
-    // pouzijem goto at to stoji za to?
     return 1;
 }

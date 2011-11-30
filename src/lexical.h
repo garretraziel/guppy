@@ -17,15 +17,8 @@
 #define ASCII_CONTROLL 32
 
 /// Vycet navratovych kodu lexikalniho analyzatoru
-// zaporne hodnoty znaci chybu
-// nula znamena EOF
-// kladne hodnoty validni token
 enum {
-    ERROR_LEX_NUMBER = -101,
-    ERROR_LEX_UX_CHAR = -102,
-    ERROR_LEX_ESC_SEC = -103,
-
-    NOTHING = 0,
+    NOTHING = 0, // znaci EOF
 
     NUMBER,
     STRING,
@@ -81,16 +74,18 @@ enum {
 } TToken;
 
 
-/// Chybova hlaseni k lexikalnim chybam
-extern const char *LEX_ERRORS[];
 
 /// Vrati nasledujici token ze souboru
-int get_token(FILE *, string *);
-
-/// Vrati token na vstup
-int unget_token(int);
+int get_token(void);
 
 /// globalni pocitadlo radku
 extern int line;
+
+/// globalni reprezentace prave nacteneho tokenu
+extern int token;
+extern string str;
+
+/// vstupni soubor
+extern FILE *input;
 
 #endif

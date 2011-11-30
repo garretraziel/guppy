@@ -15,3 +15,8 @@ run-tests.sh
 ------------
 
 Testovací sada. Bere soubory ze vstupní složky (defaultně ./src, jsou to programy v pseudo-lua) a pro každý srovná výstup z guppy s výstupem z opravdové Lua. Pokud potřebuje nějaký vstup, může být ve složce ./src/in ve formátu in.nazev-souboru-v-src.
+
+Ostatní
+-------
+
+Viz [Wiki](https://github.com/garretraziel/guppy/wiki/Automatické-testy).

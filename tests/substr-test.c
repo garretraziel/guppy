@@ -4,6 +4,7 @@
 #include "ial.h"
 #include "string.h"
 
+size_t strlen(const char *);
 
 void substr_test(string str, char*str2, int from, int to, const char *expect, int len)
 {

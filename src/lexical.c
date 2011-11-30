@@ -17,7 +17,9 @@
 #include "guppy.h"
 #include "lexical.h"
 #include "string.h"
+#include "defines.h"
 
+#define LNG_KEYWORD 8 /// udava delku nejdelsiho klicoveho slova, "function"
 
 /// Stavy konecneho automatu
 enum {
@@ -45,23 +47,15 @@ enum {
     FSM_READ,
     FSM_START,
     FSM_STRING,
-    FSM_TERMINATE,
 } TFSMStates;
-
-const char *LEX_ERRORS[] = {
-    [NOTHING] = "NULL",
-    [(-ERROR_LEX_NUMBER) % 100] = "Neplatny ciselny literal",
-    [(-ERROR_LEX_UX_CHAR) % 100] = "Neocekavany znak",
-    [(-ERROR_LEX_ESC_SEC) % 100] = "Neplatna escape sekvence v retezci",
-};
 
 // globalni pocitadlo radku
 int line = 1;
 
-
-// pro potreby unget_token
-static int buffer = NOTHING;
-static int buffer_valid = 0; // false
+// globalni promenne, buh kvuli nim zabiji kotatka, je mi jich lito
+int token;
+string str;
+FILE *input;
 
 /** Funkce kontroluje, jestli neni ve stringu klicove nebo rezervovane slovo
  *
@@ -70,52 +64,93 @@ static int buffer_valid = 0; // false
  */
 int check_keyword(string *str)
 {
-    if(strcmp(str->str, "do") == 0)
-        return DO;
-    if(strcmp(str->str, "else") == 0)
-        return ELSE;
-    if(strcmp(str->str, "end") == 0)
-        return END;
-    if(strcmp(str->str, "false") == 0)
-        return FALSE;
-    if(strcmp(str->str, "function") == 0)
-        return FUNCTION;
-    if(strcmp(str->str, "if") == 0)
-        return IF;
-    if(strcmp(str->str, "local") == 0)
-        return LOCAL;
-    if(strcmp(str->str, "nil") == 0)
-        return NIL;
-    if(strcmp(str->str, "read") == 0)
-        return READ;
-    if(strcmp(str->str, "return") == 0)
-        return RETURN;
-    if(strcmp(str->str, "then") == 0)
-        return THEN;
-    if(strcmp(str->str, "true") == 0)
-        return TRUE;
-    if(strcmp(str->str, "while") == 0)
-        return WHILE;
-    if(strcmp(str->str, "write") == 0)
-        return WRITE;
-    if(strcmp(str->str, "and") == 0)
-        return AND;
-    if(strcmp(str->str, "break") == 0)
-        return BREAK;
-    if(strcmp(str->str, "elseif") == 0)
-        return ELSEIF;
-    if(strcmp(str->str, "for") == 0)
-        return FOR;
-    if(strcmp(str->str, "in") == 0)
-        return IN;
-    if(strcmp(str->str, "not") == 0)
-        return NOT;
-    if(strcmp(str->str, "or") == 0)
-        return OR;
-    if(strcmp(str->str, "repeat") == 0)
-        return REPEAT;
-    if(strcmp(str->str, "until") == 0)
-        return UNTIL;
+    if(str->length > LNG_KEYWORD) return IDENTIFIER;
+    
+    if(str->str[0] == 'a') {
+        if(strcmp(str->str, "and") == 0)
+            return AND;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'b') {
+        if(strcmp(str->str, "break") == 0)
+            return BREAK;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'd') {
+        if(strcmp(str->str, "do") == 0)
+            return DO;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'e') {
+        if(strcmp(str->str, "else") == 0)
+            return ELSE;
+        if(strcmp(str->str, "end") == 0)
+            return END;
+        if(strcmp(str->str, "elseif") == 0)
+            return ELSEIF;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'f') {
+        if(strcmp(str->str, "false") == 0)
+            return FALSE;
+        if(strcmp(str->str, "function") == 0)
+            return FUNCTION;
+        if(strcmp(str->str, "for") == 0)
+            return FOR;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'i') {
+        if(strcmp(str->str, "if") == 0)
+            return IF;
+        if(strcmp(str->str, "in") == 0)
+            return IN;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'l') {
+        if(strcmp(str->str, "local") == 0)
+            return LOCAL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'n') {
+        if(strcmp(str->str, "not") == 0)
+            return NOT;
+        if(strcmp(str->str, "nil") == 0)
+            return NIL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'o') {
+        if(strcmp(str->str, "or") == 0)
+            return OR;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'r') {
+        if(strcmp(str->str, "read") == 0)
+            return READ;
+        if(strcmp(str->str, "return") == 0)
+            return RETURN;
+        if(strcmp(str->str, "repeat") == 0)
+            return REPEAT;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 't') {
+        if(strcmp(str->str, "then") == 0)
+            return THEN;
+        if(strcmp(str->str, "true") == 0)
+            return TRUE;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'u') {
+        if(strcmp(str->str, "until") == 0)
+            return UNTIL;
+        return IDENTIFIER;
+    }
+    if(str->str[0] == 'w') {
+        if(strcmp(str->str, "while") == 0)
+            return WHILE;
+        if(strcmp(str->str, "write") == 0)
+            return WRITE;
+        return IDENTIFIER;
+    }
     return IDENTIFIER;
 }
 
@@ -125,21 +160,15 @@ int check_keyword(string *str)
  * @param string slozi k navratu identifikatoru a cisel
  * vraci ciselnou reprezentaci tokenu
  */
-int get_token(FILE *input, string *value)
+int get_token(void)
 {
     static int c;
     static int state = FSM_READ;
 
     int num;
 
-    // vraceni tokenu z bufferu
-    if(buffer_valid) {
-        buffer_valid = 0;
-        return buffer;
-    }
-
     // buffer se musi vyprazdnit
-    str_clean(value);
+    str_clean(&str);
 
     for(;;) {
 
@@ -206,21 +235,23 @@ int get_token(FILE *input, string *value)
                 }
                 else if(c == EOF)
                     return NOTHING;
-                else
+                else {
+                    state = FSM_READ;
                     return ERROR_LEX_UX_CHAR;
+                }
                 break;
 
             case FSM_IDENTIFIER:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(! (isalnum(c) || c == '_')) {
                     state = FSM_START;
-                    return check_keyword(value); // kontrola klicovych slov
+                    return check_keyword(&str); // kontrola klicovych slov
                 }
                 break;
 
             case FSM_NUMBER:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     ;
@@ -235,7 +266,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_FLOAT0:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     state = FSM_FLOAT;
@@ -246,7 +277,7 @@ int get_token(FILE *input, string *value)
                 break;
             
             case FSM_FLOAT:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     ;
@@ -259,7 +290,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_EXP_E:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(c == '+' || c == '-')
                     state = FSM_EXP0;
@@ -272,7 +303,7 @@ int get_token(FILE *input, string *value)
                 break;
 
             case FSM_EXP0:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(isdigit(c))
                     state = FSM_EXP;
@@ -284,7 +315,7 @@ int get_token(FILE *input, string *value)
 
 
             case FSM_EXP:
-                str_push(value, c);
+                str_push(&str, c);
                 c = fgetc(input);
                 if(! isdigit(c)) {
                     state = FSM_START;
@@ -305,20 +336,20 @@ int get_token(FILE *input, string *value)
                     state = FSM_READ;
                     return STRING;
                 } else
-                    str_push(value, c);
+                    str_push(&str, c);
                 break;
 
             case FSM_ESCAPE:
                 c = fgetc(input);
                 if(c == 'n') {
                     state = FSM_STRING;
-                    str_push(value, '\n');
+                    str_push(&str, '\n');
                 } else if(c == 't') {
                     state = FSM_STRING;
-                    str_push(value, '\t');
+                    str_push(&str, '\t');
                 } else if(c == '\\' || c == '"') {
                     state = FSM_STRING;
-                    str_push(value, c);
+                    str_push(&str, c);
                 } else if(isdigit(c))
                     state = FSM_ESCAPE_NUM;
                 else {
@@ -345,7 +376,7 @@ int get_token(FILE *input, string *value)
                 if(isdigit(c)) { 
                     num = num * 10 + c - '0';
                     if(num > 0 && num < 256) {
-                        str_push(value, num);
+                        str_push(&str, num);
                         state = FSM_STRING;
                     }
                 } else {
@@ -463,24 +494,13 @@ int get_token(FILE *input, string *value)
                     return ERROR_LEX_UX_CHAR;
                 }
                 break;
-        }
-    }
 
-    assert(0);
-    return NOTHING;
-}
-
-
-/** Vrati token zpet na vstup
- *
- * vzdy se smi vratit jen jeden
- * nesmi se znicit obsah nactenych dat, ty se ukladat nebudou
- */
-int unget_token(int token)
-{
-    if(buffer_valid)
-        return 0; 
-    buffer_valid = 1;
-    buffer = token;
-    return 1;
+#ifdef DEBUG
+            // konecny automat by nemel vypadnout do jineho stavu
+            default:
+                assert(0);
+                break;
+#endif
+        } /* switch */
+    } /* for */
 }

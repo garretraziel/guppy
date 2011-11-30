@@ -20,11 +20,4 @@ enum {
     ERROR_GEN
 } EErrors;
 
-// Kody chyb
-enum {
-    ERROR_GEN_PARAM = -501,
-    ERROR_GEN_FILE = -502,
-    ERROR_GEN_MEM = -503,
-} EGenErrors;
-
 #endif

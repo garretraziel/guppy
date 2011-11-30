@@ -39,4 +39,35 @@ enum {
     ICMPEG      // porovna na vetsi nebo rovno
 } Instructions;
 
+enum {
+    ALITTABLE, // typ ukazatele do tabulky literalu
+    ALOCTABLE, // typ ukazatel do lokalni tabulky symbolu - lokalni promenne, argumenty
+    AFUNCTABLE, // ukazatel do tabulky funkci
+    //TODO: vymyslet, co vsechno tady ma byt
+} AdrTypes;
+
+typedef struct TTapeItem { // paska pro ulozeni instrukci
+    int instr; // samotna instrukce podle enum Instructions
+    void *adr; // adresa, ktera se treba pouzije
+    int adrtype; // typ ukazatele
+    struct TTapeItem *next; // ukazatel na dalsi instrukci
+} *PTapeItem;
+
+typedef struct TTape {
+    PTapeItem top; // vrchol listu
+    PTapeItem bot; // spodek listu
+    PTapeItem act; // aktivni prvek listu
+} Tape;
+
+// POZOR! paska bude globalni
+void init_tape(); /// inicializuje pasku s kodem
+int add_to_tape(PTapeItem); /// prida do pasky s kodem
+int delete_tape(); /// smaze pasku
+PTapeItem actnext_tape(); /// posune aktivni prvek na dalsi a vrati ho
+//TODO: nebude jich potreba vic?...
+
+int generate(int, void *, int); /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
+
+int execute(); /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
+
 #endif 

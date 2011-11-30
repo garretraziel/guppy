@@ -386,12 +386,16 @@ int expression(void)
     Stack stack;
     s_init(&stack);
 
+    // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
+    if(token < 0)
+        return token;
+
     // Takhle to zacina, da se dolar na zasobnik
     s_push(&stack, E_DOLLAR);
 
+    a = translatetoken[token]; // aktualni vstup
     do {
-        a = translatetoken[token];  // aktualni vstup
-        b = stack.active->type;    // nejvrchnejsi terminal na zasobniku
+        b = stack.active->type; // nejvrchnejsi terminal na zasobniku
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
@@ -435,6 +439,12 @@ int expression(void)
 
             case OO:
             default:
+                // pokud je neocekavanym tokenem carka nebo zavorka,
+                // tak se rekne, ze je konec vyrazu, kvuli write(E , E)
+                if(token == COMMA || token == RBRAC) {
+                    a = E_DOLLAR;
+                    continue;
+                }
                 // jinak syntakticka chyba
                 return ERROR_SYN_EXP_FAIL;
                 break;

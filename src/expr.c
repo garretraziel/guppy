@@ -206,7 +206,7 @@ void s_pop(Stack *stack){
     free(tmp);
     tmp = stack->top;
     while(!is_terminal(tmp->type)){
-	tmp = tmp->next;
+        tmp = tmp->next;
     }
     stack->active = tmp;
 }
@@ -237,18 +237,18 @@ void s_dump(Stack *stack)
         s_init(&s_tmp);
         char * type[] = {"^","*","/","+","-","..","<",">","<=",">=","~=","==",
                          "i","n","s","b","nil","(",")", ",","$", "{","E","P"};
-	Node * tmp = stack->top;
-	while(tmp!=NULL){
-	    s_push(&s_tmp, tmp->type);
+        Node * tmp = stack->top;
+        while(tmp!=NULL){
+            s_push(&s_tmp, tmp->type);
             tmp = tmp->next;
-	}
+        }
         tmp = s_tmp.top;
         while(tmp!=NULL){
             printf(" %s ",type[tmp->type]);
             tmp = tmp->next;
         }
         s_clean(&s_tmp);
-	printf("\n");
+        printf("\n");
 }
 
 // Aplikace pravidla (reakce na >)
@@ -288,13 +288,13 @@ static int s_oobely_boo(Stack *stack)
     int op = 0;
     if(stack->top->type == E_DOLLAR) {
         //toto tady asi nebude
-	return 0;
+        return 0;
     }
     while(stack->top->type != E_MARK && state > _ERR){
         s_dump(stack);
         switch(stack->top->type){
             case E_STR:
-		    //tady bude workaround pro string literaly
+                    //tady bude workaround pro string literaly
             case E_NUM:
             case E_BOOL:
             case E_IDENT:
@@ -303,8 +303,8 @@ static int s_oobely_boo(Stack *stack)
                     op = stack->top->type;
                     s_pop(stack);
                     state = _OKAY;
-		    //s_push(stack, E_NET_E); //aplikace pravidla na zasobniku
-		    printf("E->i\n");
+                    //s_push(stack, E_NET_E); //aplikace pravidla na zasobniku
+                    printf("E->i\n");
                 } else
                     state = _ERR; //chyba
             break;
@@ -317,8 +317,8 @@ static int s_oobely_boo(Stack *stack)
                 if(state == _OP){ //operator byl nacten 
                     s_pop(stack);
                     state = _OKAY;
-		    //s_push(stack, E_NET_E);
-		    printf("E->E %d E\n", op);
+                    //s_push(stack, E_NET_E);
+                    printf("E->E %d E\n", op);
                 } else
                     state = _ERR; //chyba
             break; //KOKOT JSEM, na toto nezapominat    
@@ -329,7 +329,7 @@ static int s_oobely_boo(Stack *stack)
                     s_pop(stack);
                     state = _OKAY; //koncovy stav
                     //s_push(stack, E_NET_E); // E->(E)
-		    printf("E->(E)\n");
+                    printf("E->(E)\n");
                 } else 
                     state = _ERR; //chyba
             break;
@@ -341,30 +341,30 @@ static int s_oobely_boo(Stack *stack)
                     state = _OP;
                 } else { 
                     state = _ERR;
-		}
+                }
             break;
             
         }
         
     }
-   
+
     if(state == _OKAY && stack->top->type == E_MARK){
         s_pop(stack); //odstrani < ze zasobniku
-  	 
+           
         switch(op){
             case E_IDENT:
             case E_NUM:
             case E_STR:
             case E_BOOL:
             case E_NIL:
-		s_push(stack, E_NET_E);
-		s_dump(stack);
+                s_push(stack, E_NET_E);
+                s_dump(stack);
                 return op; //pravidlo 1: E->i
             break; //asi zbytecne
 
             default:
-		s_push(stack, E_NET_E);
-		s_dump(stack);
+                s_push(stack, E_NET_E);
+                s_dump(stack);
                 return op; //vraci pravdilo 2 - 14
             break;
         }
@@ -426,10 +426,10 @@ int expression(void)
                     // a pouzit to pravidlo
                 // na tohle melo byt puvodne oobely_boo
                 if(s_oobely_boo(&stack) != -1)
-			b = stack.active->type; //potreba pro ukonceni cyklu
-		else {
-			return ERROR_SYN_EXP_FAIL;
-		}
+                    b = stack.active->type; //potreba pro ukonceni cyklu
+                else {
+                    return ERROR_SYN_EXP_FAIL;
+                }
                 // jinak chyba
                 break;
 

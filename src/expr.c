@@ -259,43 +259,21 @@ static int s_oobely_boo(Stack *stack)
     _START,  
     _FIRST_E, 
     _OP,
-    _FNP, //fce no param
-    _FP, //fce param
-    _FRB,
-    _FLB,
-    _FPP, //pokracovani parametru
-    _FPE, //prvni parametr fce
-    _F, //zavorky u fce s parametry zavreny
+    _F_OPEN,
     };
     int state = 1;
     int op = 0;
-    //printf("entering\n");
     if(stack->top->type == E_DOLLAR) {
         //toto tady asi nebude
 	return 0;
     }
     while(stack->top->type != E_MARK && state > _ERR){
-	//s_dump(stack);
         switch(stack->top->type){
             case E_STR:
 		    //tady bude workaround pro string literaly
             case E_NUM:
             case E_BOOL:
             case E_IDENT:
-		if(state == _FNP){
-		    op = stack->top->type; //call
-		    s_pop(stack);
-		    state = _OKAY;
-		    printf("E->i()\n");
-		    break;
-		} else
-		if(state == _F){
-		    op = stack->top->type;
-	    	    s_pop(stack);
-		    state = _OKAY;
-		    printf("E->i(E P\n");	   
-		    break;
-		}
             case E_NIL:
                 if(state == _START){ // 1 je pocatecni stav
                     op = stack->top->type;
@@ -306,7 +284,7 @@ static int s_oobely_boo(Stack *stack)
                 } else
                     state = _ERR; //chyba
             break;
-
+            
             case E_NET_E:
                 if(state == _START){ //jeste jsem nenacetl
                     s_pop(stack);
@@ -317,43 +295,9 @@ static int s_oobely_boo(Stack *stack)
                     state = _OKAY;
 		    //s_push(stack, E_NET_E);
 		    printf("E->E %d E\n", op);
-		} else
-		if(state == _FRB){ //jedno parametrova fce
-		    op = stack->top->type;	
-                    //s_pop(stack);
-		    state = _FP;
-		    printf("P->)\n");
-		    s_push(stack, E_NET_P);
-		} else
-		if(state == _FPP && stack->top->next->type == E_COMMA){ //CHEAT!!!
-		   s_pop(stack);
-		   s_pop(stack);
-		   printf("P->, E P <<\n");
-		   s_push(stack, E_NET_P);
-		} else
-		if(state == _FPP){
-		    s_pop(stack);
-		    state = _FPE;
                 } else
                     state = _ERR; //chyba
             break; //KOKOT JSEM, na toto nezapominat    
-
-	    case E_NET_P:
-	        if(state == _FP){
-		    s_pop(stack);
-		    state = _FPP;
-		} else
-	            state = _ERR;
-	    break;
-
-	    case E_RBRAC:
-	    	if(state == _START){
-		    s_pop(stack);
-		    state = _FRB;
-		   // s_push(stack, E_NET_P);
-		} else
-		    state = _ERR;
-	    break;
 
             case E_LBRAC:
                 if(state == _FIRST_E){
@@ -362,15 +306,7 @@ static int s_oobely_boo(Stack *stack)
                     state = _OKAY; //koncovy stav
                     //s_push(stack, E_NET_E); // E->(E)
 		    printf("E->(E)\n");
-		} else
-	        if(state == _FRB){
-		    s_pop(stack);
-		    state = _FNP;
-		} else 
-		if(state == _FPE){
-		    s_pop(stack);
-		    state = _F;
-                } else
+                } else 
                     state = _ERR; //chyba
             break;
 
@@ -387,10 +323,10 @@ static int s_oobely_boo(Stack *stack)
         }
         
     }
-    
-    if(state == _OKAY /*){// */ && stack->top->type == E_MARK){
-        //if(stack->top->type == E_MARK) 
-		s_pop(stack); //odstrani < ze zasobniku
+   
+    if(state == _OKAY && stack->top->type == E_MARK){
+        s_pop(stack); //odstrani < ze zasobniku
+  	 
         switch(op){
             case E_IDENT:
             case E_NUM:
@@ -398,7 +334,7 @@ static int s_oobely_boo(Stack *stack)
             case E_BOOL:
             case E_NIL:
 		s_push(stack, E_NET_E);
-		s_dump(stack);
+		//s_dump(stack);
                 return op; //pravidlo 1: E->i
             break; //asi zbytecne
 
@@ -409,10 +345,9 @@ static int s_oobely_boo(Stack *stack)
             break;
         }
         
-    } else{
+    } else {
         return -1;
     }
-  
 }
 
 //smazani zasobniku
@@ -487,7 +422,6 @@ int expression(void)
             case OO:
             default:
                 // jinak syntakticka chyba
-		printf("padne na OO\n");
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */

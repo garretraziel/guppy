@@ -11,7 +11,7 @@ build: dep $(PROJECT)
 
 rebuild: clean build
 
-$(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o expr.o
+$(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o expr.o exec.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 

@@ -404,6 +404,24 @@ int assign_z()
         get_token();
         return 1;
     }
+    // volani funkce
+    else if(token == IDENTIFIER) {
+        get_token();
+        // leva zavorka
+        if(token != LBRAC)
+//            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            return (token < 0) ? token : expression();
+        get_token();
+        // parametry
+        x = literal_identifier_list(); // TODO
+        if(x < 0)
+            return x;
+        // prava zavorka
+        if(token != RBRAC)
+            return (token < 0) ? token : ERROR_SYN_X_RBRC;
+        get_token();
+        return 1;
+    }
     // vyraz
     else
         return expression();

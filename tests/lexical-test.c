@@ -70,6 +70,7 @@ void Error(const char *fmt, ...)
 int main(void)
 {
     int token;
+    int error = 0;
 
     str_new(&str, STR_DEFAULT);
 
@@ -81,10 +82,15 @@ int main(void)
             if(token == NUMBER)
                 printf("-> %lg\n", strtod(str.str, NULL));
         }
-        else
+        else {
+            error = 1;
             Error("Na radku %d: %s\n", line, ERROR_MSG[(-token)/100][(-token)%100]);
+        }
         str_clean(&str);
     }
+
+    if(error)
+        return 1;
 
     str_free(&str);
 

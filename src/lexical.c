@@ -366,7 +366,7 @@ int get_token(void)
                     state = FSM_ESCAPE_NUM2;
                 }
                 else {
-                    state = FSM_STRING;
+                    state = FSM_START;
                     return ERROR_LEX_ESC_SEC;
                 }
                 break;
@@ -378,6 +378,9 @@ int get_token(void)
                     if(num > 0 && num < 256) {
                         str_push(&str, num);
                         state = FSM_STRING;
+                    } else {
+                        state = FSM_START;
+                        return ERROR_LEX_ESC_SEC;
                     }
                 } else {
                     state = FSM_START;

@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "lexical.h"
+#include "string.h"
 #include "expr.h"
 #include "defines.h"
 
@@ -18,7 +19,9 @@ void Error(const char *fmt, ...)
 
 int main(void)
 {
-
+    input = stdin;
+    str_new(&str, 8);
+    get_token();
     int x = expression();
     
     if(x < 0) {

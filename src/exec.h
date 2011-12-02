@@ -36,7 +36,13 @@ enum {
     ICMPL,      // porovna na mensi nez
     ICMPG,      // porovna na vetsi nez
     ICMPEL,     // porovna na mensi nebo rovno
-    ICMPEG      // porovna na vetsi nebo rovno
+    ICMPEG,     // porovna na vetsi nebo rovno
+    IWRITE,     // prehaze argumenty az po zarazku do druheho zasobniku, pak je postupne vypise
+    IREAD,      // prebere "nejspis" dva argumenty, podle prvniho fmt retezce nacte hodnotu na adresu druheho
+    ITYPE,      // popne ze zasobniku nejvyssi hodnotu, zjisti jeji typ, ktery pote pushne na zasobnik
+    ISUBSTR,    // popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
+    IFIND,      // popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
+    ISORT,      // popne vrchni string, setridi ho a vysledek pushne
 } Instructions;
 
 enum {
@@ -66,7 +72,7 @@ int delete_tape(); /// smaze pasku
 PTapeItem actnext_tape(); /// posune aktivni prvek na dalsi a vrati ho
 //TODO: nebude jich potreba vic?...
 
-int generate(int, void *, int); /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
+PTapeItem generate(int, void *, int); /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
 
 int execute(); /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 

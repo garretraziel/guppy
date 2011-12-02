@@ -185,8 +185,7 @@ int formal_parametr_seq_z()
     if(token == COMMA) {
         get_token();
         // identifikator
-        if(token != IDENTIFIER)
-            return (token < 0) ? token : ERROR_SYN_X_IDENT;
+        check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
         get_token();
         return formal_parametr_seq_z();
     }

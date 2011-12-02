@@ -22,7 +22,7 @@ fi
 # tyhle testy maji skoncit OK
 for file in programs/0-lex-*; do
     echo "Testuji  $file "
-    if [ $1 == "-q" ]; then
+    if [ "$1" == "-q" ]; then
         ./lexical-test < $file 2&>/dev/null && yell "\e[32mOK\e[0m" || yell "\e[31mFAIL\e[0m"
     else
         ./lexical-test < $file && yell "\e[32mOK\e[0m" || yell "\e[31mFAIL\e[0m"
@@ -36,7 +36,7 @@ printf "* * * * * * * * * * * * \n"
 for i in {1..1}; do
     for file in programs/$i-lex-*; do
         echo "Testuji  $file "
-        if [ $1 == "-q" ]; then
+        if [ "$1" == "-q" ]; then
             ./lexical-test < "$file" 2&>/dev/null
         else
             ./lexical-test < $file

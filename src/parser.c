@@ -44,9 +44,6 @@ static int literal(void);
 static int statement_seq(void);
 static int statement(void);
 static int assign_z(void);
-static int literal_identifier_list(void);
-static int literal_identifier_list_a(void);
-static int literal_identifier_list_z(void);
 
 static int expression_seq(void);
 static int expression_seq_z(void);
@@ -369,62 +366,6 @@ static int assign_z(void)
         return expression();
 }
 
-// LIL -> LIT LILa
-// LIL -> id LILa
-// LIL -> epsilon
-static int literal_identifier_list(void)
-{
-    switch(token) {
-        // literal
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case TRUE:
-        case FALSE:
-            try( literal() );
-            return literal_identifier_list_a();
-        case IDENTIFIER:
-            get_token();
-            return literal_identifier_list_a();
-        default:
-            return 1;
-    }
-
-}
-
-// LILa -> , LILz LILa
-// LILa -> epsilon
-static int literal_identifier_list_a(void)
-{
-    if(token == COMMA) {
-        get_token();
-        try( literal_identifier_list_z() );
-        return literal_identifier_list_a();
-    }
-    else
-        return 1;
-}
-
-// LILz -> LIT
-// LILz -> id
-static int literal_identifier_list_z(void)
-{
-    switch(token) {
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case TRUE:
-        case FALSE:
-            return literal();
-        case IDENTIFIER:
-            get_token();
-            return 1;
-            break;
-        default:
-            return 1;
-    }
-
-}
 
 // // // // // // // // // // // // // // // // // // // // // // // // //
 // Co je dal uz nefunguje ani zatim nema:

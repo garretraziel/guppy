@@ -399,6 +399,7 @@ int expression(void)
             case EQ:
                 // push(a)
                 s_push(&stack, a);
+                b = stack.active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();
                 if (token < 0) { // nacetl jsem neco spatneho
@@ -413,6 +414,7 @@ int expression(void)
                 s_alter(&stack);
                 // push(a)
                 s_push(&stack, a);
+                b = stack.active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();
                 if (token < 0) { // nacetl jsem neco spatneho

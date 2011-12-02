@@ -51,8 +51,9 @@ int main(int argc, char *argv[])
         Error(ERROR_GEN_FILE, argv[1]);
         return ERROR_GEN;
     }
-
-    int x = program(file);
+    // nastaveni vstupu
+    input = file;
+    int x = parser();
     if(x < 0) {
         Error(x);
         fclose(file);

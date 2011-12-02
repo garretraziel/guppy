@@ -21,13 +21,6 @@
 
 #define STR_INIT_LEN 16
 
-// TODO chybi generovani vnitrniho kodu
-//  chybi jeho implementace
-
-// TODO: ono to nepozna, ze je konec souboru driv nez ma
-//  povazuje to za neocekavany token
-
-
 
 // Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
 // proveden return teto hodnoty, jinak nic
@@ -40,32 +33,44 @@
 
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
-int functions_seq();
-int function();
-int formal_parametr_seq();
-int formal_parametr_seq_z();
-int local_declaration_seq();
-int local_declaration_z();
-int literal();
-int statement_seq();
-int statement();
-int assign_z();
-int literal_identifier_list();
-int literal_identifier_list_a();
-int literal_identifier_list_z();
+static int program(void);
+static int functions_seq(void);
+static int function(void);
+static int formal_parametr_seq(void);
+static int formal_parametr_seq_z(void);
+static int local_declaration_seq(void);
+static int local_declaration_z(void);
+static int literal(void);
+static int statement_seq(void);
+static int statement(void);
+static int assign_z(void);
+static int literal_identifier_list(void);
+static int literal_identifier_list_a(void);
+static int literal_identifier_list_z(void);
 
-int expression_seq();
-int expression_seq_z();
+static int expression_seq(void);
+static int expression_seq_z(void);
+
+
+/*
+ * Spousti syntaktickou analyzu
+ */
+int parser(void)
+{
+    try( str_new(&str, STR_INIT_LEN) );
+
+    int x = program();
+
+    str_free(&str);
+    return x;
+}
+
+
 
 
 // P -> DF DFS ; EOF
-int program(FILE *in)
+static int program(void)
 {
-    input = in;
-    int x;
-    if(str_new(&str, STR_INIT_LEN) == 0)
-        return ERROR_GEN_MEM;
-
     // nacteni uplne prvniho tokenu
     // to ma byt predem, ale to by musel byt token uplne globalni
     get_token();
@@ -75,33 +80,19 @@ int program(FILE *in)
         str_free(&str);
         return (token < 0) ? token : ERROR_SYN_X_FUNC;
     }
-    x = function();
-    if(x < 0) {
-        str_free(&str);
-        return x;
-    }
+    try( function() );
 
     // ostatni funkce
-    x = functions_seq();
-    if(x < 0) {
-        str_free(&str);
-        return x;
-    }
+    try( functions_seq() );
 
     // strednik za posledni funkci
-    if(token != SEMICOLON) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-    }
+    check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
 
     // EOF (ukoncivac dolar)
     get_token();
-    if(token != NOTHING) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_EOF;
-    }
+    check_token(NOTHING, ERROR_SYN_X_EOF);
 
-    str_free(&str);
+    // kontrola, zda je main posledni
     if(strcmp(last_function->name, "main") != 0)
         return ERROR_SYN_MAIN;
     return 1;
@@ -109,7 +100,7 @@ int program(FILE *in)
 
 // DFS -> DF DFS
 // DFS -> epsilon
-int functions_seq()
+static int functions_seq(void)
 {
     int x;
 
@@ -126,7 +117,7 @@ int functions_seq()
 }
 
 // DF -> function id ( FPS ) SDS SPS end
-int function()
+static int function(void)
 {
     // function
     check_token(FUNCTION, ERROR_SYN_X_FUNC);
@@ -166,7 +157,7 @@ int function()
 
 // FPS -> id FPz
 // epsilon
-int formal_parametr_seq()
+static int formal_parametr_seq(void)
 {
     // identifikator
     if(token == IDENTIFIER) {
@@ -179,7 +170,7 @@ int formal_parametr_seq()
 
 // FPz -> , id FPz
 // FPz -> epsilon
-int formal_parametr_seq_z()
+static int formal_parametr_seq_z(void)
 {
     // carka
     if(token == COMMA) {
@@ -195,7 +186,7 @@ int formal_parametr_seq_z()
 
 // SDS -> local id SDSz SDS
 // SDS -> epsilon
-int local_declaration_seq()
+static int local_declaration_seq(void)
 {
     // local
     if(token == LOCAL) {
@@ -214,7 +205,7 @@ int local_declaration_seq()
 
 // SDSz -> = LIT ;
 // SDSz -> ;
-int local_declaration_z()
+static int local_declaration_z(void)
 {
     // strednik
     if(token == SEMICOLON) {
@@ -240,7 +231,7 @@ int local_declaration_z()
 // LIT -> nil
 // LIT -> true
 // LIT -> false
-int literal()
+static int literal(void)
 {
     switch(token) {
         case NUMBER:
@@ -258,7 +249,7 @@ int literal()
 
 // SPS -> S ; SPS
 // SPS -> epsilon
-int statement_seq()
+static int statement_seq(void)
 {
     switch(token) {
         case IDENTIFIER:
@@ -285,7 +276,7 @@ int statement_seq()
 // S -> if E then SPS else SPS end
 // S -> while E do SPS end
 // S -> ret E
-int statement()
+static int statement(void)
 {
     int x;
     switch(token) {
@@ -355,9 +346,8 @@ int statement()
 }
 
 // Az -> read ( LIT )
-// Az -> E // TODO
-// Az -> id ( LIL )
-int assign_z()
+// Az -> vyraz
+static int assign_z(void)
 {
     // read
     if(token == READ) {
@@ -382,7 +372,7 @@ int assign_z()
 // LIL -> LIT LILa
 // LIL -> id LILa
 // LIL -> epsilon
-int literal_identifier_list()
+static int literal_identifier_list(void)
 {
     switch(token) {
         // literal
@@ -404,7 +394,7 @@ int literal_identifier_list()
 
 // LILa -> , LILz LILa
 // LILa -> epsilon
-int literal_identifier_list_a()
+static int literal_identifier_list_a(void)
 {
     if(token == COMMA) {
         get_token();
@@ -417,7 +407,7 @@ int literal_identifier_list_a()
 
 // LILz -> LIT
 // LILz -> id
-int literal_identifier_list_z()
+static int literal_identifier_list_z(void)
 {
     switch(token) {
         case NUMBER:
@@ -440,7 +430,7 @@ int literal_identifier_list_z()
 // Co je dal uz nefunguje ani zatim nema:
 
 // ES -> E ESz
-int expression_seq()
+static int expression_seq(void)
 {
     try( expression() );
     return expression_seq_z();
@@ -448,7 +438,7 @@ int expression_seq()
 
 // ESz -> , E ESz
 // ESz -> epsilon
-int expression_seq_z()
+static int expression_seq_z(void)
 {
     if(token == COMMA) {
         get_token();

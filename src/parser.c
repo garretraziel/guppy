@@ -29,6 +29,16 @@
 
 
 
+// Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
+// proveden return teto hodnoty, jinak nic
+#define try(command) do { int x = command; if(x<0) return x; } while(0)
+
+// Pokud je token jiny nez ocekavany token, je vracen token,
+// pokud byl sam zaporny, jinak zadany chybovy kod
+#define check_token(exptok, errcode) if(token != exptok) \
+    return (token < 0) ? token : errcode
+
+
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
 int functions_seq();
 int function();
@@ -120,17 +130,15 @@ int function()
 {
     int x;
     // function
-    if(token != FUNCTION)
-        return (token < 0) ? token : ERROR_SYN_X_FUNC;
+    check_token(FUNCTION, ERROR_SYN_X_FUNC);
     get_token();
 
     // identifier
-    if(token != IDENTIFIER)
-        return (token < 0) ? token : ERROR_SYN_X_IDENT;
-    x = insert_function(str.str); // funkce do tabulky
-    if(x < 0) return x;
-    x = str_new(&str, STR_INIT_LEN);
-    if(x < 0) return x;
+    check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+    // funkce do tabulky
+    try( insert_function(str.str) );
+    // potreba novy string, puvodni je v tabulce
+    try( str_new(&str, STR_INIT_LEN) ); 
     get_token();
 
     // left bracket

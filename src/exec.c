@@ -50,19 +50,22 @@ PTapeItem actnext_tape() /// posune aktivni prvek na dalsi a vrati ho
     return (tape.act = tape.act -> next);
 }
 
-int generate(int instr, void *adr, int type) /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
+PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
 {
     //TODO: takto jednoduse to samozrejme nejde, ale aspon aby byl mustr. joa funkce by mohla vracet adresu te vygenerovane instrukce
     //TODO: jinak se asi bude muset switchovat podle typu instrukce a vytvaret vsechny ty dodatecny veci, co jsou k tomu potreba
     PTapeItem item = malloc(sizeof(struct TTapeItem));
-    if (item == NULL) return -1; //TODO: potreba udelat errory pro nedostatek pameti
+    if (item == NULL) return NULL;
     item -> instr = instr;
     item -> adr = adr;
     item -> adrtype = type;
     item -> next = NULL;
-    if (add_to_tape(item) != 0) return -1;
+    if (add_to_tape(item) != 0) {
+	free(item);
+	return NULL;
+    }
     
-    return 0;
+    return item;
 }
 
 int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je

@@ -128,7 +128,6 @@ int functions_seq()
 // DF -> function id ( FPS ) SDS SPS end
 int function()
 {
-    int x;
     // function
     check_token(FUNCTION, ERROR_SYN_X_FUNC);
     get_token();
@@ -142,33 +141,24 @@ int function()
     get_token();
 
     // left bracket
-    if(token != LBRAC)
-        return (token < 0) ? token : ERROR_SYN_X_LBRC;
+    check_token(LBRAC, ERROR_SYN_X_LBRC);
     get_token();
 
     // formal parametr seq
-    x = formal_parametr_seq();
-    if(x < 0)
-        return x;
+    try( formal_parametr_seq() );
 
     // right bracket
-    if(token != RBRAC)
-        return (token < 0) ? token : ERROR_SYN_X_RBRC;
+    check_token(RBRAC, ERROR_SYN_X_RBRC);
     get_token();
 
     // local declaration seq
-    x = local_declaration_seq();
-    if(x < 0)
-        return x;
+    try( local_declaration_seq() );
 
     // statement seq
-    x = statement_seq();
-    if(x < 0)
-        return x;
+    try( statement_seq() );
 
     // end
-    if(token != END)
-        return (token < 0) ? token : ERROR_SYN_X_END;
+    check_token(END, ERROR_SYN_X_END);
     get_token();
 
     return 1;
@@ -208,18 +198,14 @@ int formal_parametr_seq_z()
 // SDS -> epsilon
 int local_declaration_seq()
 {
-    int x;
     // local
     if(token == LOCAL) {
         get_token();
         // identifier
-        if(token != IDENTIFIER)
-            return (token < 0) ? token : ERROR_SYN_X_IDENT;
+        check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
         get_token();
         // local declaration z
-        x = local_declaration_z();
-        if(x < 0)
-            return x;
+        try( local_declaration_z() );
         // local declaration seq
         return local_declaration_seq();
     }
@@ -231,7 +217,6 @@ int local_declaration_seq()
 // SDSz -> ;
 int local_declaration_z()
 {
-    int x;
     // strednik
     if(token == SEMICOLON) {
         get_token();
@@ -241,12 +226,9 @@ int local_declaration_z()
     else if(token == ASSIGN) {
         get_token();
         // literal
-        x = literal();
-        if(x < 0)
-            return x;
+        try( literal() );
         // strednik
-        if(token != SEMICOLON)
-            return (token < 0) ? token : ERROR_SYN_X_SMCLN;
+        check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();
         return 1;
     }
@@ -279,7 +261,6 @@ int literal()
 // SPS -> epsilon
 int statement_seq()
 {
-    int x;
     switch(token) {
         case IDENTIFIER:
         case WRITE:
@@ -287,12 +268,9 @@ int statement_seq()
         case WHILE:
         case RETURN:
             // statement
-            x = statement();
-            if(x < 0)
-                return x;
+            try( statement() );
             // strednik
-            if(token != SEMICOLON)
-                return (token < 0) ? token : ERROR_SYN_X_SMCLN;
+            check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
             get_token();
             // statement_seq
             return statement_seq();
@@ -315,8 +293,7 @@ int statement()
         case IDENTIFIER:
             get_token();
             // rovnitko
-            if(token != ASSIGN)
-                return (token < 0) ? token : ERROR_SYN_X_ASGN;
+            check_token(ASSIGN, ERROR_SYN_X_ASGN);
             get_token();
             // assign_z
             return assign_z();
@@ -324,64 +301,45 @@ int statement()
         case WRITE:
             get_token();
             // left bracket
-            if(token != LBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_LBRC;
+            check_token(LBRAC, ERROR_SYN_X_LBRC);
             get_token();
             // expression list
-            x = expression_seq();
-            if(x < 0)
-                return x;
+            try( expression_seq() );
             // right bracket
-            if(token != RBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_RBRC;
+            check_token(RBRAC, ERROR_SYN_X_RBRC);
             get_token();
             return 1;
 
         case IF:
             get_token();
             // vyraz
-            x = expression();
-            if(x < 0)
-                return x;
+            try( expression() );
             // then
-            if(token != THEN)
-                return (token < 0) ? token : ERROR_SYN_X_THEN;
+            check_token(THEN, ERROR_SYN_X_THEN);
             get_token();
             // prikazy
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
             // else
-            if(token != ELSE)
-                return (token < 0) ? token : ERROR_SYN_X_ELSE;
+            check_token(ELSE, ERROR_SYN_X_ELSE);
             get_token();
             // sekvence prikazu
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
             // end
-            if(token != END)
-                return (token < 0) ? token : ERROR_SYN_X_END;
+            check_token(END, ERROR_SYN_X_END);
             get_token();
             return 1;
 
         case WHILE:
             get_token();
             // vyraz
-            x = expression();
-            if(x < 0)
-                return x;
+            try( expression() );
             // do
-            if(token != DO)
-                return (token < 0) ? token : ERROR_SYN_X_DO;
+            check_token(DO, ERROR_SYN_X_DO);
             get_token();
             // sekvence prikazu
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
             // end
-            if(token != END)
-                return (token < 0) ? token : ERROR_SYN_X_END;
+            check_token(END, ERROR_SYN_X_END);
             get_token();
             return 1;
 
@@ -406,16 +364,14 @@ int assign_z()
     if(token == READ) {
         get_token();
         // leva zavorka
-        if(token != LBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_LBRC;
+        check_token(LBRAC, ERROR_SYN_X_LBRC);
         get_token();
         // jeden parametr (string nebo cislo) FIXME
         if(token != STRING && token != NUMBER)
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
         get_token();
         // prava zavorka
-        if(token != RBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_RBRC;
+        check_token(RBRAC, ERROR_SYN_X_RBRC);
         get_token();
         return 1;
     }
@@ -429,7 +385,6 @@ int assign_z()
 // LIL -> epsilon
 int literal_identifier_list()
 {
-    int x;
     switch(token) {
         // literal
         case NUMBER:
@@ -437,9 +392,7 @@ int literal_identifier_list()
         case NIL:
         case TRUE:
         case FALSE:
-            x = literal();
-            if(x < 0)
-                return x;
+            try( literal() );
             return literal_identifier_list_a();
         case IDENTIFIER:
             get_token();
@@ -454,12 +407,9 @@ int literal_identifier_list()
 // LILa -> epsilon
 int literal_identifier_list_a()
 {
-    int x;
     if(token == COMMA) {
         get_token();
-        x = literal_identifier_list_z();
-        if(x < 0)
-            return 0;
+        try( literal_identifier_list_z() );
         return literal_identifier_list_a();
     }
     else
@@ -493,10 +443,7 @@ int literal_identifier_list_z()
 // ES -> E ESz
 int expression_seq()
 {
-    int x;
-    x = expression();
-    if(x < 0)
-        return x;
+    try( expression() );
     return expression_seq_z();
 }
 
@@ -504,12 +451,9 @@ int expression_seq()
 // ESz -> epsilon
 int expression_seq_z()
 {
-    int x;
     if(token == COMMA) {
         get_token();
-        x = expression();
-        if(x < 0)
-            return x;
+        try( expression() );
         return expression_seq_z();
     }
     // epsilon

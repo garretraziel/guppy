@@ -9,9 +9,10 @@
  */
 
 #include <stdlib.h>
-#include <string.h> //TODO: pouzivat? nebo definovat vlastni strlen a strcmp?
+#include <string.h>
 #include "ial.h"
 #include "string.h"
+#include "defines.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -21,7 +22,7 @@
  * @param a znaky v intervalu <a,b> budou razeny
  * @param b
  */
-void quicksort(char *str, int a, int b)
+static inline void quicksort(char *str, int a, int b)
 {
     int l = a;
     int r = b;
@@ -64,8 +65,139 @@ void sort(string *str)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: tabulka symbolu pomoci BST
 
+// Globalni tabulky symbolu
+FunctionTree *functions_table = NULL;
+LiteralTree *literals_table = NULL;
+
+// Ukazatel na posledni pridanou funkci
+FunctionTree *last_function = NULL;
+
+/*
+ * Prida funckci do tabulky funkci,
+ * pokud jiz takova funkce existuje, vraci chybu, jinak 0
+ */
+static inline int insert_function__(FunctionTree **root, char *str)
+{
+    int cmp;
+    if(*root == NULL) {
+        FunctionTree *new = malloc(sizeof(FunctionTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->name = str; // nebo kopirovat?
+        new->symbols = NULL;
+        new->left = NULL;
+        new->right = NULL;
+        last_function = new;
+        return 0;
+    }
+    cmp = strcmp(str, (*root)->name);
+    if(cmp < 0)
+        return insert_function__(&(*root)->left, str);
+    else if(cmp > 0)
+        return insert_function__(&(*root)->right, str);
+    else // == 0
+        return ERROR_SYN_FUNC_REDEF;
+}
+
+
+/*
+ * Wrapper
+ */
+int insert_function(char *str)
+{
+    return insert_function__(&functions_table, str);
+}
+
+/*
+ * Musi se vyresit, jak je tam vkladat, co bude klicem
+ * je potreba vubec vyhledavat?
+ */
+static inline int insert_literal__(LiteralTree **root, int key, Data data)
+{
+    if(*root == NULL) {
+        LiteralTree *new = malloc(sizeof(LiteralTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->key = key;
+        new->data = data;
+        new->left = NULL;
+        new->right = NULL;
+        return 0;
+    }
+    if(key < (*root)->key)
+        return insert_literal__(&(*root)->left, key, data);
+    else if(key > (*root)->key)
+        return insert_literal__(&(*root)->right, key, data);
+    else
+        return insert_literal__(&(*root)->left, key-1, data);
+}
+
+int insert_literal(int key, Data data)
+{
+    return insert_literal__(&literals_table, key, data);
+}
+/*
+ * Prida do tabulky symbolu jmeno indentifikatoru
+ * kazda funkce ma svuj
+ */
+int insert_local(LocalTree **root, char *str, int offset, Data data)
+{
+    int cmp;
+    if(*root == NULL) {
+        LocalTree *new = malloc(sizeof(LocalTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->name = str; // nebo kopirovat?
+        new->data = data;
+        new->left = NULL;
+        new->right = NULL;
+        return 0;
+    }
+    cmp = strcmp(str, (*root)->name);
+    if(cmp < 0)
+        return insert_local(&(*root)->left, str, offset, data);
+    else if(cmp > 0)
+        return insert_local(&(*root)->right, str, offset, data);
+    else // == 0
+        return ERROR_SYN_FUNC_REDEF;
+}
+
+/*
+int drop_functions(FunctionTree **root)
+{
+    return 0;
+}
+
+int drop_literals(LiteralTree **root)
+{
+    return 0;
+}
+
+int find_function(FunctionTree *root, const char *str)
+{
+    return 0;
+}
+
+int find_local(FunctionTree *root, const char *str)
+{
+    return 0;
+}
+*/
+
+#ifdef DEBUG
+void print_functions(FunctionTree *root)
+{
+    if(root == NULL)
+        return;
+    print_functions(root->left);
+    printf("%s\n", root->name);
+    print_functions(root->right);
+}
+#endif
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 ///FIXME: toto bude asi vysledny pouzity KMP algoritmus, ale zatim je to

@@ -34,6 +34,8 @@ enum {
     ERROR_SYN_X_DO = -212,
     ERROR_SYN_X_OPRTR = -213,
     ERROR_SYN_EXP_FAIL = -214,
+    ERROR_SYN_FUNC_REDEF = -215,
+    ERROR_SYN_MAIN= -216,
 } ESynErrors;
 
 // [3]

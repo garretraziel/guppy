@@ -10,12 +10,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "defines.h"
 #include "lexical.h"
 #include "parser.h"
 #include "guppy.h"
 #include "expr.h"
+#include "ial.h"
 
 #define STR_INIT_LEN 16
 
@@ -90,6 +92,8 @@ int program(FILE *in)
     }
 
     str_free(&str);
+    if(strcmp(last_function->name, "main") != 0)
+        return ERROR_SYN_MAIN;
     return 1;
 }
 
@@ -123,6 +127,10 @@ int function()
     // identifier
     if(token != IDENTIFIER)
         return (token < 0) ? token : ERROR_SYN_X_IDENT;
+    x = insert_function(str.str); // funkce do tabulky
+    if(x < 0) return x;
+    x = str_new(&str, STR_INIT_LEN);
+    if(x < 0) return x;
     get_token();
 
     // left bracket

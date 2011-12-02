@@ -34,6 +34,8 @@ const char *SYN_ERRORS[] = {
     [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
     [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
     [(-ERROR_SYN_EXP_FAIL) % 100] = "Neplatny vyraz",
+    [(-ERROR_SYN_FUNC_REDEF) % 100] = "Funkce je jiz definovana",
+    [(-ERROR_SYN_MAIN) % 100] = "Funkce main neni definovana nebo neni definovana jako posledni",
 };
 
 

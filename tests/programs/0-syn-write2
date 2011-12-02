@@ -1,0 +1,6 @@
+function main()
+    write(a);
+    write(a, b);
+    write(1+2*4, "ss" .. "s", 32);
+    write("hello", 12+6, "hel".."lo");
+end;

@@ -6,6 +6,7 @@
 #include "string.h"
 #include "expr.h"
 #include "defines.h"
+#include "ial.h"
 
 void Error(const char *fmt, ...)
 {

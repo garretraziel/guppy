@@ -471,7 +471,9 @@ int expression(void)
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
+#ifdef DEBUG
         s_dump(&stack);
+#endif
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
     // uvolneni zasobniku, vzdycky tam zbyde E_DOLLAR

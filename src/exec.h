@@ -76,4 +76,7 @@ PTapeItem generate(int, void *, int); /// funkce, ktera prebere typ instrukce, u
 
 int execute(); /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 
+// globalni paska instrukci
+extern Tape tape;
+
 #endif 

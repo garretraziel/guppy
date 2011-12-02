@@ -302,11 +302,11 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case LITERAL:
-            case IDENT:
-                if(top == E_MARK)
-                    return OKILY_DOKILY; // E -> string, bool, num, nil
-                else
+            case IDENT: // E -> string, bool, num, nil, id
+                if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_push(stack, E_NET_E);
+                return OKILY_DOKILY; 
                 break;
             case RBRAC:
                 if(top == E_NET_E)
@@ -327,8 +327,17 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case BRAC_EEEE:
-                if(top == E_LBRAC)
-                    state = B_E_B;
+                if(top != E_LBRAC)
+                    return ERROR_SYN_EXP_FAIL;
+                s_pop(stack);
+                top = translate[stack->top->type];
+                if(top == E_IDENT)
+                    state = FUNC_CALL;
+                else if(top == E_MARK) {
+                    // vyraz v zavorce
+                    s_push(stack, E_NET_E);
+                    return OKILY_DOKILY;
+                }
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
@@ -337,10 +346,10 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack);
                 top = translate[stack->top->type];
-                if(top == E_MARK)
-                    return OKILY_DOKILY;
-                else
+                if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_push(stack, E_NET_E);
+                return OKILY_DOKILY;
                 break;
             case FUNC_N:
                 if(top == E_LBRAC)
@@ -353,17 +362,19 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack);
                 top = translate[stack->top->type];
-                if(top == E_MARK)
-                    return OKILY_DOKILY;
-                else
+                if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_push(stack, E_NET_E);
+                return OKILY_DOKILY;
                 break;
             case EEEE_COMM: // redukce parametru
                 if(top != E_NET_E && top != E_NET_P)
                     return ERROR_SYN_EXP_FAIL;
                 top = translate[stack->top->type];
-                if(top == E_MARK)
+                if(top == E_MARK) {
+                    s_push(stack, E_NET_P);
                     return OKILY_DOKILY;
+                }
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
@@ -392,6 +403,8 @@ int expression(void)
 
     a = translatetoken[token]; // aktualni vstup
     do {
+        printf("pred: ");
+        s_dump(&stack);
         b = stack.active->type; // nejvrchnejsi terminal na zasobniku
         switch( prec_table[b][a] ) {
             case EQ:
@@ -423,6 +436,7 @@ int expression(void)
                 break;
 
             case GT:
+                printf("redukce\n");
                 // pokud je na zasobiku <y a existuje pravidlo r: A -> y, pak
                     // vymenit <y za A
                     // a pouzit to pravidlo
@@ -448,6 +462,9 @@ int expression(void)
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
+        printf("  po: ");
+        s_dump(&stack);
+        printf("\n");
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
     // uvolneni zasobniku, vzdycky tam zbyde E_DOLLAR

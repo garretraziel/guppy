@@ -257,9 +257,9 @@ void s_dump(Stack *stack)
 // Aplikace pravidla (reakce na >)
 static int s_oobely_boo(Stack *stack)
 {
-    enum states { START, LITERAL, IDENT, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER, B_E_B};
+    enum states { START, VAL, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER};
     const int OKILY_DOKILY = 1;
-    const int translate[E_MARK] = {
+    const int translate[] = {
         [E_POW] = E_OP,
         [E_MUL] = E_OP,
         [E_DIV] = E_OP,
@@ -281,6 +281,9 @@ static int s_oobely_boo(Stack *stack)
         [E_RBRAC] = E_RBRAC,
         [E_COMMA] = E_COMMA,
         [E_DOLLAR] = E_DOLLAR,
+        [E_MARK] = E_MARK,
+        [E_NET_E] = E_NET_E,
+        [E_NET_P] = E_NET_P,
     };
 
     int top;
@@ -291,9 +294,9 @@ static int s_oobely_boo(Stack *stack)
         switch(state) {
             case START:
                 if(top == E_LIT)
-                    state = LITERAL;
+                    state = VAL;
                 else if(top == E_IDENT)
-                    state = IDENT;
+                    state = VAL;
                 else if(top == E_RBRAC)
                     state = RBRAC;
                 else if(top == E_NET_E)
@@ -301,10 +304,10 @@ static int s_oobely_boo(Stack *stack)
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
-            case LITERAL:
-            case IDENT: // E -> string, bool, num, nil, id
+            case VAL: // E -> string, bool, num, nil, id
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_pop(stack); // oddelani znacky
                 s_push(stack, E_NET_E);
                 return OKILY_DOKILY; 
                 break;
@@ -331,23 +334,28 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack);
                 top = translate[stack->top->type];
-                if(top == E_IDENT)
-                    state = FUNC_CALL;
-                else if(top == E_MARK) {
-                    // vyraz v zavorce
+                if(top == E_IDENT){ // volani funkce s 1 parametrem
+                    s_pop(stack); // oddelani identifikatoru
+                    top = translate[stack->top->type];
+                }
+                // bud vyraz v zacorce, nebo volani funkce
+                if(top == E_MARK) {
+                    s_pop(stack); // oddelani znacky
                     s_push(stack, E_NET_E);
                     return OKILY_DOKILY;
                 }
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
-            case FUNC_CALL: // volani funkce
+            case FUNC_CALL: // volani funkce bez a s vice parametry
+                // overeni, ze tam je identifikator a znacka
                 if(top != E_IDENT)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_pop(stack); // oddelani znacky
                 s_push(stack, E_NET_E);
                 return OKILY_DOKILY;
                 break;
@@ -364,14 +372,17 @@ static int s_oobely_boo(Stack *stack)
                 top = translate[stack->top->type];
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
+                s_pop(stack); // oddelani znacky
                 s_push(stack, E_NET_E);
                 return OKILY_DOKILY;
                 break;
             case EEEE_COMM: // redukce parametru
                 if(top != E_NET_E && top != E_NET_P)
                     return ERROR_SYN_EXP_FAIL;
+                s_pop(stack);
                 top = translate[stack->top->type];
                 if(top == E_MARK) {
+                    s_pop(stack); // oddelani znacky
                     s_push(stack, E_NET_P);
                     return OKILY_DOKILY;
                 }
@@ -383,6 +394,7 @@ static int s_oobely_boo(Stack *stack)
 
     // TODO v cyklu chybi generovani instrukci
     // nejak se musi jeste pocitat parametry funci a pripadne je doplnit nil
+    // je to napsane celkem prasacky, asi budu muset nekde uvest, jak to funguje
 }
 
 
@@ -403,8 +415,6 @@ int expression(void)
 
     a = translatetoken[token]; // aktualni vstup
     do {
-        printf("pred: ");
-        s_dump(&stack);
         b = stack.active->type; // nejvrchnejsi terminal na zasobniku
         switch( prec_table[b][a] ) {
             case EQ:
@@ -436,7 +446,6 @@ int expression(void)
                 break;
 
             case GT:
-                printf("redukce\n");
                 // pokud je na zasobiku <y a existuje pravidlo r: A -> y, pak
                     // vymenit <y za A
                     // a pouzit to pravidlo
@@ -462,9 +471,7 @@ int expression(void)
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
-        printf("  po: ");
         s_dump(&stack);
-        printf("\n");
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
     // uvolneni zasobniku, vzdycky tam zbyde E_DOLLAR

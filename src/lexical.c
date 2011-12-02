@@ -160,7 +160,7 @@ int check_keyword(string *str)
  * @param string slozi k navratu identifikatoru a cisel
  * vraci ciselnou reprezentaci tokenu
  */
-int get_token(void)
+static inline int get_token__(void)
 {
     static int c;
     static int state = FSM_READ;
@@ -503,4 +503,12 @@ int get_token(void)
 #endif
         } /* switch */
     } /* for */
+}
+
+/*
+ *  Wrapper funkce pro nacteni dalsiho tokenu
+ */
+void get_token(void)
+{
+    token = get_token__();
 }

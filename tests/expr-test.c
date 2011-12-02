@@ -3,8 +3,9 @@
 
 #include "parser.h"
 #include "lexical.h"
-#include "defines.h"
+#include "string.h"
 #include "expr.h"
+#include "defines.h"
 
 void Error(const char *fmt, ...)
 {
@@ -15,10 +16,13 @@ void Error(const char *fmt, ...)
     va_end(args);
 }
 
+
 int main(void)
 {
-
-    int x = program(stdin);
+    input = stdin;
+    str_new(&str, 8);
+    get_token();
+    int x = expression();
     
     if(x < 0) {
         Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);

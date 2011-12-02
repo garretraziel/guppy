@@ -11,7 +11,6 @@
 #ifndef IFJ_PARSER_H
 #define IFJ_PARSER_H
 
-// Zpracuje pocatacni neterminalni symbol
 int program(FILE *);
 
 #endif

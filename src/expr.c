@@ -61,6 +61,10 @@ enum {
     // jeste jsou potreba neterminaly
     E_NET_E,
     E_NET_P,
+
+    // tohle jsou jen pomocne konstanty pro oobely-boo
+    E_OP,
+    E_LIT,
 } ESymbols;
 
 #define is_terminal(e_sym)(e_sym < E_MARK)
@@ -118,7 +122,7 @@ const int translatetoken[] = {
 
 
 // Precedencni tabulka
-int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka <
+const int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka <
        /*    ^   *   /   +   -   ..  <   >   <=  >=  ~=  ==  id  nu  st  bl  ni  (   )   ,   $   */
 /* ^    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
 /* *    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
@@ -253,128 +257,122 @@ void s_dump(Stack *stack)
 // Aplikace pravidla (reakce na >)
 static int s_oobely_boo(Stack *stack)
 {
-    // potreba najit nejake pravidlo a nahradit to, to bude jeste svanda
-    
-    /* Pravidla bez volani fci: 
-     * 1: E -> i //i je z {E_NUM, E_STR, E_BOOL, E_IDENT, E_NIL}
-     * 2: E -> (E)
-     * 3: E -> E^E
-     * 4: E -> E * E
-     * 5: E -> E / E
-     * 6: E -> E + E
-     * 7: E -> E - E
-     * 8: E -> E .. E
-     * 9: E -> E < E
-     *10: E -> E > E
-     *11: E -> E <= E
-     *12: E -> E >= E
-     *13: E -> E == E
-     *14: E -> E ~= E
-     *15: E -> E_IDENT ( )
-     *16: E -> E_IDENT ( E P
-     *17: P -> )
-     *18: P -> , E P
-     */
-    enum stavy{
-    _OKAY=-1,
-    _ERR=0,   
-    _START,  
-    _FIRST_E, 
-    _OP,
-    _F_OPEN,
+    enum states { START, LITERAL, IDENT, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER, B_E_B};
+    const int OKILY_DOKILY = 1;
+    const int translate[E_MARK] = {
+        [E_POW] = E_OP,
+        [E_MUL] = E_OP,
+        [E_DIV] = E_OP,
+        [E_PLUS] = E_OP,
+        [E_MINUS] = E_OP,
+        [E_STRCONCAT] = E_OP,
+        [E_LESS] = E_OP,
+        [E_GREAT] = E_OP,
+        [E_LESSEQ] = E_OP,
+        [E_GREATEQ] = E_OP,
+        [E_NOTEQ] = E_OP,
+        [E_EQUAL] = E_OP,
+        [E_IDENT] = E_IDENT,
+        [E_NUM] = E_LIT,
+        [E_STR] = E_LIT,
+        [E_BOOL] = E_LIT,
+        [E_NIL] = E_LIT,
+        [E_LBRAC] = E_LBRAC,
+        [E_RBRAC] = E_RBRAC,
+        [E_COMMA] = E_COMMA,
+        [E_DOLLAR] = E_DOLLAR,
     };
-    int state = 1;
-    int op = 0;
-    if(stack->top->type == E_DOLLAR) {
-        //toto tady asi nebude
-        return 0;
-    }
-    while(stack->top->type != E_MARK && state > _ERR){
-        s_dump(stack);
-        switch(stack->top->type){
-            case E_STR:
-                    //tady bude workaround pro string literaly
-            case E_NUM:
-            case E_BOOL:
-            case E_IDENT:
-            case E_NIL:
-                if(state == _START){ // 1 je pocatecni stav
-                    op = stack->top->type;
-                    s_pop(stack);
-                    state = _OKAY;
-                    //s_push(stack, E_NET_E); //aplikace pravidla na zasobniku
-                    printf("E->i\n");
-                } else
-                    state = _ERR; //chyba
-            break;
-            
-            case E_NET_E:
-                if(state == _START){ //jeste jsem nenacetl
-                    s_pop(stack);
-                    state = _FIRST_E; //prvni E nacteno
-                } else
-                if(state == _OP){ //operator byl nacten 
-                    s_pop(stack);
-                    state = _OKAY;
-                    //s_push(stack, E_NET_E);
-                    printf("E->E %d E\n", op);
-                } else
-                    state = _ERR; //chyba
-            break; //KOKOT JSEM, na toto nezapominat    
 
-            case E_LBRAC:
-                if(state == _FIRST_E){
-                    op = stack->top->type;
-                    s_pop(stack);
-                    state = _OKAY; //koncovy stav
-                    //s_push(stack, E_NET_E); // E->(E)
-                    printf("E->(E)\n");
-                } else 
-                    state = _ERR; //chyba
-            break;
-
-            default: //ostatni terminaly
-                if(state == _FIRST_E){ // jen kdyz uz jsem nacetl jeden neterminal
-                    op = stack->top->type; //ulozim si operator
-                    s_pop(stack);
-                    state = _OP;
-                } else { 
-                    state = _ERR;
-                }
-            break;
-            
+    int top;
+    int state = START;
+    // cyklus prochazni zasobnikem
+    for(;;s_pop(stack)) {
+        top = translate[stack->top->type];
+        switch(state) {
+            case START:
+                if(top == E_LIT)
+                    state = LITERAL;
+                else if(top == E_IDENT)
+                    state = IDENT;
+                else if(top == E_RBRAC)
+                    state = RBRAC;
+                else if(top == E_NET_E)
+                    state = EEEE;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case LITERAL:
+            case IDENT:
+                if(top == E_MARK)
+                    return OKILY_DOKILY; // E -> string, bool, num, nil
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case RBRAC:
+                if(top == E_NET_E)
+                    state = BRAC_EEEE;
+                else if(top == E_LBRAC)
+                    state = FUNC_CALL;
+                else if(top == E_NET_P)
+                    state = FUNC_N;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case EEEE:
+                if(top == E_OP)
+                    state = OPER;
+                else if(top == E_COMMA)
+                    state = EEEE_COMM;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case BRAC_EEEE:
+                if(top == E_LBRAC)
+                    state = B_E_B;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case FUNC_CALL: // volani funkce
+                if(top != E_IDENT)
+                    return ERROR_SYN_EXP_FAIL;
+                s_pop(stack);
+                top = translate[stack->top->type];
+                if(top == E_MARK)
+                    return OKILY_DOKILY;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case FUNC_N:
+                if(top == E_LBRAC)
+                    state = FUNC_CALL;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case OPER: // vykonani aritmeticke operace
+                if(top != E_NET_E)
+                    return ERROR_SYN_EXP_FAIL;
+                s_pop(stack);
+                top = translate[stack->top->type];
+                if(top == E_MARK)
+                    return OKILY_DOKILY;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
+            case EEEE_COMM: // redukce parametru
+                if(top != E_NET_E && top != E_NET_P)
+                    return ERROR_SYN_EXP_FAIL;
+                top = translate[stack->top->type];
+                if(top == E_MARK)
+                    return OKILY_DOKILY;
+                else
+                    return ERROR_SYN_EXP_FAIL;
+                break;
         }
-        
     }
 
-    if(state == _OKAY && stack->top->type == E_MARK){
-        s_pop(stack); //odstrani < ze zasobniku
-           
-        switch(op){
-            case E_IDENT:
-            case E_NUM:
-            case E_STR:
-            case E_BOOL:
-            case E_NIL:
-                s_push(stack, E_NET_E);
-                s_dump(stack);
-                return op; //pravidlo 1: E->i
-            break; //asi zbytecne
-
-            default:
-                s_push(stack, E_NET_E);
-                s_dump(stack);
-                return op; //vraci pravdilo 2 - 14
-            break;
-        }
-        
-    } else {
-        return -1;
-    }
+    // TODO v cyklu chybi generovani instrukci
+    // nejak se musi jeste pocitat parametry funci a pripadne je doplnit nil
 }
-
-
-
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -425,18 +423,16 @@ int expression(void)
                 break;
 
             case GT:
-                // aplikace pravidla, tohle bude nejslozitejsi
-                // pokud je na zasobiku <y a existuje pravidlo r: A -> y
-                    // pak vymenit <y za A
+                // pokud je na zasobiku <y a existuje pravidlo r: A -> y, pak
+                    // vymenit <y za A
                     // a pouzit to pravidlo
-                // na tohle melo byt puvodne oobely_boo
-                if(s_oobely_boo(&stack) != -1)
-                    b = stack.active->type; //potreba pro ukonceni cyklu
+                if(s_oobely_boo(&stack) >= 0)
+                    b = stack.active->type; // nejhornejsi terminal byl zmenen
+                // jinak chyba
                 else {
                     s_clean(&stack);
                     return ERROR_SYN_EXP_FAIL;
                 }
-                // jinak chyba
                 break;
 
             case OO:

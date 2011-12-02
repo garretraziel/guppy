@@ -61,8 +61,8 @@ PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ
     item -> adrtype = type;
     item -> next = NULL;
     if (add_to_tape(item) != 0) {
-	free(item);
-	return NULL;
+        free(item);
+        return NULL;
     }
     
     return item;

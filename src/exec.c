@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "exec.h"
 #include "defines.h"
@@ -273,8 +274,19 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             break;
         case ICMPEG:
             break;
-        case IWRITE:
+        case IWRITE: {
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            if (dattype == DNUM) printf("%g", value.num);
+            else if (dattype == DSTRING) {
+                printf("%s", value.str);
+                free(value.str);
+            } else {
+                ExecError(); //TODO: write jenom string nebo num, jaka chyba kdyz je neco jineho?
+            }
             break;
+        }
         case IREAD:
             break;
         case ITYPE: {

@@ -13,7 +13,7 @@
 #include "exec.h"
 #include "string.h"
 
-//globalni promenna, paska pro ulozeni instrukci
+//globalni promenne, paska pro ulozeni instrukci
 Tape tape;
 
 void init_tape() /// inicializuje pasku s kodem
@@ -47,7 +47,9 @@ int delete_tape() /// smaze pasku
 PTapeItem actnext_tape() /// posune aktivni prvek na dalsi a vrati ho
 {
     if (tape.act == NULL) return NULL;
-    return (tape.act = tape.act -> next);
+    PTapeItem temp =  tape.act;
+    tape.act = tape.act -> next; // posunu se na dalsi instrukci
+    return temp;
 }
 
 PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
@@ -71,5 +73,89 @@ PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ
 int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 {
     //TODO: exekuce
+
+    if (tape.top == NULL) return 0; //TODO: ma to vubec cenu osetrovat? tohle se stejne nikdy nestane, ne?
+
+    tape.act = tape.top; //TODO: aktualni se asi nikdy jindy nastavovat nebude, popremyslet o tom
+    
+    while (1) { // reknete mi duvod, proc by to nemohl byt nekonecny cyklus
+        
+        PTapeItem instr = actnext_tape();
+
+        if (instr == NULL) return -1; //TODO: neco se nepovedlo, popremyslet co by to mohlo byt za chybu
+
+        switch (instr -> instr) {
+        case IHALT:
+            delete_tape();
+            return 0;
+            break; // sem by to nemelo dojit
+        case IJMP:
+            tape.act = (PTapeItem) instr -> adr;
+            break;
+        case IJMPT:
+            break;
+        case IJMPF:
+            break;
+        case ICALL:
+            break;
+        case IRETP:
+            break;
+        case IRET:
+            break;
+        case IPUSH:
+            break;
+        case IPUSHI:
+            break;
+        case IPUSHT:
+            break;
+        case IPUSHF:
+            break;
+        case IPOPI:
+            break;
+        case IPUSHM:
+            break;
+        case IADD:
+            break;
+        case ISUB:
+            break;
+        case IMUL:
+            break;
+        case IDIV:
+            break;
+        case IPOW:
+            break;
+        case ICONCAT:
+            break;
+        case ICMP:
+            break;
+        case ICMPN:
+            break;
+        case ICMPL:
+            break;
+        case ICMPG:
+            break;
+        case ICMPEL:
+            break;
+        case ICMPEG:
+            break;
+        case IWRITE:
+            break;
+        case IREAD:
+            break;
+        case ITYPE:
+            break;
+        case ISUBSTR:
+            break;
+        case IFIND:
+            break;
+        case ISORT:
+            break;
+        default:
+            //TODO: nedefinovana instrukce, POMOC!
+            return -1; //TODO: co to ma vracet za chybu?
+        }
+        
+    }
+    
     return 0;
 }

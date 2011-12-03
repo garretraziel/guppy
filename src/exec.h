@@ -49,6 +49,7 @@ enum {
     ALITTABLE, // typ ukazatele do tabulky literalu
     ALOCTABLE, // typ ukazatel do lokalni tabulky symbolu - lokalni promenne, argumenty
     AFUNCTABLE, // ukazatel do tabulky funkci
+    ATAPE, // ukazatel na pasku, pouzivane u skoku
     //TODO: vymyslet, co vsechno tady ma byt
 } AdrTypes;
 

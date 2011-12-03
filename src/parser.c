@@ -22,10 +22,6 @@
 #define STR_INIT_LEN 16
 
 
-// Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
-// proveden return teto hodnoty, jinak nic
-#define try(command) do { int x = command; if(x<0) return x; } while(0)
-
 // Pokud je token jiny nez ocekavany token, je vracen token,
 // pokud byl sam zaporny, jinak zadany chybovy kod
 #define check_token(exptok, errcode) do { if(token != exptok) \

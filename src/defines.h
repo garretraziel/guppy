@@ -68,4 +68,10 @@ enum {
     T_NIL,
 } EDataTypes;
 
+
+// Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
+// proveden return teto hodnoty, jinak nic
+#define try(command) do { int x = command; if(x<0) return x; } while(0)
+
+
 #endif

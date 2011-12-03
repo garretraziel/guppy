@@ -72,6 +72,8 @@ enum {
 #define STRUE 1
 #define SFALSE 0
 
+#define STACK_DEFAULT_SIZE 1000 //TODO: chci slyset vase navrhy
+
 // Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
 // proveden return teto hodnoty, jinak nic
 #define try(command) do { int x = command; if(x<0) return x; } while(0)

@@ -97,7 +97,7 @@ PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ
 //TODO: spousta veci se opakuje a dala by se dat do nejakych maker, ale me uz je to proste vsechno jedno, budu jenom kopirovat
 int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 {
-    //TODO: exekuce
+    init_stack(STACK_DEFAULT_SIZE);
 
     if (tape.top == NULL) return 0; //TODO: ma to vubec cenu osetrovat? tohle se stejne nikdy nestane, ne?
 

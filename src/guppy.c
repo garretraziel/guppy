@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
     }
     // nastaveni vstupu
     input = file;
+    // inicializace pasky instrukci
+    init_tape();
     int x = parser();
     if(x < 0) {
         Error(x);

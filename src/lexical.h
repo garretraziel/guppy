@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_LEXICAL_H
-#define IJC_LEXICAL_H
+#ifndef GUPPY_LEXICAL_H
+#define GUPPY_LEXICAL_H
 
 #include "string.h"
 

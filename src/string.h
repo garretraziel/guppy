@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_STRING_H
-#define IJC_STRING_H
+#ifndef GUPPY_STRING_H
+#define GUPPY_STRING_H
 
 #define STR_DEFAULT 255
 

@@ -17,6 +17,7 @@
 #include "ial.h"
 
 #define ExecError() do {delete_stack(); delete_tape(); return -1;} while(0)
+#define try_push_stack(type,val) do { if (push_stack(type, val) != 0) ExecError(); } while(0)
 
 typedef struct TStack {
     int esp;
@@ -147,13 +148,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPUSHT: {
             univalue value;
             value.log = STRUE;
-            if (push_stack(DBOOL, value) != 0) ExecError();
+            try_push_stack(DBOOL, value);
             break;
         }
         case IPUSHF: {
             univalue value;
             value.log = SFALSE;
-            if (push_stack(DBOOL, value) != 0) ExecError();
+            try_push_stack(DBOOL, value);
             break;
         }
         case IPOPI:
@@ -161,7 +162,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPUSHM: {
             univalue value;
             value.log = STRUE; // zbytecne, ale nezbytne
-            if (push_stack(DMARK, value) != 0) ExecError();
+            try_push_stack(DMARK, value);
+            break;
+        }
+        case IPUSHN: {
+            univalue value;
+            value.log = STRUE;
+            try_push_stack(DNIL, value);
             break;
         }
         case IADD: {
@@ -172,9 +179,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
             retvalue.num = value1.num + value2.num;
-            if (push_stack(DNUM, retvalue) != 0) {
-                ExecError();
-            }
+            try_push_stack(DNUM, retvalue);
             break;
         }
         case ISUB: {
@@ -185,8 +190,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
             retvalue.num = value2.num - value1.num;
-            if (push_stack(DNUM, retvalue) != 0) 
-                ExecError();
+            try_push_stack(DNUM, retvalue);
             break;
         }
         case IMUL: {
@@ -197,8 +201,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
             retvalue.num = value1.num * value2.num;
-            if (push_stack(DNUM, retvalue) != 0)
-                ExecError();
+            try_push_stack(DNUM, retvalue);
             break;
         }
         case IDIV: {
@@ -211,8 +214,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (value1.num == 0)
                 ExecError(); //TODO: tady mam vracet nejakou dulezitou chybu, ne? ne?
             retvalue.num = value2.num / value1.num;
-            if (push_stack(DNUM, retvalue) != 0)
-                ExecError();
+            try_push_stack(DNUM, retvalue);
             break;
         }
         case IPOW: {
@@ -223,8 +225,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
             retvalue.num = pow(value2.num, value1.num);
-            if (push_stack(DNUM, retvalue) != 0)
-                ExecError();
+            try_push_stack(DNUM, retvalue);
             break;
         }
         case ICONCAT: {
@@ -236,12 +237,26 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 ExecError();
             retvalue.str = concat(value2.str, value1.str);
             if (retvalue.str == NULL) ExecError();
-            if (push_stack(DSTRING, retvalue) != 0)
-                ExecError();
+            try_push_stack(DSTRING, retvalue);
             break;
         }
-        case ICMP:
+        case ICMP: {
+            univalue value1, value2, retvalue;
+            int dattype1, dattype2;
+            if (pop_stack(&dattype1, &value1) != 0) ExecError();
+            if (pop_stack(&dattype2, &value2) != 0) ExecError();
+            if (dattype1 != dattype2) {
+                retvalue.log = SFALSE;
+                try_push_stack(DBOOL, retvalue);
+            } else if (dattype1 == DNUM) {
+                if (value1.num == value2.num)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+                try_push_stack(DBOOL, retvalue);
+            }
             break;
+        }
         case ICMPN:
             break;
         case ICMPL:

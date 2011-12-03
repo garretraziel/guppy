@@ -87,6 +87,7 @@ static inline int insert_function__(FunctionTree **root, char *str)
         *root = new;
         new->name = str; // nebo kopirovat?
         new->symbols = NULL;
+        new->syms = 0;
         new->left = NULL;
         new->right = NULL;
         last_function = new;
@@ -110,9 +111,12 @@ int insert_function(char *str)
     return insert_function__(&functions_table, str);
 }
 
+
+
 /*
- * Musi se vyresit, jak je tam vkladat, co bude klicem
- * je potreba vubec vyhledavat?
+ * Vlozi literal do tabulky literalu
+ * Vklada se s nahodnym klicem s virou, ze to bude vytvaret nahodne dobre
+ * vyvazeny strom
  */
 static inline int insert_literal__(LiteralTree **root, int key, Data data)
 {
@@ -125,7 +129,7 @@ static inline int insert_literal__(LiteralTree **root, int key, Data data)
         new->data = data;
         new->left = NULL;
         new->right = NULL;
-        return 0;
+        return 1;
     }
     if(key < (*root)->key)
         return insert_literal__(&(*root)->left, key, data);
@@ -135,15 +139,20 @@ static inline int insert_literal__(LiteralTree **root, int key, Data data)
         return insert_literal__(&(*root)->left, key-1, data);
 }
 
-int insert_literal(int key, Data data)
+/*
+ * Wrapper pro vlozeni literalu do tabulky
+ */
+int insert_literal(Data data)
 {
-    return insert_literal__(&literals_table, key, data);
+    return insert_literal__(&literals_table, rand(), data);
 }
+
+
 /*
  * Prida do tabulky symbolu jmeno indentifikatoru
  * kazda funkce ma svuj
  */
-int insert_local(LocalTree **root, char *str, int offset, Data data)
+static inline int insert_local__(LocalTree **root, char *str, int offset, Data data)
 {
     int cmp;
     if(*root == NULL) {
@@ -151,32 +160,89 @@ int insert_local(LocalTree **root, char *str, int offset, Data data)
         if(new == NULL)
             return ERROR_GEN_MEM;
         *root = new;
-        new->name = str; // nebo kopirovat?
+        new->name = str;
         new->data = data;
+        new->offset = offset;
         new->left = NULL;
         new->right = NULL;
-        return 0;
+        return 1;
     }
     cmp = strcmp(str, (*root)->name);
     if(cmp < 0)
-        return insert_local(&(*root)->left, str, offset, data);
+        return insert_local__(&(*root)->left, str, offset, data);
     else if(cmp > 0)
-        return insert_local(&(*root)->right, str, offset, data);
+        return insert_local__(&(*root)->right, str, offset, data);
     else // == 0
         return ERROR_SYN_FUNC_REDEF;
 }
 
+int insert_local(char *str, Data data)
+{
+    return insert_local__(&last_function->symbols, str, ++last_function->syms, data);
+}
+
+
+
 /*
-int drop_functions(FunctionTree **root)
+ * Rekurzivni pruchod stromem a uvolneni kazdeho uzlu
+ */
+static inline void drop_locals(LocalTree *root)
 {
-    return 0;
+    if(root != NULL) {
+        drop_locals(root->left);
+        drop_locals(root->right);
+        if(root->data.type == T_STRING)
+            free(root->data.value.str);
+        free(root->name);
+        free(root);
+    }
 }
 
-int drop_literals(LiteralTree **root)
+/*
+ * Rekurzivni pruchod stromem a uvolneni kazdeho uzlu
+ */
+static inline void drop_functions__(FunctionTree *root)
 {
-    return 0;
+    if(root != NULL) {
+        drop_functions__(root->left);
+        drop_functions__(root->right);
+        drop_locals(root->symbols);
+        free(root->name);
+        free(root);
+    }
 }
 
+/*
+ * Smaze strom funkci, nenastavuje null
+ */
+void drop_functions(void)
+{
+    drop_functions__(functions_table);
+}
+
+/*
+ * Rekurzivni pruchod stromem, uvolneni kazdeho uzlu
+ */
+static inline void drop_literals__(LiteralTree *root)
+{
+    if(root != NULL) {
+        drop_literals__(root->left);
+        drop_literals__(root->right);
+        if(root->data.type == T_STRING)
+            free(root->data.value.str);
+        free(root);
+    }
+}
+
+/*
+ * Wrapper pro smazani stromu literalu
+ */
+void drop_literals(void)
+{
+    drop_literals__(literals_table);
+}
+
+/*
 int find_function(FunctionTree *root, const char *str)
 {
     return 0;
@@ -186,18 +252,42 @@ int find_local(FunctionTree *root, const char *str)
 {
     return 0;
 }
+
+// Vyhledavat literaly asi nebude potreba, stejne je na ne nahodny klic
 */
 
-#ifdef DEBUG
+#ifndef NDEBUG
+
+#include <stdio.h>
+void print_locals(LocalTree *root)
+{
+    if(root == NULL)
+        return;
+    print_locals(root->left);
+    printf("  %s (%2d): ", root->name, root->offset);
+    if(root->data.type == T_STRING)
+        printf("\"%s\"\n", root->data.value.str);
+    else if(root->data.type == T_NUMBER)
+        printf("%g\n", root->data.value.num);
+    else if(root->data.type == T_BOOLEAN)
+        printf("%s\n", root->data.value.log? "true" : "false");
+    else if(root->data.type == T_NIL)
+        printf("nil\n");
+    print_locals(root->right);
+}
+
 void print_functions(FunctionTree *root)
 {
     if(root == NULL)
         return;
     print_functions(root->left);
     printf("%s\n", root->name);
+    print_locals(root->symbols);
     print_functions(root->right);
 }
+
 #endif
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 ///FIXME: toto bude asi vysledny pouzity KMP algoritmus, ale zatim je to

@@ -15,6 +15,8 @@
 #include "lexical.h"
 #include "parser.h"
 #include "defines.h"
+#include "exec.h"
+#include "ial.h"
 
 /// Zprava napovedy.
 const char HELP_MSG[] =
@@ -59,8 +61,15 @@ int main(int argc, char *argv[])
         fclose(file);
         return (-x) / 100;
     }
-
     fclose(file);
 
+    // vyhledove
+    execute();
+
+    // uklid tabulky funkci
+    drop_functions();
+    // uklid tabulky literalu
+    drop_literals();
+    // uklid seznamu instrukci
     return 0;
 }

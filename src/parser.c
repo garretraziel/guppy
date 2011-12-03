@@ -49,6 +49,8 @@ static int expression_seq(void);
 static int expression_seq_z(void);
 
 
+const Data nil = {.type = T_NIL};
+
 /*
  * Spousti syntaktickou analyzu
  */
@@ -57,6 +59,10 @@ int parser(void)
     try( str_new(&str, STR_INIT_LEN) );
 
     int x = program();
+
+#ifndef NDEBUG
+    print_functions(functions_table);
+#endif
 
     str_free(&str);
     return x;
@@ -99,15 +105,10 @@ static int program(void)
 // DFS -> epsilon
 static int functions_seq(void)
 {
-    int x;
-
     // funkce
     if(token == FUNCTION) {
-        x = function();
-        if(x < 0)
-            return x;
-        x = functions_seq();
-        return x;
+        try ( function() );
+        return functions_seq();
     }
     else // epsilon
         return 1;
@@ -158,6 +159,11 @@ static int formal_parametr_seq(void)
 {
     // identifikator
     if(token == IDENTIFIER) {
+        // pridat parametr do tabulky symbolu aktualni funkce
+        // defaultni hodnota je nil
+        try( insert_local(str.str, nil) );
+        // potreba novy string
+        try( str_new(&str, STR_INIT_LEN) );
         get_token();
         return formal_parametr_seq_z();
     }
@@ -174,6 +180,8 @@ static int formal_parametr_seq_z(void)
         get_token();
         // identifikator
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+        try( insert_local(str.str, nil) ); // pridat do stromu
+        try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         return formal_parametr_seq_z();
     }

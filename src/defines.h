@@ -58,4 +58,13 @@ enum {
 // Pole vsech chybovych zprav
 extern const char **ERROR_MSG[];
 
+
+// Vycet datovych typu
+enum {
+    T_NUMBER,
+    T_STRING,
+    T_BOOLEAN,
+    T_NIL,
+} EDataTypes;
+
 #endif

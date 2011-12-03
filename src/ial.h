@@ -42,6 +42,7 @@ typedef struct localnode {
 typedef struct funcnode {
     char *name;
     LocalTree *symbols;
+    int syms;
     struct funcnode *left, *right;
 } FunctionTree;
 
@@ -54,11 +55,11 @@ typedef struct literalnode {
 
 
 int insert_function(char *);
-int insert_literal(int, Data);
-int insert_local(LocalTree **, char *, int, Data);
+int insert_literal(Data);
+int insert_local(char *, Data);
 
-int drop_functions(FunctionTree **);
-int drop_literals(LiteralTree **);
+void drop_functions(void);
+void drop_literals(void);
 
 int find_function(FunctionTree *, const char *);
 int find_local(FunctionTree *, const char *);

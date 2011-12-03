@@ -277,8 +277,35 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             break;
         case IREAD:
             break;
-        case ITYPE:
+        case ITYPE: {
+            univalue value, retvalue;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            switch (dattype) {
+            case DNUM:
+                retvalue.str = malloc(sizeof(char)*(strlen("number") + 1));
+                strcpy(retvalue.str, "number");
+                break;
+            case DSTRING:
+                retvalue.str = malloc(sizeof(char)*(strlen("string") + 1));
+                strcpy(retvalue.str, "string");
+                free(retvalue.str);
+                break;
+            case DBOOL:
+                retvalue.str = malloc(sizeof(char)*(strlen("boolean") + 1));
+                strcpy(retvalue.str, "boolean");
+                break;
+            case DNIL:
+                retvalue.str = malloc(sizeof(char)*(strlen("nil") + 1));
+                strcpy(retvalue.str, "nil");
+                break;
+            default:
+                // Na vrcholu zasobniku bylo neco jineho, chyba!
+                ExecError();
+            }
+            try_push_stack(DSTRING, retvalue);
             break;
+        }
         case ISUBSTR:
             break;
         case IFIND:
@@ -346,4 +373,3 @@ int delete_stack() /// smaze cely zasobnik
     stack -> val = NULL;
     return 0;
 }
-

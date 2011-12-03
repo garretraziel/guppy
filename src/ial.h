@@ -60,8 +60,8 @@ int insert_local(char *);
 void drop_functions(void);
 void drop_literals(void);
 
-int find_function(FunctionTree *, const char *);
-int find_local(FunctionTree *, const char *);
+FunctionTree * find_function(char *);
+LocalTree * find_local(char *);
 
 // globalni tabulky
 extern FunctionTree *functions_table;

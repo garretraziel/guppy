@@ -68,6 +68,8 @@ enum {
     T_NIL,
 } EDataTypes;
 
+#define STRUE 1
+#define SFALSE 0
 
 // Makro ktere provede prikaz, pokud skonci zapornym navratovym kodem, bude
 // proveden return teto hodnoty, jinak nic

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "exec.h"
+#include "defines.h"
 #include "string.h"
 #include "ial.h"
 
@@ -98,21 +99,46 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         if (instr == NULL) return -1; //TODO: neco se nepovedlo, popremyslet co by to mohlo byt za chybu
 
         switch (instr -> instr) {
-        case IHALT:
+        case IHALT: {
             delete_tape();
+            delete_stack();
             return 0;
             break; // sem by to nemelo dojit
-        case IJMP:
+        }
+        case IJMP: {
             tape.act = (PTapeItem) instr -> adr;
             break;
-        case IJMPT:
+        }
+        case IJMPT: {
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) {
+                delete_tape();
+                delete_stack();
+                return -1; //TODO: proste udelat poradek v tech errorech
+            }
+            if (value.log == STRUE) tape.act = (PTapeItem) instr -> adr; //TODO: proc se to vubec musi pretypovavat?
             break;
-        case IJMPF:
+        }
+        case IJMPF: {
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) {
+                delete_tape();
+                delete_stack();
+                return -1;
+            }
+            if (value.log == SFALSE) tape.act = (PTapeItem) instr -> adr;
             break;
-        case ICALL:
+        }
+        case ICALL: {
+            //TODO: tady se jeste zasmejeme
             break;
-        case IRETP:
+        }
+        case IRETP: {
+            //TODO: tady taky
             break;
+        }
         case IRET:
             break;
         case IPUSH:
@@ -187,6 +213,7 @@ int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodno
     if (stack -> esp == -1) return -1; //TODO: definovat error
     (*dattype) = stack -> val[stack -> esp] -> type;
     (*value) = stack -> val[stack -> esp] -> value;
+    free(stack -> val[stack -> esp]); //TODO: opravdu uvolnovat
     (stack -> esp)--;
     
     return 0;

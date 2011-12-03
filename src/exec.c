@@ -261,7 +261,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING) {
                 ExecError();
             }
-            
+            retvalue.str = concat(value2.str, value1.str);
+            if (retvalue.str == NULL) ExecError();
             if (push_stack(DSTRING, retvalue) != 0) {
                 ExecError();
             }

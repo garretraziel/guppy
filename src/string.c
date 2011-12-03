@@ -172,3 +172,17 @@ char *substr(string *str, int x, int y)
 
     return substr_c(str->str, str->length, x, y);
 }
+
+char *concat(char *str1, char *str2)
+{
+    int length = strlen(str1) + strlen(str2);
+    char *retstr = malloc(sizeof(char)*(length+1));
+    if (retstr == NULL) return NULL;
+    strcpy(retstr, str1);
+    strcat(retstr, str2);
+
+    free(str1);
+    free(str2);
+    
+    return retstr;
+}

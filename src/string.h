@@ -44,4 +44,7 @@ char *substr_c(char *, int, int, int);
 /// Vrati substring ze stringu podle zadanych indexu
 char *substr(string *, int, int);
 
+/// Spoji dva stringy do jednoho, ten vrati, stringy free
+char *concat(char *, char *);
+
 #endif

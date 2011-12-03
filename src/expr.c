@@ -65,6 +65,23 @@ enum {
 } ESymbols;
 
 
+
+// Normalni clovek nezanori vice volani funkci nez 3, 20 musi stacit kazdemu
+#define FUNC_STACK_SIZE 20
+
+
+// Zasobnik poctu parametru instance volani funkce
+static int func_stack[FUNC_STACK_SIZE] = {0};
+// Ukazatel do zasobniku
+static int F = -1;
+
+// Nova funkce, posunout se na nove misto
+#define func_push() do { if(++F >= FUNC_STACK_SIZE) return ERROR_GEN_MEM; } while(0)
+// Funkce konci, vynulovat a pop
+#define func_pop() do { func_stack[F] = 0; F--; } while(0)
+// Pripocteni 1 do zasobniku parametru
+#define func_inc() do { func_stack[F] += 1; } while(0)
+
 // Makro vraci true, pokud je symbol terminalni
 #define is_terminal(e_sym)(e_sym < E_MARK)
 
@@ -263,7 +280,7 @@ void s_dump(Stack *stack)
 // Aplikace pravidla (reakce na >)
 static int s_oobely_boo(Stack *stack)
 {
-    enum states { START, VAL, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER};
+    enum states { START, VAL, VAR, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER};
     const int translate[] = {
         [E_POW] = E_OP,
         [E_MUL] = E_OP,
@@ -301,7 +318,7 @@ static int s_oobely_boo(Stack *stack)
                 if(top == E_LIT)
                     state = VAL;
                 else if(top == E_IDENT)
-                    state = VAL;
+                    state = VAR;
                 else if(top == E_RBRAC)
                     state = RBRAC;
                 else if(top == E_NET_E)
@@ -309,7 +326,9 @@ static int s_oobely_boo(Stack *stack)
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
-            case VAL: // E -> string, bool, num, nil, id
+            case VAR: // E -> id
+                func_pop(); // neslo o funkci, pop
+            case VAL: // E -> string, bool, num, nil
                 // na zasobniku je hodnota, ocekava se konec a redukce
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
@@ -343,6 +362,13 @@ static int s_oobely_boo(Stack *stack)
                 if(top == E_IDENT){ // volani funkce s 1 parametrem
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
+                // asi bylo volani funkce a ja vim ze mela 1 parametr
+                    func_inc();
+                // FIXME snad neva to spojeni s (E)
+#ifdef DEBUG
+    printf("Byla volana funkce s %d parametry\n", func_stack[F]);
+#endif
+                    func_pop();
                 }
                 // bud vyraz v zacorce, nebo volani funkce
                 if(top == E_MARK) {
@@ -363,6 +389,11 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E) );
+                // bylo volani funkce a ja vim, kolik mela parametru
+#ifdef DEBUG
+    printf("Byla volana funkce s %d parametry\n", func_stack[F]);
+#endif
+                func_pop();
                 return 1;
                 break;
             case FUNC_N: // na zasobniku je ...  P )
@@ -385,11 +416,15 @@ static int s_oobely_boo(Stack *stack)
             case EEEE_COMM: // na zasobniku je ... , E
                 if(top != E_NET_E && top != E_NET_P)
                     return ERROR_SYN_EXP_FAIL;
+                if(top == E_NET_E) // pokud je to E, tak se musi zapocitat o param navic
+                    func_inc();
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top == E_MARK) {
                     s_pop(stack); // oddelani znacky
                     try( s_push(stack, E_NET_P) );
+                    // byl parametr, musim pricist
+                    func_inc();
                     return 1;
                 }
                 else
@@ -420,6 +455,11 @@ static inline int expression__(Stack *stack)
     a = translatetoken[token]; // aktualni vstup
     do {
         b = stack->active->type; // nejvrchnejsi terminal na zasobniku
+
+        // pokud je identifikator, da se predpokladat, ze to bude funkce
+        if(a == E_IDENT)
+            func_push();
+
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
@@ -465,7 +505,7 @@ static inline int expression__(Stack *stack)
                 break;
         } /* switch */
 #ifdef DEBUG
-        s_dump(&stack);
+        s_dump(stack);
 #endif
     } while(a != E_DOLLAR || b != E_DOLLAR);
 

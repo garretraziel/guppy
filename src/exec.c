@@ -14,14 +14,20 @@
 #include "string.h"
 #include "ial.h"
 
+typedef struct TStack {
+    int esp;
+    int size;
+    Data **val;
+} *PStack;
+
 //globalni promenne, paska pro ulozeni instrukci a zasobnik
 Tape tape;
-Data **stack;
+PStack stack;
 
-int init_stack(int size);
-int pop_stack(int *dattype, univalue *value);
-int push_stack(int dattype, univalue value);
-int delete_stack();
+int init_stack(int size); /// inicializuje zasobnik
+int pop_stack(int *dattype, univalue *value); /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
+int push_stack(int dattype, univalue value); /// pushne na zasobnik hodnotu i jeji datovy typ
+int delete_stack(); /// smaze cely zasobnik
 
 void init_tape() /// inicializuje pasku s kodem
 {
@@ -166,3 +172,47 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
     
     return 0;
 }
+
+int init_stack(int size) /// inicializuje zasobnik
+{
+    stack -> val = malloc(sizeof(Data)*size);
+    if (stack -> val == NULL) return -1; //TODO: err_mem
+    stack -> size = size;
+    stack -> esp = -1;
+    return 0;
+}
+
+int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
+{
+    if (stack -> esp == -1) return -1; //TODO: definovat error
+    (*dattype) = stack -> val[stack -> esp] -> type;
+    (*value) = stack -> val[stack -> esp] -> value;
+    (stack -> esp)--;
+    
+    return 0;
+}
+
+int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jeji datovy typ
+{
+    Data *temp = malloc(sizeof(Data));
+    if (temp == NULL) return -1; //TODO: err_mem
+    temp -> type = dattype;
+    temp -> value = value;
+    (stack -> esp)++;
+
+    stack -> val[stack -> esp] = temp;
+    
+    return 0;
+}
+
+int delete_stack() /// smaze cely zasobnik
+{
+    for (int i = 0; i<= stack->esp; i++) {
+        free(stack -> val[i]);
+    }
+    free(stack -> val);
+    stack -> esp = -1;
+    stack -> val = NULL;
+    return 0;
+}
+

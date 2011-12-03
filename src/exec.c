@@ -175,7 +175,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
 
 int init_stack(int size) /// inicializuje zasobnik
 {
-    stack -> val = malloc(sizeof(Data)*size);
+    stack -> val = malloc(sizeof(Data*)*size);
     if (stack -> val == NULL) return -1; //TODO: err_mem
     stack -> size = size;
     stack -> esp = -1;
@@ -196,6 +196,14 @@ int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jej
 {
     Data *temp = malloc(sizeof(Data));
     if (temp == NULL) return -1; //TODO: err_mem
+
+    if (stack -> esp == (stack -> size)-1) {
+        Data ** temp = realloc(stack -> val, (stack -> size)*2);
+        if (temp == NULL) return -2; //TODO: err_jezis_dosel_nam_zasobnik
+        stack -> val = temp;
+        stack -> size *= 2;
+    }
+    
     temp -> type = dattype;
     temp -> value = value;
     (stack -> esp)++;

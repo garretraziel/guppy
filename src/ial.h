@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_IAL_H
-#define IJC_IAL_H
+#ifndef GUPPY_IAL_H
+#define GUPPY_IAL_H
 
 #include "string.h"
 

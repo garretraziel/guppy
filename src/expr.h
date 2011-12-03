@@ -1,6 +1,6 @@
 /*
  * projekt: interpret jazyka IFJ11 
- * soubor: ial.h
+ * soubor: expr.h
  * autori:
  *   xbrabe09 Brabec Lukas
  *   xdujic01 Dujicek Ales
@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_EXPR_H
-#define IJC_EXPR_H
+#ifndef GUPPY_EXPR_H
+#define GUPPY_EXPR_H
 
 enum {
     LT, // less than

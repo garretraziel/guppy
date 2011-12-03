@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IFJ_EXEC_H
-#define IFJ_EXEC_H
+#ifndef GUPPY_EXEC_H
+#define GUPPY_EXEC_H
 
 enum {
     IHALT,      // zastav vykonavani programu

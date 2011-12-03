@@ -177,11 +177,13 @@ static inline int insert_local__(LocalTree **root, char *str, int offset)
     else if(cmp > 0)
         return insert_local__(&(*root)->right, str, offset);
     else // == 0
-        return ERROR_SYN_FUNC_REDEF;
+        return ERROR_SEM_VAR_REDEF;
 }
 
 int insert_local(char *str)
 {
+    if(find_function(str) != NULL)
+        return ERROR_SEM_VAR_REDEF;
     return insert_local__(&last_function->symbols, str, ++last_function->syms);
 }
 

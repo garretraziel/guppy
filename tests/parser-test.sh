@@ -29,7 +29,7 @@ printf "* * * * * * * * * * * * \n"
 
 # tyhle naopak maji koncit chybou
 # 1-2 protoze to jsou lexikalni a syntakticke chyby, to je jedine, co to pozna
-for i in {1..2}; do
+for i in {1..3}; do
     for file in programs/$i-syn-*; do
         echo "Testuji  $file "
         ./parser-test < $file

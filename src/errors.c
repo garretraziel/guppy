@@ -42,6 +42,7 @@ const char *SYN_ERRORS[] = {
 // [3] Chybove zpravy semantice analyzy
 const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_VAR_UND) % 100] = "Nedeklarovana promenna",
+     [(-ERROR_SEM_VAR_REDEF) % 100] = "Promenna je jiz definovana",
 };
 
 // [4] Obecne chybove zpravy interpretace

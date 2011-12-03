@@ -31,6 +31,14 @@
 #define check_token(exptok, errcode) do { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
+// Kontroluje, jestli byl v posledni funkci definovan identifikator jako promenna
+// pokud ne, vyvola return ERROR_SEM_VAR_UND
+#define check_variable(id) do { \
+    if(find_local(id) == NULL || find_function(id) != NULL)\
+        return ERROR_SEM_VAR_UND; } while(0)
+
+
+
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
 static int program(void);
@@ -319,6 +327,8 @@ static int statement(void)
     int x;
     switch(token) {
         case IDENTIFIER:
+            // kontrola, jestli je promenna definovana
+            check_variable(str.str);
             get_token();
             // rovnitko
             check_token(ASSIGN, ERROR_SYN_X_ASGN);

@@ -40,7 +40,7 @@ enum {
 
 // [3]
 enum {
-    ERROR_SEM_X = -301,
+    ERROR_SEM_VAR_UND = -301,
 } ESemErrors;
 
 // [4]

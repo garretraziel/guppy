@@ -16,9 +16,6 @@
 #include "defines.h"
 #include "lexical.h"
 
-extern int token;
-extern string str;
-extern FILE *input;
 
 
 // Symboly se kterymi pracuje zasobnikovy automat
@@ -68,6 +65,7 @@ enum {
 } ESymbols;
 
 #define is_terminal(e_sym)(e_sym < E_MARK)
+
 
 // Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
 const int translatetoken[] = {
@@ -193,7 +191,7 @@ int s_push(Stack *stack, int t)
 {
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
-        return 0;
+        return ERROR_GEN_MEM;
     new->type = t;
     new->res = NULL;
     new->next  = stack->top;
@@ -219,7 +217,7 @@ static int s_alter(Stack *stack)
 {
     Node * new = malloc(sizeof(Node));
     if(new == NULL)
-        return 0;
+        return ERROR_GEN_MEM;
 
     new->type = stack->active->type;
     new->res = NULL;
@@ -233,6 +231,8 @@ static int s_alter(Stack *stack)
     return 1;
 }
 
+
+#ifdef DEBUG
 //jen pro debug
 void s_dump(Stack *stack)
 {
@@ -253,6 +253,7 @@ void s_dump(Stack *stack)
         s_clean(&s_tmp);
         printf("\n");
 }
+#endif
 
 // Aplikace pravidla (reakce na >)
 static int s_oobely_boo(Stack *stack)

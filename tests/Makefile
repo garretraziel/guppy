@@ -1,11 +1,15 @@
 CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -g -I../src/ -L../src
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -I../src/ -L../src
+DFLAGS=-g -DDEBUG
 
 .PHONY: build rebuild clean guppy
 
 build: guppy lexical-test quicksort-test substr-test knuth-test parser-test expr-test
 
 rebuild: clean build
+
+debug: CFLAGS += $(DFLAGS)
+debug: rebuild
 
 clean:
 	rm -f *.o lexical-test quicksort-test knuth-test parser-test substr-test expr-test

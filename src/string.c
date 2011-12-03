@@ -108,7 +108,7 @@ char *substr_c(char *str, int len, int from, int to)
         y = len + to; // prepocitam index pro zaporne cislo
         if (y < 0) {
 #ifdef DEBUG
-            fpritnf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
+            fprintf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
 #endif
             y = 0;
         }

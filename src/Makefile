@@ -3,9 +3,9 @@ PROJECT=guppy
 
 CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra
-DFLAGS=-g -DNDEBUG
+DFLAGS=-g -DDEBUG
 
-.PHONY: rebuild build dep clean zip
+.PHONY: rebuild build dep clean zip debug
 
 
 build: dep $(PROJECT)
@@ -13,7 +13,7 @@ build: dep $(PROJECT)
 rebuild: clean build
 
 debug: CFLAGS += $(DFLAGS)
-debug: dep $(PROJECT)
+debug: rebuild
 
 $(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o expr.o exec.o
 	$(CC) $(CFLAGS) $^ -o $@

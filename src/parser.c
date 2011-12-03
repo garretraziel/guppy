@@ -31,7 +31,7 @@
 #define check_token(exptok, errcode) do { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
-#ifdef NDEBUG
+#ifdef DEBUG
 void print_functions(FunctionTree *);
 #endif
 
@@ -63,7 +63,7 @@ int parser(void)
 
     int x = program();
 
-#ifdef NDEBUG
+#ifdef DEBUG
     print_functions(functions_table);
 #endif
 
@@ -163,7 +163,6 @@ static int formal_parametr_seq(void)
     // identifikator
     if(token == IDENTIFIER) {
         // pridat parametr do tabulky symbolu aktualni funkce
-        // defaultni hodnota je nil
         try( insert_local(str.str) );
         // potreba novy string
         try( str_new(&str, STR_INIT_LEN) );
@@ -273,7 +272,7 @@ static int literal()
     try( insert_literal(data, &lit) );
     // TODO instrukce na nacteni hodnoty do lok. promenne
     // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
-#ifdef NDEBUG
+#ifdef DEBUG
     // test, jak to vypada
     printf("mov [EBP + %2d], %p    // %s <- ", last_local->offset, (void*)lit, last_local->name);
     if(lit->data.type == T_NUMBER)

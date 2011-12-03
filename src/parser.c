@@ -215,6 +215,7 @@ static int local_declaration_z(void)
 {
     // strednik
     if(token == SEMICOLON) {
+        // TODO, tady se musi generovat vlozeni inicializace na nil
         get_token();
         return 1;
     }
@@ -265,9 +266,21 @@ static int literal()
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
-    insert_literal(data, &lit);
+    try( insert_literal(data, &lit) );
     // TODO instrukce na nacteni hodnoty do lok. promenne
     // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
+#ifndef NDEBUG
+    // test, jak to vypada
+    printf("mov [EBP + %2d], %p    // %s <- ", last_local->offset, (void*)lit, last_local->name);
+    if(lit->data.type == T_NUMBER)
+        printf("%g\n", lit->data.value.num);
+    else if(lit->data.type == T_STRING)
+        printf("%s\n", lit->data.value.str);
+    else if(lit->data.type == T_BOOLEAN)
+        printf("%s\n", lit->data.value.log?"true":"false");
+    else if(lit->data.type == T_NIL)
+        printf("nil\n");
+#endif
     get_token();
     return 1;
 }

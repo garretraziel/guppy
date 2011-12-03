@@ -28,7 +28,7 @@
 
 // Pokud je token jiny nez ocekavany token, je vracen token,
 // pokud byl sam zaporny, jinak zadany chybovy kod
-#define check_token(exptok, errcode) { if(token != exptok) \
+#define check_token(exptok, errcode) do { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
 

@@ -60,6 +60,7 @@ enum {
     DNIL, // datovy typ nil
     DMARK, // zarazka
     DREGISTER, // ulozeni EBP/ESP
+    DRETADR, // navratova adresa z funkce
 } StackDatTypes; // seznam datovych typu, ktere mohou byt ulozene na zasobniku
 
 typedef struct TTapeItem { // paska pro ulozeni instrukci

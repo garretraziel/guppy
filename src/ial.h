@@ -24,6 +24,7 @@ typedef union {
     int log;
     double num;
     char *str;
+    void *adr;
 } univalue;
 
 // univerzalni datova polozka

@@ -42,6 +42,7 @@ enum {
 enum {
     ERROR_SEM_VAR_UND = -301,
     ERROR_SEM_VAR_REDEF = -302,
+    ERROR_SEM_WRONG_TYPES = -303,
 } ESemErrors;
 
 // [4]

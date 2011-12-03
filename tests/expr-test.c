@@ -27,8 +27,10 @@ int main(void)
     
     if(x < 0) {
         Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);
+        str_free(&str);
         return -x/100;
     }
     
+    str_free(&str);
     return 0;
 }

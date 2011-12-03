@@ -43,6 +43,7 @@ const char *SYN_ERRORS[] = {
 const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_VAR_UND) % 100] = "Nedeklarovana promenna",
      [(-ERROR_SEM_VAR_REDEF) % 100] = "Promenna je jiz definovana",
+     [(-ERROR_SEM_WRONG_TYPES) % 100] = "Nekompatibilni typy operandu ve vyrazu",
 };
 
 // [4] Obecne chybove zpravy interpretace

@@ -72,6 +72,7 @@ LiteralTree *literals_table = NULL;
 
 // Ukazatel na posledni pridanou funkci
 FunctionTree *last_function = NULL;
+LocalTree *last_local = NULL;
 
 /*
  * Prida funckci do tabulky funkci,
@@ -165,6 +166,7 @@ static inline int insert_local__(LocalTree **root, char *str, int offset, Data d
         new->offset = offset;
         new->left = NULL;
         new->right = NULL;
+        last_local = new;
         return 1;
     }
     cmp = strcmp(str, (*root)->name);

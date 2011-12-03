@@ -70,6 +70,8 @@ extern LiteralTree *literals_table;
 
 // posledni funkce
 extern FunctionTree *last_function;
+// posledni lokalni promenna
+extern LocalTree *last_local;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

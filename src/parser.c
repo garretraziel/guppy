@@ -40,7 +40,7 @@ static int formal_parametr_seq(void);
 static int formal_parametr_seq_z(void);
 static int local_declaration_seq(void);
 static int local_declaration_z(void);
-static int literal(void);
+static int literal(Data *);
 static int statement_seq(void);
 static int statement(void);
 static int assign_z(void);
@@ -198,6 +198,8 @@ static int local_declaration_seq(void)
         get_token();
         // identifier
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+        try( insert_local(str.str, nil) ); // pridat do tabulky
+        try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         // local declaration z
         try( local_declaration_z() );
@@ -221,7 +223,7 @@ static int local_declaration_z(void)
     else if(token == ASSIGN) {
         get_token();
         // literal
-        try( literal() );
+        try( literal(&last_local->data) ); // ulozi hodnotu do tabulku
         // strednik
         check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();
@@ -236,20 +238,34 @@ static int local_declaration_z(void)
 // LIT -> nil
 // LIT -> true
 // LIT -> false
-static int literal(void)
+static int literal(Data *data)
 {
     switch(token) {
         case NUMBER:
+            data->type = T_NUMBER;
+            data->value.num = strtod(str.str, NULL);
+            break;
         case STRING:
+            data->type = T_STRING;
+            data->value.str = str.str;
+            try( str_new(&str, STR_INIT_LEN) );
+            break;
         case NIL:
+            data->type = T_NIL;
+            break;
         case TRUE:
+            data->type = T_BOOLEAN;
+            data->value.log = 1;
+            break;
         case FALSE:
-            // ulozit na stack s hodnotou
-            get_token();
-            return 1;
+            data->type = T_BOOLEAN;
+            data->value.log = 0;
+            break;
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
+    get_token();
+    return 1;
 }
 
 // SPS -> S ; SPS

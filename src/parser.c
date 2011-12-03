@@ -77,6 +77,12 @@ static int program(void)
     // to ma byt predem, ale to by musel byt token uplne globalni
     get_token();
 
+    // rezervovani jmen pro builtin funkce
+    try( insert_function("sort") );
+    try( insert_function("type") );
+    try( insert_function("substr") );
+    try( insert_function("find") );
+
     // prvni funkce
     if(token != FUNCTION) {
         str_free(&str);

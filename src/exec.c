@@ -36,6 +36,11 @@ int pop_stack(int *dattype, univalue *value); /// popne ze zasobniku vrchni hodn
 int push_stack(int dattype, univalue value); /// pushne na zasobnik hodnotu i jeji datovy typ
 int delete_stack(); /// smaze cely zasobnik
 
+#ifdef DEBUG
+int print_stack();
+int print_tape();
+#endif
+
 void init_tape() /// inicializuje pasku s kodem
 {
     tape.act = tape.bot = tape.top = NULL;
@@ -385,3 +390,67 @@ int delete_stack() /// smaze cely zasobnik
     stack -> val = NULL;
     return 0;
 }
+
+#ifdef DEBUG
+int print_stack()
+{
+    printf("Zasobnik:\n---------\n");
+    for (int i = 0; i<(stack -> esp); i++) {
+        Data *temp = stack -> val[i];
+        printf("* %d) <--\n", i);
+        switch (temp -> type) {
+        case DNUM:
+            printf("** cislo   %g\n", temp -> value.num);
+            break;
+        case DSTRING:
+            printf("** string  %s\n", temp -> value.str);
+            break;
+        case DBOOL:
+            printf("** boolean %d\n", temp -> value.log);
+            break;
+        case DNIL:
+            printf("** nil\n");
+            break;
+        case DREGISTER:
+            printf("** ulozeny register\n");
+            break;
+        case DRETADR:
+            printf("** navratova adresa funkce\n");
+            break;
+        default:
+            printf("** !!! neco jineho\n");
+        }
+    }
+    printf("----------\nkonec zasobniku\n");
+    return 0;
+}
+
+int print_tape()
+{
+    PTapeItem temp = tape.top;
+    printf("Paska instrukci:\n---------------\n");
+    while (temp != NULL) {
+        printf("%d: ", temp -> instr);
+        switch (temp -> adrtype) {
+        case ANONE:
+            printf("NULL\n");
+            break;
+        case ALITTABLE:
+            printf("TAB_LITERALU\n");
+            break;
+        case ALOCTABLE:
+            printf("TAB_LOKALNICH\n");
+            break;
+        case AFUNCTABLE:
+            printf("TAB_FUNKCI\n");
+            break;
+        case ATAPE:
+            printf("PASKA\n");
+            break;
+        }
+        temp = temp -> next;
+    }
+    printf("-----------\nkonec pasky instrukci\n");
+    return 0;
+}
+#endif

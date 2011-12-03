@@ -46,6 +46,7 @@ enum {
 } Instructions;
 
 enum {
+    ANONE, // zadna adresa, bude se pouzivat vetsinou
     ALITTABLE, // typ ukazatele do tabulky literalu
     ALOCTABLE, // typ ukazatel do lokalni tabulky symbolu - lokalni promenne, argumenty
     AFUNCTABLE, // ukazatel do tabulky funkci

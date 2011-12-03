@@ -300,7 +300,7 @@ LocalTree * find_local(char *str)
     return find_local__(last_function->symbols, str);
 }
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 
 #include <stdio.h>
 void print_locals(LocalTree *root)

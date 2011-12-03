@@ -53,6 +53,15 @@ enum {
     //TODO: vymyslet, co vsechno tady ma byt
 } AdrTypes;
 
+enum {
+    DNUM, // datovy typ cislo
+    DSTRING, // datovy typ string
+    DBOOL, // datovy typ boolean
+    DNIL, // datovy typ nil
+    DMARK, // zarazka
+    DREGISTER, // ulozeni EBP/ESP
+} StackDatTypes; // seznam datovych typu, ktere mohou byt ulozene na zasobniku
+
 typedef struct TTapeItem { // paska pro ulozeni instrukci
     int instr; // samotna instrukce podle enum Instructions
     void *adr; // adresa, ktera se treba pouzije

@@ -25,6 +25,7 @@ enum {
     IPUSHF,     // na vrchol zasobniku pushne false
     IPOPI,      // popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
     IPUSHM,     // pushne zarazku pro uklizeni po funkci
+    IPUSHN,     // pushne do zasobniku nil
     IADD,       // popne vrchni dve hodnoty, secte je, vysledek pushne
     ISUB,       // popne vrchni dve hodnoty, odecte, vysledek pushne
     IMUL,       // vynasobi vrchni dve hodnoty na zasobniku, vysledek pushne

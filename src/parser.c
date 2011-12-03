@@ -40,7 +40,7 @@ static int formal_parametr_seq(void);
 static int formal_parametr_seq_z(void);
 static int local_declaration_seq(void);
 static int local_declaration_z(void);
-static int literal(LiteralTree **);
+static int literal(void);
 static int statement_seq(void);
 static int statement(void);
 static int assign_z(void);
@@ -222,8 +222,7 @@ static int local_declaration_z(void)
     else if(token == ASSIGN) {
         get_token();
         // literal
-        try( literal(NULL) ); 
-        // TODO instrukce na nacteni hodnoty do lok. promenne
+        try( literal() ); 
         // strednik
         check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();
@@ -238,9 +237,10 @@ static int local_declaration_z(void)
 // LIT -> nil
 // LIT -> true
 // LIT -> false
-static int literal(LiteralTree **root)
+static int literal()
 {
     Data data;
+    LiteralTree *lit;
     switch(token) {
         case NUMBER:
             data.type = T_NUMBER;
@@ -265,7 +265,9 @@ static int literal(LiteralTree **root)
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
-    insert_literal(data);
+    insert_literal(data, &lit);
+    // TODO instrukce na nacteni hodnoty do lok. promenne
+    // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
     get_token();
     return 1;
 }

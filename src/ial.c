@@ -119,7 +119,7 @@ int insert_function(char *str)
  * Vklada se s nahodnym klicem s virou, ze to bude vytvaret nahodne dobre
  * vyvazeny strom
  */
-static inline int insert_literal__(LiteralTree **root, int key, Data data)
+static inline int insert_literal__(LiteralTree **root, int key, Data data, LiteralTree **dst)
 {
     if(*root == NULL) {
         LiteralTree *new = malloc(sizeof(LiteralTree));
@@ -130,22 +130,25 @@ static inline int insert_literal__(LiteralTree **root, int key, Data data)
         new->data = data;
         new->left = NULL;
         new->right = NULL;
+        *dst = new;
         return 1;
     }
     if(key < (*root)->key)
-        return insert_literal__(&(*root)->left, key, data);
+        return insert_literal__(&(*root)->left, key, data, dst);
     else if(key > (*root)->key)
-        return insert_literal__(&(*root)->right, key, data);
+        return insert_literal__(&(*root)->right, key, data, dst);
     else
-        return insert_literal__(&(*root)->left, key-1, data);
+        return insert_literal__(&(*root)->left, key-1, data, dst);
 }
 
 /*
  * Wrapper pro vlozeni literalu do tabulky
+ *
+ * do *dst je ulozen ukazatel na vlozeny prvek
  */
-int insert_literal(Data data)
+int insert_literal(Data data, LiteralTree **dst)
 {
-    return insert_literal__(&literals_table, rand(), data);
+    return insert_literal__(&literals_table, rand(), data, dst);
 }
 
 

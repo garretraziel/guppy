@@ -60,8 +60,9 @@ enum {
     E_NET_P,
 
     // tohle jsou jen pomocne konstanty pro oobely-boo
-    E_OP,
-    E_LIT,
+    E_OP, // obecne operator
+    E_LIT, // obecne literal
+    E_UNKNOWN, // neznamy typ
 } ESymbols;
 
 
@@ -85,6 +86,44 @@ static int F = -1;
 // Makro vraci true, pokud je symbol terminalni
 #define is_terminal(e_sym)(e_sym < E_MARK)
 
+
+/*
+ * Vraci typ vysledku operatoru
+ */
+static inline int get_result_type(int op)
+{
+    switch(op) {
+        case E_POW:
+        case E_MUL:
+        case E_DIV:
+        case E_PLUS:
+        case E_MINUS:
+            return E_NUM;
+        case E_STRCONCAT:
+            return E_STR;
+        case E_LESS:
+        case E_GREAT:
+        case E_LESSEQ:
+        case E_GREATEQ:
+        case E_NOTEQ:
+        case E_EQUAL:
+            return E_BOOL;
+        default:
+            return E_UNKNOWN;
+    }
+}
+static inline int get_e_type(int symb)
+{
+    switch(symb) {
+        case E_BOOL:
+        case E_NUM:
+        case E_STR:
+        case E_NIL:
+            return symb;
+        default:
+            return E_UNKNOWN;
+    }
+}
 
 // Prekladova tabulka, pokud se nacte token, tak tady muze mit jiny vyznam
 const int translatetoken[] = {
@@ -175,7 +214,7 @@ const int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka
 // Polozka zasobniku
 typedef struct node {
     int type;
-    void *res; // zrejme bude treba mit tam nejaka dalsi data
+    int e_type;
     struct node *next;
 } Node; // Expression Stack Node
 
@@ -208,16 +247,16 @@ int s_clean(Stack * stack)
 }
 
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
-int s_push(Stack *stack, int t)
+int s_push(Stack *stack, int type, int e_type)
 {
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
         return ERROR_GEN_MEM;
-    new->type = t;
-    new->res = NULL;
+    new->type = type;
+    new->e_type = e_type;
     new->next  = stack->top;
     stack->top = new;
-    if(is_terminal(t))
+    if(is_terminal(type))
         stack->active = new;
     return 1;
 }
@@ -242,7 +281,7 @@ static int s_alter(Stack *stack)
         return ERROR_GEN_MEM;
 
     new->type = stack->active->type;
-    new->res = NULL;
+    new->e_type = stack->active->e_type;
     new->next = stack->active->next;
     stack->active->next = new;
  //   if(stack->active == stack->top){
@@ -264,7 +303,7 @@ void s_dump(Stack *stack)
                          "i","n","s","b","nil","(",")", ",","$", "{","E","P"};
         Node * tmp = stack->top;
         while(tmp!=NULL){
-            s_push(&s_tmp, tmp->type);
+            s_push(&s_tmp, tmp->type, 0);
             tmp = tmp->next;
         }
         tmp = s_tmp.top;
@@ -308,10 +347,12 @@ static int s_oobely_boo(Stack *stack)
         [E_NET_P] = E_NET_P,
     };
 
+    int E1, E2, OP; // pro uchovani typu redukovanych E
+
     int top;
     int state = START;
     // cyklus prochazeni zasobnikem
-    for(;;s_pop(stack)) {
+    for(E1 = stack->top->e_type; ;s_pop(stack)) {
         top = translate[stack->top->type];
         switch(state) {
             case START: // startovaci stav
@@ -333,12 +374,14 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                try( s_push(stack, E_NET_E) );
+                try( s_push(stack, E_NET_E, E1) );
                 return 1;
                 break;
             case RBRAC: // na zasobniku je ... )
-                if(top == E_NET_E)
+                if(top == E_NET_E) {
+                    E1 = stack->top->e_type;
                     state = BRAC_EEEE;
+                }
                 else if(top == E_LBRAC)
                     state = FUNC_CALL;
                 else if(top == E_NET_P)
@@ -347,8 +390,10 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case EEEE: // na zasobniku je ... E
-                if(top == E_OP)
+                if(top == E_OP) {
+                    OP = stack->top->type;
                     state = OPER;
+                }
                 else if(top == E_COMMA)
                     state = EEEE_COMM;
                 else
@@ -362,18 +407,18 @@ static int s_oobely_boo(Stack *stack)
                 if(top == E_IDENT){ // volani funkce s 1 parametrem
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
-                // asi bylo volani funkce a ja vim ze mela 1 parametr
+                    // asi bylo volani funkce a ja vim ze mela 1 parametr
                     func_inc();
-                // FIXME snad neva to spojeni s (E)
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
 #endif
                     func_pop();
+                    E1 = E_UNKNOWN;
                 }
                 // bud vyraz v zacorce, nebo volani funkce
                 if(top == E_MARK) {
                     s_pop(stack); // oddelani znacky
-                    try( s_push(stack, E_NET_E) );
+                    try( s_push(stack, E_NET_E, E1) );
                     return 1;
                 }
                 else
@@ -388,7 +433,7 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                try( s_push(stack, E_NET_E) );
+                try( s_push(stack, E_NET_E, E_UNKNOWN) );
                 // bylo volani funkce a ja vim, kolik mela parametru
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
@@ -405,12 +450,15 @@ static int s_oobely_boo(Stack *stack)
             case OPER: // na zasobniku je ... E op E
                 if(top != E_NET_E)
                     return ERROR_SYN_EXP_FAIL;
+                E2 = stack->top->e_type;
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                try( s_push(stack, E_NET_E) );
+                if(E1 != E2 && E1 != E_UNKNOWN && E2 != E_UNKNOWN)
+                    return ERROR_SEM_WRONG_TYPES;
+                try( s_push(stack, E_NET_E, get_result_type(OP)) );
                 return 1;
                 break;
             case EEEE_COMM: // na zasobniku je ... , E
@@ -422,7 +470,7 @@ static int s_oobely_boo(Stack *stack)
                 top = translate[stack->top->type];
                 if(top == E_MARK) {
                     s_pop(stack); // oddelani znacky
-                    try( s_push(stack, E_NET_P) );
+                    try( s_push(stack, E_NET_P, E_UNKNOWN) );
                     // byl parametr, musim pricist
                     func_inc();
                     return 1;
@@ -450,7 +498,7 @@ static inline int expression__(Stack *stack)
         return token;
 
     // Takhle to zacina, da se dolar na zasobnik
-    try( s_push(stack, E_DOLLAR) );
+    try( s_push(stack, E_DOLLAR, E_UNKNOWN) );
 
     a = translatetoken[token]; // aktualni vstup
     do {
@@ -463,8 +511,11 @@ static inline int expression__(Stack *stack)
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
-                try( s_push(stack, a) );
+                try( s_push(stack, a, E_UNKNOWN) );
                 b = stack->active->type; // doslo ke zmene horniho terminalu
+                // TODO vygenerovat instrukci, pokud je potreba
+                  // tady tohle se stane jen pro id ( a ( ), toho se mozna
+                  // bude dat vyuzit nejak
                 // precist novy token
                 get_token();
                 if (token < 0) // nacetl jsem neco spatneho
@@ -476,7 +527,11 @@ static inline int expression__(Stack *stack)
                 // b na zasobniku vymenit za b<
                 try( s_alter(stack) );
                 // push(a)
-                try( s_push(stack, a) );
+                try( s_push(stack, a, get_e_type(a)) );
+                // TODO vygenerovat instrukci
+                  // push nil, true, false
+                  // nebo pridat literal do tabulky a push s odkazem na literal
+                  // nebo push a odkaz na promennou
                 b = stack->active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();

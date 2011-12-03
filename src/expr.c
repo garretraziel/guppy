@@ -528,6 +528,11 @@ static inline int expression__(Stack *stack)
                 try( s_alter(stack) );
                 // push(a)
                 try( s_push(stack, a, get_e_type(a)) );
+                // pokud je carka mimo funkci, tak je konec vyrazu (kvuli write)
+                if(a == E_COMMA && F == -1) {
+                    a = E_DOLLAR;
+                    continue;
+                }
                 // TODO vygenerovat instrukci
                   // push nil, true, false
                   // nebo pridat literal do tabulky a push s odkazem na literal
@@ -549,9 +554,9 @@ static inline int expression__(Stack *stack)
 
             case OO:
             default:
-                // pokud je neocekavanym tokenem carka nebo zavorka,
-                // tak se rekne, ze je konec vyrazu, kvuli write(E , E)
-                if(token == COMMA || token == RBRAC) {
+                // pokud je neocekavanym tokenem prava zavorka,
+                // tak se rekne, ze je konec vyrazu, kvuli konci write( ... )
+                if(token == RBRAC) {
                     a = E_DOLLAR;
                     continue;
                 }

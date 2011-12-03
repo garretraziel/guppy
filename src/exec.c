@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "exec.h"
 #include "defines.h"
@@ -159,12 +160,6 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case IPOPI:
             break;
-        case IPUSHM: {
-            univalue value;
-            value.log = STRUE; // zbytecne, ale nezbytne
-            try_push_stack(DMARK, value);
-            break;
-        }
         case IPUSHN: {
             univalue value;
             value.log = STRUE;
@@ -247,14 +242,25 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0) ExecError();
             if (dattype1 != dattype2) {
                 retvalue.log = SFALSE;
-                try_push_stack(DBOOL, retvalue);
             } else if (dattype1 == DNUM) {
                 if (value1.num == value2.num)
                     retvalue.log = STRUE;
                 else
                     retvalue.log = SFALSE;
-                try_push_stack(DBOOL, retvalue);
-            }
+            } else if (dattype1 == DBOOL) {
+                if (value1.log == value2.log)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+            } else if (dattype1 == DSTRING) {
+                if (strcmp(value1.str, value2.str) == 0) //TODO: nemam to tady resit nejak vic?
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+                free(value1.str);
+                free(value2.str);
+            } else if (dattype1 == DNIL) retvalue.log = STRUE;
+            try_push_stack(DBOOL, retvalue);
             break;
         }
         case ICMPN:

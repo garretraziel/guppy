@@ -24,7 +24,6 @@ enum {
     IPUSHT,     // na vrchol zasobniku pushne true
     IPUSHF,     // na vrchol zasobniku pushne false
     IPOPI,      // popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
-    IPUSHM,     // pushne zarazku pro uklizeni po funkci
     IPUSHN,     // pushne do zasobniku nil
     IADD,       // popne vrchni dve hodnoty, secte je, vysledek pushne
     ISUB,       // popne vrchni dve hodnoty, odecte, vysledek pushne
@@ -59,7 +58,6 @@ enum {
     DSTRING, // datovy typ string
     DBOOL, // datovy typ boolean
     DNIL, // datovy typ nil
-    DMARK, // zarazka
     DREGISTER, // ulozeni EBP/ESP
     DRETADR, // navratova adresa z funkce
 } StackDatTypes; // seznam datovych typu, ktere mohou byt ulozene na zasobniku

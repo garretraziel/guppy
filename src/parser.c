@@ -40,7 +40,7 @@ static int formal_parametr_seq(void);
 static int formal_parametr_seq_z(void);
 static int local_declaration_seq(void);
 static int local_declaration_z(void);
-static int literal(Data *);
+static int literal(LiteralTree **);
 static int statement_seq(void);
 static int statement(void);
 static int assign_z(void);
@@ -49,7 +49,6 @@ static int expression_seq(void);
 static int expression_seq_z(void);
 
 
-const Data nil = {.type = T_NIL};
 
 /*
  * Spousti syntaktickou analyzu
@@ -161,7 +160,7 @@ static int formal_parametr_seq(void)
     if(token == IDENTIFIER) {
         // pridat parametr do tabulky symbolu aktualni funkce
         // defaultni hodnota je nil
-        try( insert_local(str.str, nil) );
+        try( insert_local(str.str) );
         // potreba novy string
         try( str_new(&str, STR_INIT_LEN) );
         get_token();
@@ -180,7 +179,7 @@ static int formal_parametr_seq_z(void)
         get_token();
         // identifikator
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
-        try( insert_local(str.str, nil) ); // pridat do stromu
+        try( insert_local(str.str) ); // pridat do stromu
         try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         return formal_parametr_seq_z();
@@ -198,7 +197,7 @@ static int local_declaration_seq(void)
         get_token();
         // identifier
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
-        try( insert_local(str.str, nil) ); // pridat do tabulky
+        try( insert_local(str.str) ); // pridat do tabulky
         try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         // local declaration z
@@ -223,7 +222,8 @@ static int local_declaration_z(void)
     else if(token == ASSIGN) {
         get_token();
         // literal
-        try( literal(&last_local->data) ); // ulozi hodnotu do tabulku
+        try( literal(NULL) ); 
+        // TODO instrukce na nacteni hodnoty do lok. promenne
         // strednik
         check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();
@@ -238,32 +238,34 @@ static int local_declaration_z(void)
 // LIT -> nil
 // LIT -> true
 // LIT -> false
-static int literal(Data *data)
+static int literal(LiteralTree **root)
 {
+    Data data;
     switch(token) {
         case NUMBER:
-            data->type = T_NUMBER;
-            data->value.num = strtod(str.str, NULL);
+            data.type = T_NUMBER;
+            data.value.num = strtod(str.str, NULL);
             break;
         case STRING:
-            data->type = T_STRING;
-            data->value.str = str.str;
+            data.type = T_STRING;
+            data.value.str = str.str;
             try( str_new(&str, STR_INIT_LEN) );
             break;
         case NIL:
-            data->type = T_NIL;
+            data.type = T_NIL;
             break;
         case TRUE:
-            data->type = T_BOOLEAN;
-            data->value.log = 1;
+            data.type = T_BOOLEAN;
+            data.value.log = 1;
             break;
         case FALSE:
-            data->type = T_BOOLEAN;
-            data->value.log = 0;
+            data.type = T_BOOLEAN;
+            data.value.log = 0;
             break;
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
+    insert_literal(data);
     get_token();
     return 1;
 }

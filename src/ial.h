@@ -34,7 +34,6 @@ typedef struct {
 typedef struct localnode {
     char *name;
     int offset;
-    Data data;
     struct localnode *left, *right;
 } LocalTree;
 
@@ -56,7 +55,7 @@ typedef struct literalnode {
 
 int insert_function(char *);
 int insert_literal(Data);
-int insert_local(char *, Data);
+int insert_local(char *);
 
 void drop_functions(void);
 void drop_literals(void);

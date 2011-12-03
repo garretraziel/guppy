@@ -153,7 +153,7 @@ int insert_literal(Data data)
  * Prida do tabulky symbolu jmeno indentifikatoru
  * kazda funkce ma svuj
  */
-static inline int insert_local__(LocalTree **root, char *str, int offset, Data data)
+static inline int insert_local__(LocalTree **root, char *str, int offset)
 {
     int cmp;
     if(*root == NULL) {
@@ -162,7 +162,6 @@ static inline int insert_local__(LocalTree **root, char *str, int offset, Data d
             return ERROR_GEN_MEM;
         *root = new;
         new->name = str;
-        new->data = data;
         new->offset = offset;
         new->left = NULL;
         new->right = NULL;
@@ -171,16 +170,16 @@ static inline int insert_local__(LocalTree **root, char *str, int offset, Data d
     }
     cmp = strcmp(str, (*root)->name);
     if(cmp < 0)
-        return insert_local__(&(*root)->left, str, offset, data);
+        return insert_local__(&(*root)->left, str, offset);
     else if(cmp > 0)
-        return insert_local__(&(*root)->right, str, offset, data);
+        return insert_local__(&(*root)->right, str, offset);
     else // == 0
         return ERROR_SYN_FUNC_REDEF;
 }
 
-int insert_local(char *str, Data data)
+int insert_local(char *str)
 {
-    return insert_local__(&last_function->symbols, str, ++last_function->syms, data);
+    return insert_local__(&last_function->symbols, str, ++last_function->syms);
 }
 
 
@@ -193,8 +192,6 @@ static inline void drop_locals(LocalTree *root)
     if(root != NULL) {
         drop_locals(root->left);
         drop_locals(root->right);
-        if(root->data.type == T_STRING)
-            free(root->data.value.str);
         free(root->name);
         free(root);
     }
@@ -221,6 +218,7 @@ void drop_functions(void)
 {
     drop_functions__(functions_table);
 }
+
 
 /*
  * Rekurzivni pruchod stromem, uvolneni kazdeho uzlu
@@ -266,15 +264,7 @@ void print_locals(LocalTree *root)
     if(root == NULL)
         return;
     print_locals(root->left);
-    printf("  %s (%2d): ", root->name, root->offset);
-    if(root->data.type == T_STRING)
-        printf("\"%s\"\n", root->data.value.str);
-    else if(root->data.type == T_NUMBER)
-        printf("%g\n", root->data.value.num);
-    else if(root->data.type == T_BOOLEAN)
-        printf("%s\n", root->data.value.log? "true" : "false");
-    else if(root->data.type == T_NIL)
-        printf("nil\n");
+    printf("  %s (%2d)\n", root->name, root->offset);
     print_locals(root->right);
 }
 

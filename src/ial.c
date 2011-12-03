@@ -245,19 +245,58 @@ void drop_literals(void)
     drop_literals__(literals_table);
 }
 
+
 /*
-int find_function(FunctionTree *root, const char *str)
+ * Vyhleda v tabulce funkci funkci a vrati ukazatel na ni
+ * pokud nenajde, vraci NULL
+ */
+static inline FunctionTree * find_function__(FunctionTree *root, char *str)
 {
+    if(root == NULL)
+        return NULL; // tohle je, ze nenasel
+    int cmp = strcmp(str, root->name);
+    if(cmp == 0)
+        return root;
+    else if(cmp < 0)
+        return find_function__(root->left, str);
+    else // cmp > 0
+        return find_function__(root->right, str);
+}
+
+/*
+ * Wrapper pro vyhledani funkce v tabulce
+ */
+FunctionTree * find_function(char *str)
+{
+    return find_function__(functions_table, str);
+}
+
+
+/*
+ * Vyhleda v tabulce posledni funkce lokalni promennou a vrati ukazatel na ni
+ * pokud nenajde, vraci NULL
+ */
+static inline LocalTree * find_local__(LocalTree *root, char *str)
+{
+    if(root == NULL)
+        return NULL; // tohle je, ze nenasel
+    int cmp = strcmp(str, root->name);
+    if(cmp == 0)
+        return root;
+    else if(cmp < 0)
+        return find_local__(root->left, str);
+    else // cmp > 0
+        return find_local__(root->right, str);
     return 0;
 }
 
-int find_local(FunctionTree *root, const char *str)
+/*
+ * Wrapper pro hledani lokalnich promennych
+ */
+LocalTree * find_local(char *str)
 {
-    return 0;
+    return find_local__(last_function->symbols, str);
 }
-
-// Vyhledavat literaly asi nebude potreba, stejne je na ne nahodny klic
-*/
 
 #ifndef NDEBUG
 

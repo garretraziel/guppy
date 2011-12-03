@@ -31,6 +31,9 @@
 #define check_token(exptok, errcode) { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
+#ifdef NDEBUG
+void print_functions(FunctionTree *);
+#endif
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
 static int program(void);
@@ -59,7 +62,7 @@ int parser(void)
 
     int x = program();
 
-#ifndef NDEBUG
+#ifdef NDEBUG
     print_functions(functions_table);
 #endif
 
@@ -269,7 +272,7 @@ static int literal()
     try( insert_literal(data, &lit) );
     // TODO instrukce na nacteni hodnoty do lok. promenne
     // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
-#ifndef NDEBUG
+#ifdef NDEBUG
     // test, jak to vypada
     printf("mov [EBP + %2d], %p    // %s <- ", last_local->offset, (void*)lit, last_local->name);
     if(lit->data.type == T_NUMBER)

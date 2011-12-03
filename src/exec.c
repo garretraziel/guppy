@@ -12,9 +12,16 @@
 
 #include "exec.h"
 #include "string.h"
+#include "ial.h"
 
-//globalni promenne, paska pro ulozeni instrukci
+//globalni promenne, paska pro ulozeni instrukci a zasobnik
 Tape tape;
+Data **stack;
+
+int init_stack(int size);
+int pop_stack(int *dattype, univalue *value);
+int push_stack(int dattype, univalue value);
+int delete_stack();
 
 void init_tape() /// inicializuje pasku s kodem
 {

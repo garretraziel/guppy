@@ -20,14 +20,16 @@ void sort(string *);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+typedef union {
+    int log;
+    double num;
+    char *str;
+} univalue;
+
 // univerzalni datova polozka
 typedef struct {
     int type;
-    union {
-        int log;
-        double num;
-        char *str;
-    } value;
+    univalue value;
 } Data;
 
 // uzel tabulky symbolu funkce

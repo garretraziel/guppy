@@ -401,48 +401,42 @@ static int s_oobely_boo(Stack *stack)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int expression(void)
+static inline int expression__(Stack *stack)
 {
     int a, b;
-    Stack stack;
-    s_init(&stack);
 
     // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
     if(token < 0)
         return token;
 
     // Takhle to zacina, da se dolar na zasobnik
-    s_push(&stack, E_DOLLAR);
+    s_push(stack, E_DOLLAR);
 
     a = translatetoken[token]; // aktualni vstup
     do {
-        b = stack.active->type; // nejvrchnejsi terminal na zasobniku
+        b = stack->active->type; // nejvrchnejsi terminal na zasobniku
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
-                s_push(&stack, a);
-                b = stack.active->type; // doslo ke zmene horniho terminalu
+                s_push(stack, a);
+                b = stack->active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();
-                if (token < 0) { // nacetl jsem neco spatneho
-                    s_clean(&stack);
+                if (token < 0) // nacetl jsem neco spatneho
                     return token;
-                }
                 a = translatetoken[token];
                 break;
 
             case LT:
                 // b na zasobniku vymenit za b<
-                s_alter(&stack);
+                s_alter(stack);
                 // push(a)
-                s_push(&stack, a);
-                b = stack.active->type; // doslo ke zmene horniho terminalu
+                s_push(stack, a);
+                b = stack->active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();
-                if (token < 0) { // nacetl jsem neco spatneho
-                    s_clean(&stack);
+                if (token < 0) // nacetl jsem neco spatneho
                     return token;
-                }
                 a = translatetoken[token];
                 break;
 
@@ -450,13 +444,10 @@ int expression(void)
                 // pokud je na zasobiku <y a existuje pravidlo r: A -> y, pak
                     // vymenit <y za A
                     // a pouzit to pravidlo
-                if(s_oobely_boo(&stack) >= 0)
-                    b = stack.active->type; // nejhornejsi terminal byl zmenen
-                // jinak chyba
-                else {
-                    s_clean(&stack);
+                if(s_oobely_boo(stack) >= 0)
+                    b = stack->active->type; // nejhornejsi terminal byl zmenen
+                else // jinak chyba
                     return ERROR_SYN_EXP_FAIL;
-                }
                 break;
 
             case OO:
@@ -468,7 +459,6 @@ int expression(void)
                     continue;
                 }
                 // jinak syntakticka chyba
-                s_clean(&stack);
                 return ERROR_SYN_EXP_FAIL;
                 break;
         } /* switch */
@@ -477,7 +467,21 @@ int expression(void)
 #endif
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
-    // uvolneni zasobniku, vzdycky tam zbyde E_DOLLAR
-    s_clean(&stack);
     return 1;
+}
+
+
+/*
+ * Wrapper pro funkci na zpracovani vyrazu
+ */
+int expression(void)
+{
+    Stack stack;
+    // inicializace zasobniku
+    s_init(&stack);
+    // samotne zpracovani vyrazu
+    int x = expression__(&stack);
+    // uvolneni zasobniku
+    s_clean(&stack);
+    return x;
 }

@@ -198,9 +198,9 @@ int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jej
     if (temp == NULL) return -1; //TODO: err_mem
 
     if (stack -> esp == (stack -> size)-1) {
-        Data ** temp = realloc(stack -> val, (stack -> size)*2);
-        if (temp == NULL) return -2; //TODO: err_jezis_dosel_nam_zasobnik
-        stack -> val = temp;
+        Data ** temp_val = realloc(stack -> val, (stack -> size)*2);
+        if (temp_val == NULL) return -2; //TODO: err_jezis_dosel_nam_zasobnik
+        stack -> val = temp_val;
         stack -> size *= 2;
     }
     

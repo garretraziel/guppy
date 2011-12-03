@@ -115,18 +115,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IJMPT: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) {
-                ExecError();
-            }
+            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) ExecError();
             if (value.log == STRUE) tape.act = (PTapeItem) instr -> adr; //TODO: proc se to vubec musi pretypovavat?
             break;
         }
         case IJMPF: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) {
-                ExecError();
-            }
+            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) ExecError();
             if (value.log == SFALSE) tape.act = (PTapeItem) instr -> adr;
             break;
         }
@@ -151,17 +147,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPUSHT: {
             univalue value;
             value.log = STRUE;
-            if (push_stack(DBOOL, value) != 0) {
-                ExecError();
-            }
+            if (push_stack(DBOOL, value) != 0) ExecError();
             break;
         }
         case IPUSHF: {
             univalue value;
             value.log = SFALSE;
-            if (push_stack(DBOOL, value) != 0) {
-                ExecError();
-            }
+            if (push_stack(DBOOL, value) != 0) ExecError();
             break;
         }
         case IPOPI:
@@ -169,20 +161,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPUSHM: {
             univalue value;
             value.log = STRUE; // zbytecne, ale nezbytne
-            if (push_stack(DMARK, value) != 0) {
-                ExecError();
-            }
+            if (push_stack(DMARK, value) != 0) ExecError();
             break;
         }
         case IADD: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            }
             retvalue.num = value1.num + value2.num;
             if (push_stack(DNUM, retvalue) != 0) {
                 ExecError();
@@ -192,80 +180,64 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case ISUB: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            }
             retvalue.num = value2.num - value1.num;
-            if (push_stack(DNUM, retvalue) != 0) {
+            if (push_stack(DNUM, retvalue) != 0) 
                 ExecError();
-            }
             break;
         }
         case IMUL: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            }
             retvalue.num = value1.num * value2.num;
-            if (push_stack(DNUM, retvalue) != 0) {
+            if (push_stack(DNUM, retvalue) != 0)
                 ExecError();
-            }
             break;
         }
         case IDIV: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            }
-            if (value1.num == 0) {
+            if (value1.num == 0)
                 ExecError(); //TODO: tady mam vracet nejakou dulezitou chybu, ne? ne?
-            }
             retvalue.num = value2.num / value1.num;
-            if (push_stack(DNUM, retvalue) != 0) {
+            if (push_stack(DNUM, retvalue) != 0)
                 ExecError();
-            }
             break;
         }
         case IPOW: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            }
             retvalue.num = pow(value2.num, value1.num);
-            if (push_stack(DNUM, retvalue) != 0) {
+            if (push_stack(DNUM, retvalue) != 0)
                 ExecError();
-            }
             break;
         }
         case ICONCAT: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DSTRING) {
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DSTRING)
                 ExecError(); //TODO: nema to nekdy vracet nil?
-            }
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING) {
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING)
                 ExecError();
-            }
             retvalue.str = concat(value2.str, value1.str);
             if (retvalue.str == NULL) ExecError();
-            if (push_stack(DSTRING, retvalue) != 0) {
+            if (push_stack(DSTRING, retvalue) != 0)
                 ExecError();
-            }
             break;
         }
         case ICMP:

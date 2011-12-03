@@ -28,8 +28,8 @@
 
 // Pokud je token jiny nez ocekavany token, je vracen token,
 // pokud byl sam zaporny, jinak zadany chybovy kod
-#define check_token(exptok, errcode) if(token != exptok) \
-    return (token < 0) ? token : errcode
+#define check_token(exptok, errcode) { if(token != exptok) \
+    return (token < 0) ? token : errcode; } while(0)
 
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani

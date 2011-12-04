@@ -387,10 +387,10 @@ int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jej
         stack.val = temp_val;
         stack.size *= 2;
     }
-    
+
+    stack.esp++;
     stack.val[stack.esp].type = dattype;
     stack.val[stack.esp].value = value;
-    stack.esp++;
     
     return 0;
 }

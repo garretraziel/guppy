@@ -404,7 +404,6 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case VAR: // E -> id
-                func_pop(); // neslo o funkci, pop
             case VAL: // E -> string, bool, num, nil
                 // na zasobniku je hodnota, ocekava se konec a redukce
                 if(top != E_MARK)
@@ -555,10 +554,6 @@ static inline int expression__(Stack *stack)
     do {
         b = stack->active->type; // nejvrchnejsi terminal na zasobniku
 
-        // pokud je identifikator, da se predpokladat, ze to bude funkce
-        if(a == E_IDENT)
-            func_push();
-
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
@@ -584,9 +579,10 @@ static inline int expression__(Stack *stack)
                 }
                 // pokud je to identifikator, tak ho najdu v tabulce
                 if(a == E_IDENT) {
-                    if((ptr = find_function(str.str)))
+                    if((ptr = find_function(str.str))) {
+                        func_push(); // nova funkce
                         e_type = E_FUNC;
-                    else if((ptr = find_local(str.str)))
+                    } else if((ptr = find_local(str.str)))
                         e_type = E_VAR;
                     else
                         return ERROR_SEM_VAR_UND;

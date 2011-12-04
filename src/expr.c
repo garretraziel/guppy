@@ -354,8 +354,9 @@ void s_dump(Stack *stack)
 }
 #endif
 
-//ted uz je asi zbytecny aby to byla zvlast fce...
-static inline void * __generate(int E)
+
+// Aplikace pravidla (reakce na >)
+static int s_oobely_boo(Stack *stack)
 {
     const int conv_inst[] = {
         [E_IDENT] = IPUSHI,
@@ -376,13 +377,6 @@ static inline void * __generate(int E)
         [E_NOTEQ] = ICMP,
         [E_EQUAL] = ICMPN
     };
-    //adresy!!
-    return (void *) generate(conv_inst[E], NULL, E);
-}
-
-// Aplikace pravidla (reakce na >)
-static int s_oobely_boo(Stack *stack)
-{
     enum states { START, VAL, VAR, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER};
     const int translate[] = {
         [E_POW] = E_OP,
@@ -439,15 +433,19 @@ static int s_oobely_boo(Stack *stack)
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E, E1, NULL) );
 #ifdef DEBUG
-    printf("I: PUSH(I) %p %d NULL\n", NULL, E1);
+    printf("I: PUSH(I) %p %d NULL\n", NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
 #endif
-                __generate(E1);
+                generate(conv_inst[E1], NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
                 return 1;
                 break;
             case RBRAC: // na zasobniku je ... )
                 if(top == E_NET_E) {
                     E1 = stack->top->e_type;
                     state = BRAC_EEEE;
+#ifdef DEBUG
+    printf("I: PUSHI %p %d", NULL, E1);
+#endif
+                    generate(conv_inst[E1], NULL, E1);
                 }
                 else if(top == E_LBRAC)
                     state = FUNC_CALL;
@@ -478,7 +476,9 @@ static int s_oobely_boo(Stack *stack)
                     func_inc();
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
+    printf("I: CALL %p NULL NULL\n", NULL);
 #endif
+                    generate(ICALL, NULL, AFUNCTABLE);
                     func_pop();
                     E1 = E_UNKNOWN;
                 }
@@ -507,7 +507,9 @@ static int s_oobely_boo(Stack *stack)
                 // bylo volani funkce a ja vim, kolik mela parametru
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
+    printf("I: CALL %p NULL NULL\n", NULL);
 #endif
+                generate(ICALL, NULL, AFUNCTABLE);
                 func_pop();
                 return 1;
                 break;
@@ -534,7 +536,7 @@ static int s_oobely_boo(Stack *stack)
 #ifdef DEBUG
     printf("I: (OPER)%d NULL NULL NULL\n", OP);
 #endif
-                __generate(OP);
+                generate(conv_inst[OP], NULL, ANONE);
                 return 1;
                 break;
             case EEEE_COMM: // na zasobniku je ... , E

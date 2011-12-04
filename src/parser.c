@@ -342,6 +342,9 @@ static int statement(void)
             get_token();
             // expression list
             try( expression_seq() );
+#ifdef DEBUG
+    printf("I: WRITE NULL NULL NULL\n:");
+#endif    
             // right bracket
             check_token(RBRAC, ERROR_SYN_X_RBRC);
             get_token();
@@ -409,6 +412,9 @@ static int assign_z(void)
         // prava zavorka
         check_token(RBRAC, ERROR_SYN_X_RBRC);
         get_token();
+#ifdef DEBUG
+    printf("I: READ ? ? NULL\n:");
+#endif
         return 1;
     }
     // vyraz

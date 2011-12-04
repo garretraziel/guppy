@@ -15,12 +15,8 @@
 #include "expr.h"
 #include "defines.h"
 #include "lexical.h"
-<<<<<<< HEAD
 #include "exec.h"
-=======
 #include "ial.h"
->>>>>>> 0e4ac3fa1f06783d55ca2a1d127d84d827666f50
-
 
 
 // Symboly se kterymi pracuje zasobnikovy automat

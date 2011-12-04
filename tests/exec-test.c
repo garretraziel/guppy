@@ -6,6 +6,7 @@
 
 int main(void) {
     init_tape();
+    Data name;
     generate(IHALT, NULL, ANONE);
     execute();
 }

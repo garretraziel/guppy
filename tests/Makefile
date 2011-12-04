@@ -36,5 +36,5 @@ parser-test: ../src/ial.o ../src/string.o ../src/lexical.o ../src/parser.o ../sr
 expr-test: ../src/errors.o ../src/lexical.o ../src/string.o ../src/expr.o ../src/parser.o ../src/ial.o expr-test.o 
 	$(CC) $(CFLAGS) $^ -o $@
 
-exec-test: ../src/exec.o ../src/string.o exec-test.o
+exec-test: ../src/exec.o ../src/string.o ../src/ial.o exec-test.o
 	$(CC) $(CFLAGS) -lm $^ -o $@

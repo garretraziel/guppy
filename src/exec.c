@@ -8,6 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
+//TODO: u kazdeho erroru taky spravne uvolnovat pamet. TO bude jeste peklo
+
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -157,7 +159,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (instr -> adrtype != ALITTABLE) ExecError();
             LiteralTree *literal = (LiteralTree *) instr -> adr;
             if (literal == NULL) ExecError();
-            try_push_stack(literal -> data.type, literal -> data.value);
+            if (literal -> data.type == T_STRING) { //TODO: kontrolovat kopirovani toho stringu z tabulky literalu
+                univalue str;
+                str.str = malloc(sizeof(char)*(strlen(literal -> data.value.str)+1));
+                if (str.str == NULL) ExecError();
+                strcpy(str.str, literal -> data.value.str);
+                try_push_stack(literal -> data.type, str);
+            } else
+                try_push_stack(literal -> data.type, literal -> data.value);
             break;
         }
         case IPUSHI:

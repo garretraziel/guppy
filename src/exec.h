@@ -17,33 +17,32 @@ enum {
     IJMPT,      // 2  skoc na adresu z operandu, je-li na vrcholu zasobniku true, pop
     IJMPF,      // 3  skoc na adresu z operandu, je-li na vrcholu zasobniku false, pop
     ICALL,      // 4  zavolej funkci na adrese ve stromu funkci
-    IRETP,      // 5  navrat z funkce, pop az na zarazku, navratovou hodnotu ziska z vrcholu zasobniku
-    IRET,       // 6  navrat z funkce, pop az na zarazku, navratova hodnota nil
-    IPUSH,      // 7  na vrchol zasobniku pushne literal na zadane adrese
-    IPUSHI,     // 8  na vrchol zasobniku pushne lokalni promennou/argument na zadane adrese
-    IPUSHT,     // 9  na vrchol zasobniku pushne true
-    IPUSHF,     // 10 na vrchol zasobniku pushne false
-    IPOPI,      // 11 popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
-    IPUSHN,     // 12 pushne do zasobniku nil
-    IADD,       // 13 popne vrchni dve hodnoty, secte je, vysledek pushne
-    ISUB,       // 14 popne vrchni dve hodnoty, odecte, vysledek pushne
-    IMUL,       // 15 vynasobi vrchni dve hodnoty na zasobniku, vysledek pushne
-    IDIV,       // 16 vydeli vrchni dve hodnoty na zasobniku, vysledek pushne
-    IPOW,       // 17 umocni prvni na druhou hodnotu na zasobniku, vysledek pushne
-    ICONCAT,    // 18 spoji vrchni dva stringy v zasobniku, vysledek pushne
-    ICMP,       // 19 porovna vrchni dve hodnoty na zasobniku, vysledek pushne
-    ICMPN,      // 20 porovna na nerovnost
-    ICMPL,      // 21 porovna na mensi nez
-    ICMPG,      // 22 porovna na vetsi nez
-    ICMPEL,     // 23 porovna na mensi nebo rovno
-    ICMPEG,     // 24 porovna na vetsi nebo rovno
-    IWRITE,     // 25 prehaze argumenty az po zarazku do druheho zasobniku, pak je postupne vypise
-    IREAD,      // 26 prebere "nejspis" dva argumenty, podle prvniho fmt retezce nacte hodnotu na adresu druheho
-    ITYPE,      // 27 popne ze zasobniku nejvyssi hodnotu, zjisti jeji typ, ktery pote pushne na zasobnik
-    ISUBSTR,    // 28 popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
-    IFIND,      // 29 popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
-    ISORT,      // 30 popne vrchni string, setridi ho a vysledek pushne
-    INOP,       // 31 neudela nic, pouzivano jako label
+    IRET,       // 5  navrat z funkce, pop az na zarazku, navratovou hodnotu ziska z vrcholu zasobniku POZOR: pokud nema navratovou hodnotu, musi se pred retp dat pushn
+    IPUSH,      // 6  na vrchol zasobniku pushne literal na zadane adrese
+    IPUSHI,     // 7  na vrchol zasobniku pushne lokalni promennou/argument na zadane adrese
+    IPUSHT,     // 8  na vrchol zasobniku pushne true
+    IPUSHF,     // 9  na vrchol zasobniku pushne false
+    IPOPI,      // 10 popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
+    IPUSHN,     // 11 pushne do zasobniku nil
+    IADD,       // 12 popne vrchni dve hodnoty, secte je, vysledek pushne
+    ISUB,       // 13 popne vrchni dve hodnoty, odecte, vysledek pushne
+    IMUL,       // 14 vynasobi vrchni dve hodnoty na zasobniku, vysledek pushne
+    IDIV,       // 15 vydeli vrchni dve hodnoty na zasobniku, vysledek pushne
+    IPOW,       // 16 umocni prvni na druhou hodnotu na zasobniku, vysledek pushne
+    ICONCAT,    // 17 spoji vrchni dva stringy v zasobniku, vysledek pushne
+    ICMP,       // 18 porovna vrchni dve hodnoty na zasobniku, vysledek pushne
+    ICMPN,      // 19 porovna na nerovnost
+    ICMPL,      // 20 porovna na mensi nez
+    ICMPG,      // 21 porovna na vetsi nez
+    ICMPEL,     // 22 porovna na mensi nebo rovno
+    ICMPEG,     // 23 porovna na vetsi nebo rovno
+    IWRITE,     // 24 prehaze argumenty az po zarazku do druheho zasobniku, pak je postupne vypise
+    IREAD,      // 25 prebere "nejspis" dva argumenty, podle prvniho fmt retezce nacte hodnotu na adresu druheho
+    ITYPE,      // 26 popne ze zasobniku nejvyssi hodnotu, zjisti jeji typ, ktery pote pushne na zasobnik
+    ISUBSTR,    // 27 popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
+    IFIND,      // 28 popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
+    ISORT,      // 29 popne vrchni string, setridi ho a vysledek pushne
+    INOP,       // 30 neudela nic, pouzivano jako label
 } Instructions;
 
 enum {

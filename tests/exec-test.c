@@ -20,13 +20,19 @@ int main(void) {
     
     generate(IPUSH, last_literal, ALITTABLE);
 
-    str.value.str = malloc(5);
-    strcpy(str.value.str,"mele");
+
+    str.type = T_NUMBER;
+    str.value.num = 2;
+    insert_literal(str);
+
+    generate(IPUSH, last_literal, ALITTABLE);
+
+    str.value.num = 4;
     insert_literal(str);
 
     generate(IPUSH, last_literal, ALITTABLE);
     
-    generate(IFIND, NULL, ANONE);
+    generate(ISUBSTR, NULL, ANONE);
     generate(IWRITE, NULL, ANONE);
     generate(IHALT, NULL, ANONE);
 

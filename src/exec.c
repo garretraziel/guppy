@@ -99,7 +99,11 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
 {
     init_stack(STACK_DEFAULT_SIZE);
 
-    if (tape.top == NULL) return 0; //TODO: ma to vubec cenu osetrovat? tohle se stejne nikdy nestane, ne?
+    if (tape.top == NULL) {
+        delete_stack();
+        delete_tape();
+        return 0; //TODO: ma to vubec cenu osetrovat? tohle se stejne nikdy nestane, ne?
+    }
 
     tape.act = tape.top; //TODO: aktualni se asi nikdy jindy nastavovat nebude, popremyslet o tom
     
@@ -107,7 +111,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         
         PTapeItem instr = actnext_tape();
 
-        if (instr == NULL) return -1; //TODO: neco se nepovedlo, popremyslet co by to mohlo byt za chybu
+        if (instr == NULL) ExecError(); //TODO: neco se nepovedlo, popremyslet co by to mohlo byt za chybu
 
         switch (instr -> instr) {
         case IHALT: {

@@ -164,7 +164,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 str.str = malloc(sizeof(char)*(strlen(literal -> data.value.str)+1));
                 if (str.str == NULL) ExecError();
                 strcpy(str.str, literal -> data.value.str);
-                try_push_stack(literal -> data.type, str);
+                try_push_stack(literal -> data.type, str); // T_TYP se prevede na DTYP, jsou kompatibilni
             } else
                 try_push_stack(literal -> data.type, literal -> data.value);
             break;
@@ -320,20 +320,20 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype, &value) != 0) ExecError();
             switch (dattype) {
             case DNUM:
-                retvalue.str = malloc(sizeof(char)*(strlen("number") + 1));
+                retvalue.str = malloc(sizeof(char)*7);
                 strcpy(retvalue.str, "number");
                 break;
             case DSTRING:
-                retvalue.str = malloc(sizeof(char)*(strlen("string") + 1));
+                retvalue.str = malloc(sizeof(char)*7);
                 strcpy(retvalue.str, "string");
                 free(retvalue.str);
                 break;
             case DBOOL:
-                retvalue.str = malloc(sizeof(char)*(strlen("boolean") + 1));
+                retvalue.str = malloc(sizeof(char)*8);
                 strcpy(retvalue.str, "boolean");
                 break;
             case DNIL:
-                retvalue.str = malloc(sizeof(char)*(strlen("nil") + 1));
+                retvalue.str = malloc(sizeof(char)*4);
                 strcpy(retvalue.str, "nil");
                 break;
             default:

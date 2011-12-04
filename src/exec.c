@@ -24,7 +24,7 @@
 typedef struct TStack {
     int esp;
     int size;
-    Data **val;
+    Data *val;
 } *PStack;
 
 //globalni promenne, paska pro ulozeni instrukci a zasobnik
@@ -343,7 +343,7 @@ int init_stack(int size) /// inicializuje zasobnik
 {
     stack = malloc(sizeof(struct TStack));
     if (stack == NULL) return -1;
-    stack -> val = malloc(sizeof(Data*)*size);
+    stack -> val = malloc(sizeof(Data)*size);
     if (stack -> val == NULL) return -1; //TODO: err_mem
     stack -> size = size;
     stack -> esp = -1;
@@ -353,9 +353,9 @@ int init_stack(int size) /// inicializuje zasobnik
 int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
 {
     if (stack -> esp == -1) return -1; //TODO: definovat error
-    (*dattype) = stack -> val[stack -> esp] -> type;
-    (*value) = stack -> val[stack -> esp] -> value;
-    free(stack -> val[stack -> esp]); //TODO: opravdu uvolnovat
+    (*dattype) = stack -> val[stack -> esp].type;
+    (*value) = stack -> val[stack -> esp].value;
+    //free(stack -> val[stack -> esp]); //TODO: opravdu uvolnovat
     (stack -> esp)--;
     
     return 0;
@@ -363,30 +363,22 @@ int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodno
 
 int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jeji datovy typ
 {
-    Data *temp = malloc(sizeof(Data));
-    if (temp == NULL) return -1; //TODO: err_mem
-
     if (stack -> esp == (stack -> size)-1) {
-        Data ** temp_val = realloc(stack -> val, (stack -> size)*2);
+        Data *temp_val = realloc(stack -> val, (stack -> size)*2);
         if (temp_val == NULL) return -2; //TODO: err_jezis_dosel_nam_zasobnik
         stack -> val = temp_val;
         stack -> size *= 2;
     }
     
-    temp -> type = dattype;
-    temp -> value = value;
+    stack -> val[stack->esp].type = dattype;
+    stack -> val[stack->esp].value = value;
     (stack -> esp)++;
-
-    stack -> val[stack -> esp] = temp;
     
     return 0;
 }
 
 int delete_stack() /// smaze cely zasobnik
 {
-    for (int i = 0; i<= stack->esp; i++) {
-        free(stack -> val[i]);
-    }
     free(stack -> val);
     stack -> esp = -1;
     stack -> val = NULL;
@@ -399,17 +391,17 @@ int print_stack()
 {
     printf("Zasobnik:\n---------\n");
     for (int i = 0; i<(stack -> esp); i++) {
-        Data *temp = stack -> val[i];
+        Data temp = stack -> val[i];
         printf("* %d) <--\n", i);
-        switch (temp -> type) {
+        switch (temp.type) {
         case DNUM:
-            printf("** cislo   %g\n", temp -> value.num);
+            printf("** cislo   %g\n", temp.value.num);
             break;
         case DSTRING:
-            printf("** string  %s\n", temp -> value.str);
+            printf("** string  %s\n", temp.value.str);
             break;
         case DBOOL:
-            printf("** boolean %d\n", temp -> value.log);
+            printf("** boolean %d\n", temp.value.log);
             break;
         case DNIL:
             printf("** nil\n");

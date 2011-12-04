@@ -373,8 +373,18 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DNUM, retvalue);
             break;
         }
-        case ISORT:
+        case ISORT: {
+            univalue str, retvalue;
+            int dattype;
+            if (pop_stack(&dattype, &str) != 0 || dattype != DSTRING) ExecError();
+            string conv;
+            if (str_init(&conv, str.str) != 1) ExecError();
+            free(str.str);
+            sort(&conv);
+            retvalue.str = conv.str;
+            try_push_stack(DSTRING, retvalue);
             break;
+        }
         default:
             //TODO: nedefinovana instrukce, POMOC!
             ExecError(); //TODO: co to ma vracet za chybu?

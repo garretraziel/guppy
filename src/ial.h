@@ -44,7 +44,7 @@ typedef struct localnode {
 typedef struct funcnode {
     char *name;
     LocalTree *symbols;
-    int syms;
+    int params, vars;
     struct funcnode *left, *right;
 } FunctionTree;
 
@@ -58,7 +58,8 @@ typedef struct literalnode {
 
 int insert_function(char *);
 int insert_literal(Data);
-int insert_local(char *);
+int insert_local_param(char *);
+int insert_local_var(char *);
 
 void drop_functions(void);
 void drop_literals(void);
@@ -74,6 +75,8 @@ extern LiteralTree *literals_table;
 extern FunctionTree *last_function;
 // posledni lokalni promenna
 extern LocalTree *last_local;
+// posledni litral
+extern LiteralTree *last_literal;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

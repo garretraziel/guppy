@@ -165,7 +165,7 @@ static int formal_parametr_seq(void)
     // identifikator
     if(token == IDENTIFIER) {
         // pridat parametr do tabulky symbolu aktualni funkce
-        try( insert_local(str.str) );
+        try( insert_local_param(str.str) );
         // potreba novy string
         try( str_new(&str, STR_INIT_LEN) );
         get_token();
@@ -184,7 +184,7 @@ static int formal_parametr_seq_z(void)
         get_token();
         // identifikator
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
-        try( insert_local(str.str) ); // pridat do stromu
+        try( insert_local_param(str.str) ); // pridat do stromu
         try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         return formal_parametr_seq_z();
@@ -202,7 +202,7 @@ static int local_declaration_seq(void)
         get_token();
         // identifier
         check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
-        try( insert_local(str.str) ); // pridat do tabulky
+        try( insert_local_var(str.str) ); // pridat do tabulky
         try( str_new(&str, STR_INIT_LEN) ); // novy string
         get_token();
         // local declaration z
@@ -272,17 +272,17 @@ static int literal()
     }
     try( insert_literal(data) );
     // TODO instrukce na nacteni hodnoty do lok. promenne
-    // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
+    // instrukce bude rikat, ze do last_local se ma nacist z adresy last_literal
 #ifdef DEBUG
     // test, jak to vypada
-    printf("mov [EBP + %2d], %p    // %s <- ", last_local->offset, (void*)lit, last_local->name);
-    if(lit->data.type == T_NUMBER)
-        printf("%g\n", lit->data.value.num);
-    else if(lit->data.type == T_STRING)
-        printf("%s\n", lit->data.value.str);
-    else if(lit->data.type == T_BOOLEAN)
-        printf("%s\n", lit->data.value.log?"true":"false");
-    else if(lit->data.type == T_NIL)
+    printf("mov [EBP + %2d], %p    // %s <- ", last_local->offset, (void*)last_literal, last_local->name);
+    if(last_literal->data.type == T_NUMBER)
+        printf("%g\n", last_literal->data.value.num);
+    else if(last_literal->data.type == T_STRING)
+        printf("%s\n", last_literal->data.value.str);
+    else if(last_literal->data.type == T_BOOLEAN)
+        printf("%s\n", last_literal->data.value.log?"true":"false");
+    else if(last_literal->data.type == T_NIL)
         printf("nil\n");
 #endif
     get_token();

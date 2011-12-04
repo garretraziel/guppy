@@ -92,7 +92,8 @@ static inline int insert_function__(FunctionTree **root, char *str)
         *root = new;
         new->name = str; // nebo kopirovat?
         new->symbols = NULL;
-        new->syms = 0;
+        new->params = 0;
+        new->vars = 0;
         new->left = NULL;
         new->right = NULL;
         last_function = new;
@@ -163,7 +164,7 @@ int insert_literal(Data data)
  * Prida do tabulky symbolu jmeno indentifikatoru
  * kazda funkce ma svuj
  */
-static inline int insert_local__(LocalTree **root, char *str, int offset)
+static inline int insert_local__(LocalTree **root, char *str)
 {
     int cmp;
     if(*root == NULL) {
@@ -172,7 +173,7 @@ static inline int insert_local__(LocalTree **root, char *str, int offset)
             return ERROR_GEN_MEM;
         *root = new;
         new->name = str;
-        new->offset = offset;
+        new->offset = last_function->params + last_function->vars;
         new->left = NULL;
         new->right = NULL;
         last_local = new;
@@ -180,20 +181,34 @@ static inline int insert_local__(LocalTree **root, char *str, int offset)
     }
     cmp = strcmp(str, (*root)->name);
     if(cmp < 0)
-        return insert_local__(&(*root)->left, str, offset);
+        return insert_local__(&(*root)->left, str);
     else if(cmp > 0)
-        return insert_local__(&(*root)->right, str, offset);
+        return insert_local__(&(*root)->right, str);
     else // == 0
         return ERROR_SEM_VAR_REDEF;
 }
 
-int insert_local(char *str)
+/*
+ * Pridani jmena parametru do tabulky symbolu posledni funkce
+ */
+int insert_local_param(char *str)
 {
     if(find_function(str) != NULL)
         return ERROR_SEM_VAR_REDEF;
-    return insert_local__(&last_function->symbols, str, ++last_function->syms);
+    ++last_function->params;
+    return insert_local__(&last_function->symbols, str);
 }
 
+/*
+ * Pridani jmena lokalni promenne do tabulky symbolu posledni funkce
+ */
+int insert_local_var(char *str)
+{
+    if(find_function(str) != NULL)
+        return ERROR_SEM_VAR_REDEF;
+    ++last_function->vars;
+    return insert_local__(&last_function->symbols, str);
+}
 
 /* * * * * * * * * * * * * * * * * * * */
 

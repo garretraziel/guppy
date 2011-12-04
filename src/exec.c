@@ -25,11 +25,11 @@ typedef struct TStack {
     int esp;
     int size;
     Data *val;
-} *PStack;
+} Stack;
 
 //globalni promenne, paska pro ulozeni instrukci a zasobnik
 Tape tape;
-PStack stack;
+Stack stack;
 
 int init_stack(int size); /// inicializuje zasobnik
 int pop_stack(int *dattype, univalue *value); /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
@@ -153,8 +153,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case IRET:
             break;
-        case IPUSH:
+        case IPUSH: {
+            if (instr -> adrtype != ALITTABLE) ExecError();
+            LiteralTree *literal = (LiteralTree *) instr -> adr;
+            if (literal == NULL) ExecError();
+            try_push_stack(literal -> data.type, literal -> data.value);
             break;
+        }
         case IPUSHI:
             break;
         case IPUSHT: {
@@ -346,48 +351,45 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
 
 int init_stack(int size) /// inicializuje zasobnik
 {
-    stack = malloc(sizeof(struct TStack));
-    if (stack == NULL) return -1;
-    stack -> val = malloc(sizeof(Data)*size);
-    if (stack -> val == NULL) return -1; //TODO: err_mem
-    stack -> size = size;
-    stack -> esp = -1;
+    stack.val = malloc(sizeof(Data)*size);
+    if (stack.val == NULL) return -1; //TODO: err_mem
+    stack.size = size;
+    stack.esp = -1;
     return 0;
 }
 
 int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
 {
-    if (stack -> esp == -1) return -1; //TODO: definovat error
-    (*dattype) = stack -> val[stack -> esp].type;
-    (*value) = stack -> val[stack -> esp].value;
+    if (stack.esp == -1) return -1; //TODO: definovat error
+    (*dattype) = stack.val[stack.esp].type;
+    (*value) = stack.val[stack.esp].value;
     //free(stack -> val[stack -> esp]); //TODO: opravdu uvolnovat
-    (stack -> esp)--;
+    stack.esp--;
     
     return 0;
 }
 
 int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jeji datovy typ
 {
-    if (stack -> esp == (stack -> size)-1) {
-        Data *temp_val = realloc(stack -> val, (stack -> size)*2);
+    if (stack.esp == (stack.size)-1) {
+        Data *temp_val = realloc(stack.val, (stack.size)*2);
         if (temp_val == NULL) return -2; //TODO: err_jezis_dosel_nam_zasobnik
-        stack -> val = temp_val;
-        stack -> size *= 2;
+        stack.val = temp_val;
+        stack.size *= 2;
     }
     
-    stack -> val[stack->esp].type = dattype;
-    stack -> val[stack->esp].value = value;
-    (stack -> esp)++;
+    stack.val[stack.esp].type = dattype;
+    stack.val[stack.esp].value = value;
+    stack.esp++;
     
     return 0;
 }
 
 int delete_stack() /// smaze cely zasobnik
 {
-    free(stack -> val);
-    stack -> esp = -1;
-    stack -> val = NULL;
-    free(stack);
+    free(stack.val);
+    stack.esp = -1;
+    stack.val = NULL;
     return 0;
 }
 
@@ -395,8 +397,8 @@ int delete_stack() /// smaze cely zasobnik
 int print_stack()
 {
     printf("Zasobnik:\n---------\n");
-    for (int i = 0; i<(stack -> esp); i++) {
-        Data temp = stack -> val[i];
+    for (int i = 0; i<(stack.esp); i++) {
+        Data temp = stack.val[i];
         printf("* %d) <--\n", i);
         switch (temp.type) {
         case DNUM:

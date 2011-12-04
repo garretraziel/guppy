@@ -1,6 +1,6 @@
 /*
  * projekt: interpret jazyka IFJ11 
- * soubor: ial.c
+ * soubor: expr.c
  * autori:
  *   xbrabe09 Brabec Lukas
  *   xdujic01 Dujicek Ales
@@ -15,6 +15,7 @@
 #include "expr.h"
 #include "defines.h"
 #include "lexical.h"
+#include "ial.h"
 
 
 
@@ -59,10 +60,12 @@ enum {
     E_NET_E,
     E_NET_P,
 
-    // tohle jsou jen pomocne konstanty pro oobely-boo
+    // tohle jsou jen pomocne konstanty pro oobely-boo a spol.
     E_OP, // obecne operator
     E_LIT, // obecne literal
     E_UNKNOWN, // neznamy typ
+    E_VAR, // identifikator promenne
+    E_FUNC, // identifikator funkce
 } ESymbols;
 
 
@@ -86,7 +89,12 @@ static int F = -1;
 // Makro vraci true, pokud je symbol terminalni
 #define is_terminal(e_sym)(e_sym < E_MARK)
 
-
+#define check_operands_and_operator() do { int a, b;\
+    a = (E1==E_UNKNOWN || E1==E_VAR)?E_UNKNOWN:E1;  \
+    b = (E2==E_UNKNOWN || E2==E_VAR)?E_UNKNOWN:E2;  \
+    if(a != b && a != E_UNKNOWN && b != E_UNKNOWN)  \
+        return ERROR_SEM_WRONG_TYPES; \
+    } while(0)
 /*
  * Vraci typ vysledku operatoru
  */
@@ -215,6 +223,7 @@ const int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka
 typedef struct node {
     int type;
     int e_type;
+    void *ptr;
     struct node *next;
 } Node; // Expression Stack Node
 
@@ -247,13 +256,14 @@ int s_clean(Stack * stack)
 }
 
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
-int s_push(Stack *stack, int type, int e_type)
+int s_push(Stack *stack, int type, int e_type, void *ptr)
 {
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
         return ERROR_GEN_MEM;
     new->type = type;
     new->e_type = e_type;
+    new->ptr = ptr;
     new->next  = stack->top;
     stack->top = new;
     if(is_terminal(type))
@@ -303,7 +313,7 @@ void s_dump(Stack *stack)
                          "i","n","s","b","nil","(",")", ",","$", "{","E","P"};
         Node * tmp = stack->top;
         while(tmp!=NULL){
-            s_push(&s_tmp, tmp->type, 0);
+            s_push(&s_tmp, tmp->type, 0, NULL);
             tmp = tmp->next;
         }
         tmp = s_tmp.top;
@@ -374,7 +384,7 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                try( s_push(stack, E_NET_E, E1) );
+                try( s_push(stack, E_NET_E, E1, NULL) );
                 return 1;
                 break;
             case RBRAC: // na zasobniku je ... )
@@ -415,10 +425,10 @@ static int s_oobely_boo(Stack *stack)
                     func_pop();
                     E1 = E_UNKNOWN;
                 }
-                // bud vyraz v zacorce, nebo volani funkce
+                // bud vyraz v zavorce, nebo volani funkce
                 if(top == E_MARK) {
                     s_pop(stack); // oddelani znacky
-                    try( s_push(stack, E_NET_E, E1) );
+                    try( s_push(stack, E_NET_E, E1, NULL) );
                     return 1;
                 }
                 else
@@ -433,7 +443,7 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                try( s_push(stack, E_NET_E, E_UNKNOWN) );
+                try( s_push(stack, E_NET_E, E_UNKNOWN, NULL) );
                 // bylo volani funkce a ja vim, kolik mela parametru
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
@@ -456,9 +466,11 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
-                if(E1 != E2 && E1 != E_UNKNOWN && E2 != E_UNKNOWN)
-                    return ERROR_SEM_WRONG_TYPES;
-                try( s_push(stack, E_NET_E, get_result_type(OP)) );
+                // kontrola, zda jsou operandy stejneho nebo neznameho typu
+                check_operands_and_operator();
+                // kontrola, ze jsou operandy pouzitelne pro dany operator
+                // TODO
+                try( s_push(stack, E_NET_E, get_result_type(OP), NULL) );
                 return 1;
                 break;
             case EEEE_COMM: // na zasobniku je ... , E
@@ -470,7 +482,7 @@ static int s_oobely_boo(Stack *stack)
                 top = translate[stack->top->type];
                 if(top == E_MARK) {
                     s_pop(stack); // oddelani znacky
-                    try( s_push(stack, E_NET_P, E_UNKNOWN) );
+                    try( s_push(stack, E_NET_P, E_UNKNOWN, NULL) );
                     // byl parametr, musim pricist
                     func_inc();
                     return 1;
@@ -492,13 +504,15 @@ static int s_oobely_boo(Stack *stack)
 static inline int expression__(Stack *stack)
 {
     int a, b;
+    void *ptr = NULL;
+    int e_type;
 
     // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
     if(token < 0)
         return token;
 
     // Takhle to zacina, da se dolar na zasobnik
-    try( s_push(stack, E_DOLLAR, E_UNKNOWN) );
+    try( s_push(stack, E_DOLLAR, E_UNKNOWN, NULL) );
 
     a = translatetoken[token]; // aktualni vstup
     do {
@@ -511,7 +525,7 @@ static inline int expression__(Stack *stack)
         switch( prec_table[b][a] ) {
             case EQ:
                 // push(a)
-                try( s_push(stack, a, E_UNKNOWN) );
+                try( s_push(stack, a, E_UNKNOWN, NULL) );
                 b = stack->active->type; // doslo ke zmene horniho terminalu
                 // TODO vygenerovat instrukci, pokud je potreba
                   // tady tohle se stane jen pro id ( a ( ), toho se mozna
@@ -526,17 +540,28 @@ static inline int expression__(Stack *stack)
             case LT:
                 // b na zasobniku vymenit za b<
                 try( s_alter(stack) );
-                // push(a)
-                try( s_push(stack, a, get_e_type(a)) );
                 // pokud je carka mimo funkci, tak je konec vyrazu (kvuli write)
                 if(a == E_COMMA && F == -1) {
                     a = E_DOLLAR;
                     continue;
                 }
+                // pokud je to identifikator, tak ho najdu v tabulce
+                if(a == E_IDENT) {
+                    if((ptr = find_function(str.str)))
+                        e_type = E_FUNC;
+                    else if((ptr = find_local(str.str)))
+                        e_type = E_VAR;
+                    else
+                        return ERROR_SEM_VAR_UND;
+                    try( s_push(stack, a, e_type, ptr) );
+                }
+                else // TODO ostatni varianty
                 // TODO vygenerovat instrukci
                   // push nil, true, false
                   // nebo pridat literal do tabulky a push s odkazem na literal
                   // nebo push a odkaz na promennou
+                // push(a)
+                    try( s_push(stack, a, get_e_type(a), NULL) );
                 b = stack->active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();

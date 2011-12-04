@@ -21,18 +21,7 @@ int main(void) {
     generate(IPUSH, last_literal, ALITTABLE);
 
 
-    str.type = T_NUMBER;
-    str.value.num = 2;
-    insert_literal(str);
-
-    generate(IPUSH, last_literal, ALITTABLE);
-
-    str.value.num = 4;
-    insert_literal(str);
-
-    generate(IPUSH, last_literal, ALITTABLE);
-    
-    generate(ISUBSTR, NULL, ANONE);
+    generate(ISORT, NULL, ANONE);
     generate(IWRITE, NULL, ANONE);
     generate(IHALT, NULL, ANONE);
 

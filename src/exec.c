@@ -144,7 +144,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             //TODO: tady se jeste zasmejeme
             break;
         }
-        case IRETP: {
+        case IRET: {
             //TODO: tady taky
             // v zasade musi popnout jednu vec, to bude navratova hodnota, pak bude popovat
             // dokud nebude na EBP, to obnovi, pak si ulozi navratovou adresu funkce
@@ -152,8 +152,6 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             // EIP prepise navratovou adresou
             break;
         }
-        case IRET:
-            break;
         case IPUSH: {
             LiteralTree *literal = (LiteralTree *) instr -> adr;
             if (literal == NULL) ExecError();

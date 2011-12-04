@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     if(x < 0) {
         Error(x);
         fclose(file);
+        delete_tape();
         drop_functions();
         drop_literals();
         return (-x) / 100;

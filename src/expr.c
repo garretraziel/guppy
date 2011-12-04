@@ -15,7 +15,11 @@
 #include "expr.h"
 #include "defines.h"
 #include "lexical.h"
+<<<<<<< HEAD
+#include "exec.h"
+=======
 #include "ial.h"
+>>>>>>> 0e4ac3fa1f06783d55ca2a1d127d84d827666f50
 
 
 
@@ -326,6 +330,32 @@ void s_dump(Stack *stack)
 }
 #endif
 
+//ted uz je asi zbytecny aby to byla zvlast fce...
+static inline void * __generate(int E)
+{
+    const int conv_inst[] = {
+        [E_IDENT] = IPUSHI,
+        [E_NUM] = IPUSH,
+        [E_STR] = IPUSH,
+        [E_BOOL] = IPUSH,
+        [E_NIL] = IPUSH,
+        [E_POW] = IPOW,
+        [E_MUL] = IMUL,
+        [E_DIV] = IDIV,
+        [E_PLUS] = IADD,
+        [E_MINUS] = ISUB,
+        [E_STRCONCAT] = ICONCAT,
+        [E_LESS] = ICMPL,
+        [E_GREAT] = ICMPG,
+        [E_LESSEQ] = ICMPEL,
+        [E_GREATEQ] = ICMPEG,
+        [E_NOTEQ] = ICMP,
+        [E_EQUAL] = ICMPN
+    };
+    //adresy!!
+    return (void *) generate(conv_inst[E], NULL, E);
+}
+
 // Aplikace pravidla (reakce na >)
 static int s_oobely_boo(Stack *stack)
 {
@@ -385,6 +415,10 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E, E1, NULL) );
+#ifdef DEBUG
+    printf("I: PUSH(I) %p %d NULL\n", NULL, E1);
+#endif
+                __generate(E1);
                 return 1;
                 break;
             case RBRAC: // na zasobniku je ... )
@@ -474,6 +508,10 @@ static int s_oobely_boo(Stack *stack)
                 // kontrola, ze jsou operandy pouzitelne pro dany operator
                 // TODO
                 try( s_push(stack, E_NET_E, get_result_type(OP), NULL) );
+#ifdef DEBUG
+    printf("I: (OPER)%d NULL NULL NULL\n", OP);
+#endif
+                __generate(OP);
                 return 1;
                 break;
             case EEEE_COMM: // na zasobniku je ... , E

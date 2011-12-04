@@ -5,6 +5,7 @@
 #include "lexical.h"
 #include "defines.h"
 #include "expr.h"
+#include "exec.h"
 
 void Error(const char *fmt, ...)
 {

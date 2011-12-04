@@ -19,6 +19,7 @@
 #include "expr.h"
 #include "ial.h"
 #include "exec.h"
+#include "expr.h"
 
 #define STR_INIT_LEN 16
 
@@ -31,6 +32,8 @@
 #ifdef DEBUG
 void print_functions(FunctionTree *);
 #endif
+
+// TODO kotrolovat navratovou hodnotu generate, makrem ? ]:->
 
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
@@ -326,18 +329,24 @@ static int statement_seq(void)
 // S -> ret E
 static int statement(void)
 {
-    int x;
+    PTapeItem ptr1, ptr2;
+    PTapeItem lab1, lab2;
+    LocalTree *var;
+
     switch(token) {
         case IDENTIFIER:
             // kontrola, jestli je promenna definovana
-            if(find_local(str.str) == NULL)
+            if((var = find_local(str.str)) == NULL)
                 return ERROR_SEM_VAR_UND;
             get_token();
             // rovnitko
             check_token(ASSIGN, ERROR_SYN_X_ASGN);
             get_token();
             // assign_z
-            return assign_z();
+            try( assign_z() );
+            // generovani presunu vysledku do promenne
+            generate(IPOPI, var);
+            return 1;
 
         case WRITE:
             get_token();
@@ -346,10 +355,6 @@ static int statement(void)
             get_token();
             // expression list
             try( expression_seq() );
-#ifdef DEBUG
-    printf("I: WRITE(p) NULL NULL NULL\n:");
-#endif    
-            generate(IWRITE, NULL);
             // right bracket
             check_token(RBRAC, ERROR_SYN_X_RBRC);
             get_token();
@@ -359,25 +364,35 @@ static int statement(void)
             get_token();
             // vyraz
             try( expression() );
+            ptr1 = generate(IJMPF, NULL); // skok na else pri false
             // then
             check_token(THEN, ERROR_SYN_X_THEN);
             get_token();
             // prikazy
             try( statement_seq() );
+            ptr2 = generate(IJMP, NULL); // skok na konec
             // else
             check_token(ELSE, ERROR_SYN_X_ELSE);
             get_token();
+            lab1 = generate(INOP, NULL); // zacatek else
+            ptr1->adr = lab1; // doplneni
             // sekvence prikazu
             try( statement_seq() );
             // end
             check_token(END, ERROR_SYN_X_END);
             get_token();
+            lab2 = generate(INOP, NULL); // konec
+            ptr2->adr = lab2;
             return 1;
 
         case WHILE:
             get_token();
+            // label
+            lab1 = generate(INOP, NULL);
             // vyraz
             try( expression() );
+            // skok
+            ptr1 = generate(IJMPF, NULL);
             // do
             check_token(DO, ERROR_SYN_X_DO);
             get_token();
@@ -385,14 +400,20 @@ static int statement(void)
             try( statement_seq() );
             // end
             check_token(END, ERROR_SYN_X_END);
+            // jmp zpet a label konce
+            generate(IJMP, lab1);
+            lab2 = generate(INOP, NULL);
+            ptr1->adr = lab2;
             get_token();
             return 1;
 
         case RETURN:
             get_token();
             // vyraz
-            x = expression();
-            return x;
+            try( expression() );
+            // return
+            generate(IRET, last_function);
+            return 1;
             // konec funkce heh
 
         default:
@@ -410,9 +431,20 @@ static int assign_z(void)
         // leva zavorka
         check_token(LBRAC, ERROR_SYN_X_LBRC);
         get_token();
-        // jeden parametr (string nebo cislo) FIXME
-        if(token != STRING && token != NUMBER)
+        // jeden parametr (string nebo cislo)
+        Data data;
+        if(token == STRING) {
+            data.type = T_STRING;
+            data.value.str = str.str;
+            try( str_new(&str, STR_INIT_LEN) );
+        } else if(token != NUMBER) {
+            data.type = T_NUMBER;
+            data.value.num = strtod(str.str, NULL);
+        } else
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+        // generovani instrukci
+        try( insert_literal(data) );
+        generate(IREAD, last_literal);
         get_token();
         // prava zavorka
         check_token(RBRAC, ERROR_SYN_X_RBRC);
@@ -435,6 +467,8 @@ static int assign_z(void)
 static int expression_seq(void)
 {
     try( expression() );
+    // pro prvni parametr write
+    generate(IWRITE, NULL);
     return expression_seq_z();
 }
 
@@ -445,6 +479,8 @@ static int expression_seq_z(void)
     if(token == COMMA) {
         get_token();
         try( expression() );
+        // pro kazdy parametr write
+        generate(IWRITE, NULL);
         return expression_seq_z();
     }
     // epsilon

@@ -479,13 +479,47 @@ int print_stack()
 
 int print_tape()
 {
+    //omg, hnuj
+    char * i2s[] = {
+    "IHALT",      
+    "IJMP",       
+    "IJMPT",      
+    "IJMPF",      
+    "ICALL",      
+    "IRET",      
+    "IPUSH",      
+    "IPUSHI",     
+    "IPUSHT",     
+    "IPUSHF",     
+    "IPOPI",      
+    "IPUSHN",     
+    "IADD",       
+    "ISUB",       
+    "IMUL",       
+    "IDIV",       
+    "IPOW",       
+    "ICONCAT",    
+    "ICMP",       
+    "ICMPN",      
+    "ICMPL",      
+    "ICMPG",      
+    "ICMPEL",     
+    "ICMPEG",     
+    "IWRITE",     
+    "IREAD",      
+    "ITYPE",      
+    "ISUBSTR",    
+    "IFIND",      
+    "ISORT",      
+    "INOP"       
+    };
     PTapeItem temp = tape.top;
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
-        printf("Instrukce %d ", temp -> instr);
+        printf("I: %s    ", i2s[temp -> instr]);
         temp = temp -> next;
     }
-    printf("---------------\nkonec pasky instrukci\n\n");
+    printf("\n---------------\nkonec pasky instrukci\n\n");
     return 0;
 }
 #endif

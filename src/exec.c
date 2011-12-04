@@ -436,7 +436,7 @@ int print_stack()
             printf("** !!! neco jineho\n");
         }
     }
-    printf("----------\nkonec zasobniku\n");
+    printf("----------\nkonec zasobniku\n\n");
     return 0;
 }
 
@@ -445,7 +445,7 @@ int print_tape()
     PTapeItem temp = tape.top;
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
-        printf("%d: ", temp -> instr);
+        printf("Instrukce %d ", temp -> instr);
         switch (temp -> adrtype) {
         case ANONE:
             printf("NULL\n");
@@ -465,7 +465,7 @@ int print_tape()
         }
         temp = temp -> next;
     }
-    printf("-----------\nkonec pasky instrukci\n");
+    printf("---------------\nkonec pasky instrukci\n\n");
     return 0;
 }
 #endif

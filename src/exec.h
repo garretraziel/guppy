@@ -12,37 +12,37 @@
 #define GUPPY_EXEC_H
 
 enum {
-    IHALT,      // zastav vykonavani programu
-    IJMP,       // skoc na adresu z operandu
-    IJMPT,      // skoc na adresu z operandu, je-li na vrcholu zasobniku true, pop
-    IJMPF,      // skoc na adresu z operandu, je-li na vrcholu zasobniku false, pop
-    ICALL,      // zavolej funkci na adrese ve stromu funkci
-    IRETP,      // navrat z funkce, pop az na zarazku, navratovou hodnotu ziska z vrcholu zasobniku
-    IRET,       // navrat z funkce, pop az na zarazku, navratova hodnota nil
-    IPUSH,      // na vrchol zasobniku pushne literal na zadane adrese
-    IPUSHI,     // na vrchol zasobniku pushne lokalni promennou/argument na zadane adrese
-    IPUSHT,     // na vrchol zasobniku pushne true
-    IPUSHF,     // na vrchol zasobniku pushne false
-    IPOPI,      // popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
-    IPUSHN,     // pushne do zasobniku nil
-    IADD,       // popne vrchni dve hodnoty, secte je, vysledek pushne
-    ISUB,       // popne vrchni dve hodnoty, odecte, vysledek pushne
-    IMUL,       // vynasobi vrchni dve hodnoty na zasobniku, vysledek pushne
-    IDIV,       // vydeli vrchni dve hodnoty na zasobniku, vysledek pushne
-    IPOW,       // umocni prvni na druhou hodnotu na zasobniku, vysledek pushne
-    ICONCAT,    // spoji vrchni dva stringy v zasobniku, vysledek pushne
-    ICMP,       // porovna vrchni dve hodnoty na zasobniku, vysledek pushne
-    ICMPN,      // porovna na nerovnost
-    ICMPL,      // porovna na mensi nez
-    ICMPG,      // porovna na vetsi nez
-    ICMPEL,     // porovna na mensi nebo rovno
-    ICMPEG,     // porovna na vetsi nebo rovno
-    IWRITE,     // prehaze argumenty az po zarazku do druheho zasobniku, pak je postupne vypise
-    IREAD,      // prebere "nejspis" dva argumenty, podle prvniho fmt retezce nacte hodnotu na adresu druheho
-    ITYPE,      // popne ze zasobniku nejvyssi hodnotu, zjisti jeji typ, ktery pote pushne na zasobnik
-    ISUBSTR,    // popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
-    IFIND,      // popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
-    ISORT,      // popne vrchni string, setridi ho a vysledek pushne
+    IHALT,      // 0  zastav vykonavani programu
+    IJMP,       // 1  skoc na adresu z operandu
+    IJMPT,      // 2  skoc na adresu z operandu, je-li na vrcholu zasobniku true, pop
+    IJMPF,      // 3  skoc na adresu z operandu, je-li na vrcholu zasobniku false, pop
+    ICALL,      // 4  zavolej funkci na adrese ve stromu funkci
+    IRETP,      // 5  navrat z funkce, pop az na zarazku, navratovou hodnotu ziska z vrcholu zasobniku
+    IRET,       // 6  navrat z funkce, pop az na zarazku, navratova hodnota nil
+    IPUSH,      // 7  na vrchol zasobniku pushne literal na zadane adrese
+    IPUSHI,     // 8  na vrchol zasobniku pushne lokalni promennou/argument na zadane adrese
+    IPUSHT,     // 9  na vrchol zasobniku pushne true
+    IPUSHF,     // 10 na vrchol zasobniku pushne false
+    IPOPI,      // 11 popne hodnotu z vrcholu zasobniku do lokalni promenne/argumentu
+    IPUSHN,     // 12 pushne do zasobniku nil
+    IADD,       // 13 popne vrchni dve hodnoty, secte je, vysledek pushne
+    ISUB,       // 14 popne vrchni dve hodnoty, odecte, vysledek pushne
+    IMUL,       // 15 vynasobi vrchni dve hodnoty na zasobniku, vysledek pushne
+    IDIV,       // 16 vydeli vrchni dve hodnoty na zasobniku, vysledek pushne
+    IPOW,       // 17 umocni prvni na druhou hodnotu na zasobniku, vysledek pushne
+    ICONCAT,    // 18 spoji vrchni dva stringy v zasobniku, vysledek pushne
+    ICMP,       // 19 porovna vrchni dve hodnoty na zasobniku, vysledek pushne
+    ICMPN,      // 20 porovna na nerovnost
+    ICMPL,      // 21 porovna na mensi nez
+    ICMPG,      // 22 porovna na vetsi nez
+    ICMPEL,     // 23 porovna na mensi nebo rovno
+    ICMPEG,     // 24 porovna na vetsi nebo rovno
+    IWRITE,     // 25 prehaze argumenty az po zarazku do druheho zasobniku, pak je postupne vypise
+    IREAD,      // 26 prebere "nejspis" dva argumenty, podle prvniho fmt retezce nacte hodnotu na adresu druheho
+    ITYPE,      // 27 popne ze zasobniku nejvyssi hodnotu, zjisti jeji typ, ktery pote pushne na zasobnik
+    ISUBSTR,    // 28 popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
+    IFIND,      // 29 popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
+    ISORT,      // 30 popne vrchni string, setridi ho a vysledek pushne
 } Instructions;
 
 enum {
@@ -82,6 +82,10 @@ int add_to_tape(PTapeItem); /// prida do pasky s kodem
 int delete_tape(); /// smaze pasku
 PTapeItem actnext_tape(); /// posune aktivni prvek na dalsi a vrati ho
 //TODO: nebude jich potreba vic?...
+
+#ifdef DEBUG
+int print_tape();
+#endif
 
 PTapeItem generate(int, void *, int); /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
 

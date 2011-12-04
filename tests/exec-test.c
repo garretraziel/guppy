@@ -39,6 +39,10 @@ int main(void) {
     generate(IWRITE, NULL, ANONE);
     generate(IWRITE, NULL, ANONE);
     generate(IHALT, NULL, ANONE);
+
+#ifdef DEBUG
+    print_tape();
+#endif
     
     execute();
     drop_literals();

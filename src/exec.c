@@ -353,7 +353,10 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             //TODO: nedefinovana instrukce, POMOC!
             return -1; //TODO: co to ma vracet za chybu?
         }
-        
+
+#ifdef DEBUG
+        print_stack();
+#endif
     }
     
     return 0;
@@ -406,10 +409,10 @@ int delete_stack() /// smaze cely zasobnik
 #ifdef DEBUG
 int print_stack()
 {
-    printf("Zasobnik:\n---------\n");
-    for (int i = 0; i<(stack.esp); i++) {
+    printf("Zasobnik:\n----------\n");
+    for (int i = 0; i<=(stack.esp); i++) {
         Data temp = stack.val[i];
-        printf("* %d) <--\n", i);
+        printf("* %d) <--\n", i+1);
         switch (temp.type) {
         case DNUM:
             printf("** cislo   %g\n", temp.value.num);

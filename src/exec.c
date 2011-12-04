@@ -92,10 +92,7 @@ PTapeItem generate(int instr, void *adr) /// funkce, ktera prebere typ instrukce
     item -> instr = instr;
     item -> adr = adr;
     item -> next = NULL;
-    add_to_tape(item);
-    
-    switch()
-    
+    add_to_tape(item);    
     return item;
 }
 //TODO: spousta veci se opakuje a dala by se dat do nejakych maker, ale me uz je to proste vsechno jedno, budu jenom kopirovat

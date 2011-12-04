@@ -67,7 +67,10 @@ int main(int argc, char *argv[])
         return (-x) / 100;
     }
     fclose(file);
-
+    
+#ifdef DEBUG
+    print_tape();
+#endif
     // vyhledove
     execute();
 

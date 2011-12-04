@@ -454,7 +454,7 @@ static int assign_z(void)
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
         // generovani instrukci
         try( insert_literal(data) );
-        (IREAD, last_literal);
+        generate(IREAD, last_literal);
         get_token();
         // prava zavorka
         check_token(RBRAC, ERROR_SYN_X_RBRC);

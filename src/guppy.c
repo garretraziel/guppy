@@ -61,6 +61,8 @@ int main(int argc, char *argv[])
     if(x < 0) {
         Error(x);
         fclose(file);
+        drop_functions();
+        drop_literals();
         return (-x) / 100;
     }
     fclose(file);

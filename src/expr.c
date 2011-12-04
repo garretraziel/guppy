@@ -89,12 +89,40 @@ static int F = -1;
 // Makro vraci true, pokud je symbol terminalni
 #define is_terminal(e_sym)(e_sym < E_MARK)
 
+// 1) == a != muze mit libovolne operandy
+// 2) pro ostatni operatory musi byt stejneho typu stejneho typu
+// nebo alespon jeden z nich unknown nebo promenna
+// jinak je to blbe
+// 3) kontrola, zda typ operandu je ok pro dany operand
+// < > <= >= jen pro number a string
+// .. jen string
+// ^ + - * / jen number
 #define check_operands_and_operator() do { int a, b;\
     a = (E1==E_UNKNOWN || E1==E_VAR)?E_UNKNOWN:E1;  \
     b = (E2==E_UNKNOWN || E2==E_VAR)?E_UNKNOWN:E2;  \
+    if(OP == E_EQUAL || OP == E_NOTEQ) \
+        break; \
     if(a != b && a != E_UNKNOWN && b != E_UNKNOWN)  \
         return ERROR_SEM_WRONG_TYPES; \
+    switch(OP) { \
+        case E_LESS: case E_LESSEQ: case E_GREAT: case E_GREATEQ: \
+            if(a != E_UNKNOWN && a != E_NUM && a != E_STR && \
+               b != E_UNKNOWN && b != E_NUM && b != E_STR) \
+                return ERROR_SEM_WRONG_TYPES; \
+            break; \
+        case E_STRCONCAT: \
+            if(a != E_UNKNOWN && a != E_STR && \
+               b != E_UNKNOWN && b != E_STR) \
+                return ERROR_SEM_WRONG_TYPES; \
+            break; \
+        default: \
+            if(a != E_UNKNOWN && a != E_NUM && \
+               b != E_UNKNOWN && b != E_NUM) \
+                return ERROR_SEM_WRONG_TYPES; \
+    } \
     } while(0)
+
+
 /*
  * Vraci typ vysledku operatoru
  */

@@ -1,0 +1,4 @@
+function main()
+    local x;
+    x = (5 == 4) < (4 == 4);
+end;

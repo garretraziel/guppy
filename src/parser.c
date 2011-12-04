@@ -109,6 +109,13 @@ static int program(void)
     // kontrola, zda je main posledni
     if(strcmp(last_function->name, "main") != 0)
         return ERROR_SYN_MAIN;
+
+    // tohle je kod, kterym by melo zacit vykonavani
+    // TODO: vratit na to nejak adresu
+    for(int i = 0, j = last_function->vars + last_function->params; i < j; ++i)
+        generate(IPUSHN, NULL);
+    generate(ICALL, last_function);
+    generate(IHALT, NULL);
     return 1;
 }
 
@@ -164,6 +171,9 @@ static int function(void)
     check_token(END, ERROR_SYN_X_END);
     get_token();
 
+    // pri neuvedeni return to tenhle zachrani
+    generate(IPUSHN, NULL);
+    generate(IRET, last_function);
     return 1;
 }
 

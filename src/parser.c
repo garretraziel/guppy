@@ -89,10 +89,7 @@ static int program(void)
     try( insert_function(str.str) );
 
     // prvni funkce
-    if(token != FUNCTION) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_FUNC;
-    }
+    check_token(FUNCTION, ERROR_SYN_X_FUNC);
     try( function() );
 
     // ostatni funkce

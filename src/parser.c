@@ -437,7 +437,7 @@ static int assign_z(void)
             data.type = T_STRING;
             data.value.str = str.str;
             try( str_new(&str, STR_INIT_LEN) );
-        } else if(token != NUMBER) {
+        } else if(token == NUMBER) {
             data.type = T_NUMBER;
             data.value.num = strtod(str.str, NULL);
         } else

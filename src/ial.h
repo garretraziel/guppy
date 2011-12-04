@@ -64,6 +64,8 @@ int insert_local_var(char *);
 void drop_functions(void);
 void drop_literals(void);
 
+void recount_offsets(void);
+
 FunctionTree * find_function(char *);
 LocalTree * find_local(char *);
 

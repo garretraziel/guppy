@@ -150,6 +150,9 @@ static int function(void)
     // local declaration seq
     try( local_declaration_seq() );
 
+    // konec definic lokalnich symbolu, musi se prepocitat offsety
+    recount_offsets();
+
     // statement seq
     try( statement_seq() );
 

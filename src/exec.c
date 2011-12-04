@@ -341,6 +341,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
 
 int init_stack(int size) /// inicializuje zasobnik
 {
+    stack = malloc(sizeof(struct TStack));
+    if (stack == NULL) return -1;
     stack -> val = malloc(sizeof(Data*)*size);
     if (stack -> val == NULL) return -1; //TODO: err_mem
     stack -> size = size;
@@ -388,6 +390,7 @@ int delete_stack() /// smaze cely zasobnik
     free(stack -> val);
     stack -> esp = -1;
     stack -> val = NULL;
+    free(stack);
     return 0;
 }
 

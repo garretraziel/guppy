@@ -273,6 +273,29 @@ void drop_literals(void)
 
 /* * * * * * * * * * * * * * * * * * * */
 
+
+static inline void recount_offsets__(LocalTree *root, int num)
+{
+    if(root == NULL)
+        return;
+    root->offset -= num;
+    recount_offsets__(root->left, num);
+    recount_offsets__(root->right, num);
+
+}
+
+/*
+ * Prepocita offsety lokalnich symbolu podle jejich poctu s ohledem 
+ * na EIP a EBP, ktere bude taky na zasobniku
+ */
+void recount_offsets(void)
+{
+    int num = last_function->params + last_function->vars + 2;
+    recount_offsets__(last_function->symbols, num);
+}
+
+/* * * * * * * * * * * * * * * * * * * */
+
 /*
  * Vyhleda v tabulce funkci funkci a vrati ukazatel na ni
  * pokud nenajde, vraci NULL

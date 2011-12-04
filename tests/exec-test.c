@@ -22,11 +22,20 @@ int main(void) {
     
     Data number;
     number.type = T_NUMBER;
-    number.value.num = 1;
+    number.value.num = 2;
     insert_literal(number);
     
     generate(IPUSH, last_literal, ALITTABLE);
+
+    number.value.num = 40;
+    insert_literal(number);
+
+    generate(IPUSH, last_literal, ALITTABLE);
+    generate(IPUSH, last_literal, ALITTABLE);
     
+    generate(ITYPE, NULL, ANONE);
+    generate(IWRITE, NULL, ANONE);
+    generate(IDIV, NULL, ANONE);
     generate(IWRITE, NULL, ANONE);
     generate(IWRITE, NULL, ANONE);
     generate(IHALT, NULL, ANONE);

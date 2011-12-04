@@ -18,6 +18,7 @@
 #include "guppy.h"
 #include "expr.h"
 #include "ial.h"
+#include "exec.h"
 
 #define STR_INIT_LEN 16
 
@@ -346,8 +347,9 @@ static int statement(void)
             // expression list
             try( expression_seq() );
 #ifdef DEBUG
-    printf("I: WRITE NULL NULL NULL\n:");
+    printf("I: WRITE(p) NULL NULL NULL\n:");
 #endif    
+            generate(IWRITE, NULL, ANONE);
             // right bracket
             check_token(RBRAC, ERROR_SYN_X_RBRC);
             get_token();

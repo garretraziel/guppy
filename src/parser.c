@@ -454,14 +454,11 @@ static int assign_z(void)
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
         // generovani instrukci
         try( insert_literal(data) );
-        generate(IREAD, last_literal);
+        (IREAD, last_literal);
         get_token();
         // prava zavorka
         check_token(RBRAC, ERROR_SYN_X_RBRC);
         get_token();
-#ifdef DEBUG
-    printf("I: READ\n:");
-#endif
         return 1;
     }
     // vyraz
@@ -478,9 +475,6 @@ static int expression_seq(void)
 {
     try( expression() );
     // pro prvni parametr write
-#ifdef DEBUG
-    printf("I: WRITE\n:");
-#endif
     generate(IWRITE, NULL);
     return expression_seq_z();
 }
@@ -493,9 +487,6 @@ static int expression_seq_z(void)
         get_token();
         try( expression() );
         // pro kazdy parametr write
-#ifdef DEBUG
-    printf("I: WRITE\n:");
-#endif        
         generate(IWRITE, NULL);
         return expression_seq_z();
     }

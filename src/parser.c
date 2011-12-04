@@ -78,10 +78,15 @@ static int program(void)
     get_token();
 
     // rezervovani jmen pro builtin funkce
-    try( insert_function("sort") );
-    try( insert_function("type") );
-    try( insert_function("substr") );
-    try( insert_function("find") );
+    string str;
+    try( str_init(&str, "sort") );
+    try( insert_function(str.str) );
+    try( str_init(&str, "type") );
+    try( insert_function(str.str) );
+    try( str_init(&str, "substr") );
+    try( insert_function(str.str) );
+    try( str_init(&str, "find") );
+    try( insert_function(str.str) );
 
     // prvni funkce
     if(token != FUNCTION) {

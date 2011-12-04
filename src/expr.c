@@ -438,6 +438,9 @@ static int s_oobely_boo(Stack *stack)
                 // overeni, ze tam je identifikator a znacka
                 if(top != E_IDENT)
                     return ERROR_SYN_EXP_FAIL;
+                // identifikator musi byt funkce
+                if(stack->top->e_type != E_FUNC)
+                    return ERROR_SEM_CALL_VAR;
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top != E_MARK)

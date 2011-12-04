@@ -385,6 +385,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DSTRING, retvalue);
             break;
         }
+	case INOP:
+	    break;
         default:
             //TODO: nedefinovana instrukce, POMOC!
             ExecError(); //TODO: co to ma vracet za chybu?

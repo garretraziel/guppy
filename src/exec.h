@@ -43,6 +43,7 @@ enum {
     ISUBSTR,    // 28 popne vrchni tri argumenty, string a dve cisla, vytvori podle toho podretezec, vysledek pushne
     IFIND,      // 29 popne vrchni dva stringy, vyhleda druhy v prvnim, pushne index
     ISORT,      // 30 popne vrchni string, setridi ho a vysledek pushne
+    INOP,       // 31 neudela nic, pouzivano jako label
 } Instructions;
 
 enum {

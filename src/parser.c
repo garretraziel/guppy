@@ -349,7 +349,7 @@ static int statement(void)
 #ifdef DEBUG
     printf("I: WRITE(p) NULL NULL NULL\n:");
 #endif    
-            generate(IWRITE, NULL, ANONE);
+            generate(IWRITE, NULL);
             // right bracket
             check_token(RBRAC, ERROR_SYN_X_RBRC);
             get_token();

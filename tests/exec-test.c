@@ -18,12 +18,12 @@ int main(void) {
     strcpy(str.value.str,"mamamelemaso");
     insert_literal(str);
     
-    generate(IPUSH, last_literal, ALITTABLE);
+    generate(IPUSH, last_literal);
 
 
-    generate(ISORT, NULL, ANONE);
-    generate(IWRITE, NULL, ANONE);
-    generate(IHALT, NULL, ANONE);
+    generate(ISORT, NULL);
+    generate(IWRITE, NULL);
+    generate(IHALT, NULL);
 
 #ifdef DEBUG
     print_tape();

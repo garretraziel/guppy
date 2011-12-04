@@ -83,7 +83,7 @@ PTapeItem actnext_tape() /// posune aktivni prvek na dalsi a vrati ho
     return temp;
 }
 
-PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
+PTapeItem generate(int instr, void *adr) /// funkce, ktera prebere typ instrukce a ukazatel a vygeneruje podle toho instrukci
 {
     //TODO: takto jednoduse to samozrejme nejde, ale aspon aby byl mustr. joa funkce by mohla vracet adresu te vygenerovane instrukce
     //TODO: jinak se asi bude muset switchovat podle typu instrukce a vytvaret vsechny ty dodatecny veci, co jsou k tomu potreba
@@ -91,7 +91,6 @@ PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ
     if (item == NULL) return NULL;
     item -> instr = instr;
     item -> adr = adr;
-    item -> adrtype = type;
     item -> next = NULL;
     add_to_tape(item);
     
@@ -156,7 +155,6 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IRET:
             break;
         case IPUSH: {
-            if (instr -> adrtype != ALITTABLE) ExecError();
             LiteralTree *literal = (LiteralTree *) instr -> adr;
             if (literal == NULL) ExecError();
             if (literal -> data.type == T_STRING) { //TODO: kontrolovat kopirovani toho stringu z tabulky literalu
@@ -488,23 +486,6 @@ int print_tape()
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
         printf("Instrukce %d ", temp -> instr);
-        switch (temp -> adrtype) {
-        case ANONE:
-            printf("NULL\n");
-            break;
-        case ALITTABLE:
-            printf("TAB_LITERALU\n");
-            break;
-        case ALOCTABLE:
-            printf("TAB_LOKALNICH\n");
-            break;
-        case AFUNCTABLE:
-            printf("TAB_FUNKCI\n");
-            break;
-        case ATAPE:
-            printf("PASKA\n");
-            break;
-        }
         temp = temp -> next;
     }
     printf("---------------\nkonec pasky instrukci\n\n");

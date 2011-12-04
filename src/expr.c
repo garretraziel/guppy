@@ -433,9 +433,9 @@ static int s_oobely_boo(Stack *stack)
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E, E1, NULL) );
 #ifdef DEBUG
-    printf("I: PUSH(I) %p %d NULL\n", NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
+    printf("I: PUSH(I) %p %d NULL\n", NULL);
 #endif
-                generate(conv_inst[E1], NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
+                generate(conv_inst[E1], NULL);
                 //TODO: find_local() pro lokalni promenny...
                 return 1;
                 break;
@@ -444,9 +444,9 @@ static int s_oobely_boo(Stack *stack)
                     E1 = stack->top->e_type;
                     state = BRAC_EEEE;
 #ifdef DEBUG
-    printf("I: PUSH(I) %p %d\n", NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
+    printf("I: PUSH(I) %p %d\n", NULL);
 #endif
-                    generate(conv_inst[E1], NULL, (E1==E_IDENT)? ALOCTABLE : ALITTABLE);
+                    generate(conv_inst[E1], NULL);
                 }
                 else if(top == E_LBRAC)
                     state = FUNC_CALL;
@@ -479,7 +479,7 @@ static int s_oobely_boo(Stack *stack)
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
     printf("I: CALL %p NULL NULL\n", (void *)find_function(str.str));
 #endif
-                    generate(ICALL, (void *)find_function(str.str), AFUNCTABLE);
+                    generate(ICALL, (void *)find_function(str.str));
                     func_pop();
                     E1 = E_UNKNOWN;
                 }
@@ -510,7 +510,7 @@ static int s_oobely_boo(Stack *stack)
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
     printf("I: CALL %p NULL NULL\n", (void *)find_function(str.str));
 #endif
-                generate(ICALL, (void *)find_function(str.str), AFUNCTABLE);
+                generate(ICALL, (void *)find_function(str.str));
                 func_pop();
                 return 1;
                 break;
@@ -537,7 +537,7 @@ static int s_oobely_boo(Stack *stack)
 #ifdef DEBUG
     printf("I: (OPER)%d NULL NULL NULL\n", OP);
 #endif
-                generate(conv_inst[OP], NULL, ANONE);
+                generate(conv_inst[OP], NULL);
                 return 1;
                 break;
             case EEEE_COMM: // na zasobniku je ... , E
@@ -607,7 +607,7 @@ static inline int expression__(Stack *stack)
 #ifdef DEBUG
     printf("I: WRITE(e) NULL NULL NULL\n:");
 #endif
-                    generate(IWRITE, NULL, ANONE);
+                    generate(IWRITE, NULL);
                     a = E_DOLLAR;
                     continue;
                 }

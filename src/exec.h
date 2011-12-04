@@ -47,15 +47,6 @@ enum {
 } Instructions;
 
 enum {
-    ANONE, // zadna adresa, bude se pouzivat vetsinou
-    ALITTABLE, // typ ukazatele do tabulky literalu
-    ALOCTABLE, // typ ukazatel do lokalni tabulky symbolu - lokalni promenne, argumenty
-    AFUNCTABLE, // ukazatel do tabulky funkci
-    ATAPE, // ukazatel na pasku, pouzivane u skoku
-    //TODO: vymyslet, co vsechno tady ma byt
-} AdrTypes;
-
-enum {
     DNUM, // datovy typ cislo
     DSTRING, // datovy typ string
     DBOOL, // datovy typ boolean
@@ -67,7 +58,6 @@ enum {
 typedef struct TTapeItem { // paska pro ulozeni instrukci
     int instr; // samotna instrukce podle enum Instructions
     void *adr; // adresa, ktera se treba pouzije
-    int adrtype; // typ ukazatele
     struct TTapeItem *next; // ukazatel na dalsi instrukci
 } *PTapeItem;
 
@@ -88,7 +78,7 @@ PTapeItem actnext_tape(); /// posune aktivni prvek na dalsi a vrati ho
 int print_tape();
 #endif
 
-PTapeItem generate(int, void *, int); /// funkce, ktera prebere typ instrukce, ukazatel a jeho typ a vygeneruje podle toho instrukci
+PTapeItem generate(int, void *); /// funkce, ktera prebere typ instrukce a ukazatel a vygeneruje podle toho instrukci
 
 int execute(); /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 

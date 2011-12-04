@@ -438,7 +438,7 @@ int delete_stack() /// smaze cely zasobnik
 {
     for (int i = 0; i<=stack.esp; i++) {
         if (stack.val[i].type == DSTRING)
-            free(stack.val[i].str);
+            free(stack.val[i].value.str);
     }
     free(stack.val);
     stack.esp = -1;

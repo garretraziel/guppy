@@ -39,11 +39,12 @@ const char *SYN_ERRORS[] = {
 };
 
 
-// [3] Chybove zpravy semantice analyzy
+// [3] Chybove zpravy semanticke analyzy
 const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_VAR_UND) % 100] = "Nedeklarovana promenna",
      [(-ERROR_SEM_VAR_REDEF) % 100] = "Promenna je jiz definovana",
      [(-ERROR_SEM_WRONG_TYPES) % 100] = "Nekompatibilni typy operandu ve vyrazu",
+     [(-ERROR_SEM_CALL_VAR) % 100] = "Nelze volat promenne",
 };
 
 // [4] Obecne chybove zpravy interpretace

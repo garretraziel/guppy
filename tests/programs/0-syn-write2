@@ -1,4 +1,6 @@
 function main()
+    local a = "3";
+    local b = 31e3;
     write(a);
     write(a, b);
     write(1+2*4, "ss" .. "s", 32);

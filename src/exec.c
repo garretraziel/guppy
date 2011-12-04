@@ -305,6 +305,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IREAD:
             break;
         case ITYPE: {
+            //TODO: ukladat ten string do stromu literalu
             univalue value, retvalue;
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();

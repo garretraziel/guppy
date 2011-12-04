@@ -569,7 +569,6 @@ static inline int expression__(Stack *stack)
 {
     int a, b;
     void *ptr = NULL;
-    int e_type;
 
     // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
     if(token < 0)
@@ -605,24 +604,34 @@ static inline int expression__(Stack *stack)
                     a = E_DOLLAR;
                     continue;
                 }
-                // pokud je to identifikator, tak ho najdu v tabulce
-                if(a == E_IDENT) {
-                    if((ptr = find_function(str.str))) {
-                        func_push(); // nova funkce
-                        e_type = E_FUNC;
-                    } else if((ptr = find_local(str.str)))
-                        e_type = E_VAR;
-                    else
-                        return ERROR_SEM_VAR_UND;
-                    try( s_push(stack, a, e_type, ptr) );
-                }
-                else // TODO ostatni varianty
                 // TODO vygenerovat instrukci
-                  // push nil, true, false
-                  // nebo pridat literal do tabulky a push s odkazem na literal
-                  // nebo push a odkaz na promennou
+                switch(a) {
+                    // pokud je to identifikator, tak ho najdu v tabulce
+                    case E_IDENT:
+                        if((ptr = find_function(str.str))) {
+                            func_push(); // nova funkce
+                            try( s_push(stack, a, E_FUNC, ptr) );
+                        } else if((ptr = find_local(str.str)))
+                            try( s_push(stack, a, E_VAR, ptr) );
+                        else
+                            return ERROR_SEM_VAR_UND;
+                        break;
+                    // pokud hodnota tak push
+                    case E_NIL:
+                    case E_BOOL:
+                    case E_NUM:
+                    case E_STR:
+                        // TODO pridat do tabulky literalu
+                        // TODO generovat instrukce ted nebo az pri redukci?
+                        // ono je to asi jedno, stejne redukce nastane okamzite
+                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        break;
+                    // ostatni nic mimoradneho nedelaji
+                    default:
+                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        break;
+                }
                 // push(a)
-                    try( s_push(stack, a, get_e_type(a), NULL) );
                 b = stack->active->type; // doslo ke zmene horniho terminalu
                 // precist novy token
                 get_token();

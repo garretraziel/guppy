@@ -105,10 +105,10 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
     if (tape.top == NULL) {
         delete_stack();
         delete_tape();
-        return 0; //TODO: ma to vubec cenu osetrovat? tohle se stejne nikdy nestane, ne?
+        return 0;
     }
 
-    tape.act = tape.top; //TODO: aktualni se asi nikdy jindy nastavovat nebude, popremyslet o tom
+    tape.act = tape.top;
     
     while (1) { // reknete mi duvod, proc by to nemohl byt nekonecny cyklus
         
@@ -131,7 +131,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue value;
             int dattype;
             if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) ExecError();
-            if (value.log == STRUE) tape.act = (PTapeItem) instr -> adr; //TODO: proc se to vubec musi pretypovavat?
+            if (value.log == STRUE) tape.act = (PTapeItem) instr -> adr;
             break;
         }
         case IJMPF: {
@@ -198,7 +198,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 ExecError(); //TODO: nema to nekdy vracet nil?
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
                 ExecError();
-            retvalue.num = value1.num + value2.num;
+            retvalue.num = value2.num + value1.num;
             try_push_stack(DNUM, retvalue);
             break;
         }

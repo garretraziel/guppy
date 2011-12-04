@@ -450,7 +450,7 @@ static int assign_z(void)
         check_token(RBRAC, ERROR_SYN_X_RBRC);
         get_token();
 #ifdef DEBUG
-    printf("I: READ ? ? NULL\n:");
+    printf("I: READ\n:");
 #endif
         return 1;
     }
@@ -469,7 +469,7 @@ static int expression_seq(void)
     try( expression() );
     // pro prvni parametr write
 #ifdef DEBUG
-    printf("I: WRITE NULL NULL NULL\n:");
+    printf("I: WRITE\n:");
 #endif
     generate(IWRITE, NULL);
     return expression_seq_z();
@@ -484,7 +484,7 @@ static int expression_seq_z(void)
         try( expression() );
         // pro kazdy parametr write
 #ifdef DEBUG
-    printf("I: WRITE NULL NULL NULL\n:");
+    printf("I: WRITE\n:");
 #endif        
         generate(IWRITE, NULL);
         return expression_seq_z();

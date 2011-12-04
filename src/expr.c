@@ -300,7 +300,8 @@ int s_push(Stack *stack, int type, int e_type, void *ptr)
 }
 
 // Odstraneni prvku ze zasobniku
-void s_pop(Stack *stack){
+void s_pop(Stack *stack)
+{
     Node *tmp = stack->top;
     stack->top = tmp->next;
     free(tmp);
@@ -406,7 +407,6 @@ static int s_oobely_boo(Stack *stack)
     };
 
     int E1, E2, OP; // pro uchovani typu redukovanych E
-
     int top;
     int state = START;
     // cyklus prochazeni zasobnikem
@@ -426,17 +426,17 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case VAR: // E -> id
+#ifdef DEBUG
+    printf("I: PUSHI %p\n", NULL);
+#endif
+                generate(IPUSHI, NULL); 
+                //TODO: find_local() pro lokalni promenny...
             case VAL: // E -> string, bool, num, nil
                 // na zasobniku je hodnota, ocekava se konec a redukce
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E, E1, NULL) );
-#ifdef DEBUG
-    printf("I: PUSH(I) %p %d NULL\n", NULL, 0);
-#endif
-                generate(conv_inst[E1], NULL);
-                //TODO: find_local() pro lokalni promenny...
                 return 1;
                 break;
             case RBRAC: // na zasobniku je ... )
@@ -473,7 +473,7 @@ static int s_oobely_boo(Stack *stack)
                     func_inc();
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
-    printf("I: CALL %p NULL NULL\n", NULL);
+    printf("I: CALL %p\n", NULL);
 #endif
                     generate(ICALL, NULL);
                     func_pop();
@@ -504,7 +504,7 @@ static int s_oobely_boo(Stack *stack)
                 // bylo volani funkce a ja vim, kolik mela parametru
 #ifdef DEBUG
     printf("Byla volana funkce s %d parametry\n", func_stack[F]);
-    printf("I: CALL %p NULL NULL\n", NULL);
+    printf("I: CALL %p\n", NULL);
 #endif
                 generate(ICALL, NULL);
                 func_pop();
@@ -531,7 +531,7 @@ static int s_oobely_boo(Stack *stack)
                 // TODO
                 try( s_push(stack, E_NET_E, get_result_type(OP), NULL) );
 #ifdef DEBUG
-    printf("I: (OPER)%d NULL NULL NULL\n", OP);
+    printf("I: (OPER)%d\n", OP);
 #endif
                 generate(conv_inst[OP], NULL);
                 return 1;
@@ -617,12 +617,35 @@ static inline int expression__(Stack *stack)
                         break;
                     // pokud hodnota tak push
                     case E_NIL:
+#ifdef DEBUG
+                        printf("I: PUSHN\n");
+#endif
+                        generate(IPUSHI, NULL); 
+                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        break;
                     case E_BOOL:
+#ifdef DEBUG
+                        printf("I: PUSH(B)%d\n",token); //FIXME
+#endif                    
+                        generate((token == TRUE)? IPUSHT:IPUSHF, NULL); 
+                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        break;
                     case E_NUM:
+#ifdef DEBUG
+                        printf("I: PUSH num\n"); //FIXME
+#endif                    
+                        generate(IPUSH, NULL); 
+                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        break;                    
                     case E_STR:
+#ifdef DEBUG
+                        printf("I: PUSH string\n"); //FIXME
+#endif                    
+                        generate(IPUSH, NULL); 
                         // TODO pridat do tabulky literalu
                         // TODO generovat instrukce ted nebo az pri redukci?
                         // ono je to asi jedno, stejne redukce nastane okamzite
+                        // ^^^ nebude to uplně konzistentní, ale imo lepší hned
                         try( s_push(stack, a, get_e_type(a), NULL) );
                         break;
                     // ostatni nic mimoradneho nedelaji

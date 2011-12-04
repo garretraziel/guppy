@@ -343,20 +343,31 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DSTRING, retvalue);
             break;
         }
-        case ISUBSTR:
+        case ISUBSTR: {
+            univalue i, j, str, fin;
+            int dattype1, dattype2, dattype3;
+            if (pop_stack(&dattype2, &j) != 0 || dattype2 != DNUM) ExecError();
+            if (pop_stack(&dattype1, &i) != 0 || dattype1 != DNUM) ExecError();
+            if (pop_stack(&dattype3, &str) != 0 || dattype3 != DSTRING) ExecError();
+            string *conv = malloc(sizeof(string));
+            if (str_init(conv, str.str) != 1) ExecError();
+            fin.str = substr(conv, i.num, j.num); //TODO: zkontrolovat, zda spravne pouzivam poradi indexu
+            free(str.str);
+            try_push_stack(DSTRING, fin);
             break;
+        }
         case IFIND:
             break;
         case ISORT:
             break;
         default:
             //TODO: nedefinovana instrukce, POMOC!
-            return -1; //TODO: co to ma vracet za chybu?
+            ExecError(); //TODO: co to ma vracet za chybu?
         }
 
-#ifdef DEBUG
-        print_stack();
-#endif
+/* #ifdef DEBUG */
+/*         print_stack(); */
+/* #endif */
     }
     
     return 0;

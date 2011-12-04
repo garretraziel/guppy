@@ -181,8 +181,5 @@ char *concat(char *str1, char *str2)
     strcpy(retstr, str1);
     strcat(retstr, str2);
 
-    free(str1);
-    free(str2);
-    
     return retstr;
 }

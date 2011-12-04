@@ -349,15 +349,30 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &j) != 0 || dattype2 != DNUM) ExecError();
             if (pop_stack(&dattype1, &i) != 0 || dattype1 != DNUM) ExecError();
             if (pop_stack(&dattype3, &str) != 0 || dattype3 != DSTRING) ExecError();
-            string *conv = malloc(sizeof(string));
-            if (str_init(conv, str.str) != 1) ExecError();
-            fin.str = substr(conv, i.num, j.num); //TODO: zkontrolovat, zda spravne pouzivam poradi indexu
+            string conv;
+            if (str_init(&conv, str.str) != 1) ExecError();
+            fin.str = substr(&conv, i.num, j.num); //TODO: zkontrolovat, zda spravne pouzivam poradi indexu
             free(str.str);
+            str_free(&conv);
             try_push_stack(DSTRING, fin);
             break;
         }
-        case IFIND:
+        case IFIND: {
+            univalue str1, str2, retvalue;
+            int dattype1, dattype2;
+            if (pop_stack(&dattype2, &str2) != 0 || dattype2 != DSTRING) ExecError();
+            if (pop_stack(&dattype1, &str1) != 0 || dattype1 != DSTRING) ExecError();
+            string conv1, conv2;
+            if (str_init(&conv1, str1.str) != 1) ExecError();
+            if (str_init(&conv2, str2.str) != 1) ExecError();
+            free(str1.str);
+            free(str2.str);
+            retvalue.num = find(&conv1, &conv2);
+            str_free(&conv1);
+            str_free(&conv2);
+            try_push_stack(DNUM, retvalue);
             break;
+        }
         case ISORT:
             break;
         default:

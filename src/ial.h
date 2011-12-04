@@ -57,7 +57,7 @@ typedef struct literalnode {
 
 
 int insert_function(char *);
-int insert_literal(Data, LiteralTree **);
+int insert_literal(Data);
 int insert_local(char *);
 
 void drop_functions(void);

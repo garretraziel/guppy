@@ -70,9 +70,13 @@ void sort(string *str)
 FunctionTree *functions_table = NULL;
 LiteralTree *literals_table = NULL;
 
-// Ukazatel na posledni pridanou funkci
+// Ukazatele na posledni pridanou funkci, lokalni promennou a literal
 FunctionTree *last_function = NULL;
 LocalTree *last_local = NULL;
+LiteralTree *last_literal = NULL;
+
+
+/* * * * * * * * * * * * * * * * * * * */
 
 /*
  * Prida funckci do tabulky funkci,
@@ -113,13 +117,14 @@ int insert_function(char *str)
 }
 
 
+/* * * * * * * * * * * * * * * * * * * */
 
 /*
  * Vlozi literal do tabulky literalu
  * Vklada se s nahodnym klicem s virou, ze to bude vytvaret nahodne dobre
  * vyvazeny strom
  */
-static inline int insert_literal__(LiteralTree **root, int key, Data data, LiteralTree **dst)
+static inline int insert_literal__(LiteralTree **root, int key, Data data)
 {
     if(*root == NULL) {
         LiteralTree *new = malloc(sizeof(LiteralTree));
@@ -130,15 +135,15 @@ static inline int insert_literal__(LiteralTree **root, int key, Data data, Liter
         new->data = data;
         new->left = NULL;
         new->right = NULL;
-        *dst = new;
+        last_literal = new;
         return 1;
     }
     if(key < (*root)->key)
-        return insert_literal__(&(*root)->left, key, data, dst);
+        return insert_literal__(&(*root)->left, key, data);
     else if(key > (*root)->key)
-        return insert_literal__(&(*root)->right, key, data, dst);
+        return insert_literal__(&(*root)->right, key, data);
     else
-        return insert_literal__(&(*root)->left, key-1, data, dst);
+        return insert_literal__(&(*root)->left, key-1, data);
 }
 
 /*
@@ -146,11 +151,13 @@ static inline int insert_literal__(LiteralTree **root, int key, Data data, Liter
  *
  * do *dst je ulozen ukazatel na vlozeny prvek
  */
-int insert_literal(Data data, LiteralTree **dst)
+int insert_literal(Data data)
 {
-    return insert_literal__(&literals_table, rand(), data, dst);
+    return insert_literal__(&literals_table, rand(), data);
 }
 
+
+/* * * * * * * * * * * * * * * * * * * */
 
 /*
  * Prida do tabulky symbolu jmeno indentifikatoru
@@ -188,6 +195,7 @@ int insert_local(char *str)
 }
 
 
+/* * * * * * * * * * * * * * * * * * * */
 
 /*
  * Rekurzivni pruchod stromem a uvolneni kazdeho uzlu
@@ -248,6 +256,8 @@ void drop_literals(void)
 }
 
 
+/* * * * * * * * * * * * * * * * * * * */
+
 /*
  * Vyhleda v tabulce funkci funkci a vrati ukazatel na ni
  * pokud nenajde, vraci NULL
@@ -274,6 +284,8 @@ FunctionTree * find_function(char *str)
 }
 
 
+/* * * * * * * * * * * * * * * * * * * */
+
 /*
  * Vyhleda v tabulce posledni funkce lokalni promennou a vrati ukazatel na ni
  * pokud nenajde, vraci NULL
@@ -299,6 +311,8 @@ LocalTree * find_local(char *str)
 {
     return find_local__(last_function->symbols, str);
 }
+
+/* * * * * * * * * * * * * * * * * * * */
 
 #ifdef DEBUG
 

@@ -246,7 +246,6 @@ static int local_declaration_z(void)
 static int literal()
 {
     Data data;
-    LiteralTree *lit;
     switch(token) {
         case NUMBER:
             data.type = T_NUMBER;
@@ -271,7 +270,7 @@ static int literal()
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
-    try( insert_literal(data, &lit) );
+    try( insert_literal(data) );
     // TODO instrukce na nacteni hodnoty do lok. promenne
     // instrukce bude rikat, ze do last_local se ma nacist z adresy lit
 #ifdef DEBUG

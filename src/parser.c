@@ -468,6 +468,9 @@ static int expression_seq(void)
 {
     try( expression() );
     // pro prvni parametr write
+#ifdef DEBUG
+    printf("I: WRITE NULL NULL NULL\n:");
+#endif
     generate(IWRITE, NULL);
     return expression_seq_z();
 }
@@ -480,6 +483,9 @@ static int expression_seq_z(void)
         get_token();
         try( expression() );
         // pro kazdy parametr write
+#ifdef DEBUG
+    printf("I: WRITE NULL NULL NULL\n:");
+#endif        
         generate(IWRITE, NULL);
         return expression_seq_z();
     }

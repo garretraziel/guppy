@@ -52,7 +52,7 @@ int add_to_tape(PTapeItem item) /// prida do pasky s kodem
         tape.bot = item;
         tape.top = item;
     } else {
-        tape.bot -> next = item;
+        (tape.bot -> next) = item;
         tape.bot = item;
     }
     
@@ -61,10 +61,14 @@ int add_to_tape(PTapeItem item) /// prida do pasky s kodem
 
 int delete_tape() /// smaze pasku
 {
-    for (PTapeItem item = tape.top; item != NULL; item = item -> next) {
+    PTapeItem item = tape.top;
+    while (item != NULL) {
         PTapeItem temp = item;
+        item = item -> next;
         free(temp);
     }
+
+    tape.top = tape.bot = tape.act = NULL;
 
     return 0;
 }
@@ -72,7 +76,7 @@ int delete_tape() /// smaze pasku
 PTapeItem actnext_tape() /// posune aktivni prvek na dalsi a vrati ho
 {
     if (tape.act == NULL) return NULL;
-    PTapeItem temp =  tape.act;
+    PTapeItem temp = tape.act;
     tape.act = tape.act -> next; // posunu se na dalsi instrukci
     return temp;
 }
@@ -87,10 +91,7 @@ PTapeItem generate(int instr, void *adr, int type) /// funkce, ktera prebere typ
     item -> adr = adr;
     item -> adrtype = type;
     item -> next = NULL;
-    if (add_to_tape(item) != 0) {
-        free(item);
-        return NULL;
-    }
+    add_to_tape(item);
     
     return item;
 }

@@ -4,7 +4,7 @@ DFLAGS=-g -DDEBUG
 
 .PHONY: build rebuild clean guppy
 
-build: guppy lexical-test quicksort-test substr-test knuth-test parser-test expr-test
+build: guppy lexical-test quicksort-test substr-test knuth-test parser-test expr-test exec-test
 
 rebuild: clean build
 
@@ -36,3 +36,5 @@ parser-test: ../src/ial.o ../src/string.o ../src/lexical.o ../src/parser.o ../sr
 expr-test: ../src/errors.o ../src/lexical.o ../src/string.o ../src/expr.o ../src/parser.o ../src/ial.o expr-test.o 
 	$(CC) $(CFLAGS) $^ -o $@
 
+exec-test: ../src/exec.o ../src/string.o exec-test.o
+	$(CC) $(CFLAGS) -lm $^ -o $@

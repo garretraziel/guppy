@@ -21,8 +21,6 @@
 #include "exec.h"
 #include "expr.h"
 
-#define STR_INIT_LEN 16
-
 
 // Pokud je token jiny nez ocekavany token, je vracen token,
 // pokud byl sam zaporny, jinak zadany chybovy kod

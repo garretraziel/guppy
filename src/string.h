@@ -11,7 +11,7 @@
 #ifndef GUPPY_STRING_H
 #define GUPPY_STRING_H
 
-#define STR_DEFAULT 255
+#define STR_INIT_LEN 16
 
 /// Struktura pro "nekonecny" string
 typedef struct {

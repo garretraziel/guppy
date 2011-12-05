@@ -286,6 +286,7 @@ int s_clean(Stack * stack)
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
 int s_push(Stack *stack, int type, int e_type, void *ptr)
 {
+    printf("s_push, %d, %d, %p\n", type, e_type, ptr);
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
         return ERROR_GEN_MEM;
@@ -426,8 +427,6 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case VAR: // E -> id
-                generate(IPUSHI, NULL); 
-                //TODO: find_local() pro lokalni promenny...
             case VAL: // E -> string, bool, num, nil
                 // na zasobniku je hodnota, ocekava se konec a redukce
                 if(top != E_MARK)
@@ -602,14 +601,15 @@ static inline int expression__(Stack *stack)
                         if((ptr = find_function(str.str))) {
                             func_push(); // nova funkce
                             try( s_push(stack, a, E_FUNC, ptr) );
-                        } else if((ptr = find_local(str.str)))
+                        } else if((ptr = find_local(str.str))) {
+                            generate(IPUSHI, ptr); 
                             try( s_push(stack, a, E_VAR, ptr) );
-                        else
+                        } else
                             return ERROR_SEM_VAR_UND;
                         break;
                     // pokud hodnota tak push
                     case E_NIL:
-                        generate(IPUSHI, NULL); 
+                        generate(IPUSHN, NULL);
                         try( s_push(stack, a, get_e_type(a), NULL) );
                         break;
                     case E_BOOL:

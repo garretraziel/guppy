@@ -284,6 +284,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype1, &value1) != 0) ExecError();
             if (pop_stack(&dattype2, &value2) != 0) ExecError();
             if (dattype1 != dattype2) {
+                if (dattype1 == DSTRING) free(value1.str);
+                if (dattype2 == DSTRING) free(value2.str);
                 retvalue.log = SFALSE;
             } else if (dattype1 == DNUM) {
                 if (value1.num == value2.num)
@@ -312,6 +314,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype1, &value1) != 0) ExecError();
             if (pop_stack(&dattype2, &value2) != 0) ExecError();
             if (dattype1 != dattype2) {
+                if (dattype1 == DSTRING) free(value1.str);
+                if (dattype2 == DSTRING) free(value2.str);
                 retvalue.log = STRUE;
             } else if (dattype1 == DNUM) {
                 if (value1.num != value2.num)

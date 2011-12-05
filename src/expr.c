@@ -286,7 +286,7 @@ int s_clean(Stack * stack)
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
 int s_push(Stack *stack, int type, int e_type, void *ptr)
 {
-    printf("s_push, %d, %d, %p\n", type, e_type, ptr);
+//    printf("s_push, %d, %d, %p\n", type, e_type, ptr);
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
         return ERROR_GEN_MEM;

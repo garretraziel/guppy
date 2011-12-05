@@ -559,6 +559,7 @@ static inline int expression__(Stack *stack)
 {
     int a, b;
     void *ptr = NULL;
+    Data data;
 
     // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
     if(token < 0)
@@ -610,23 +611,28 @@ static inline int expression__(Stack *stack)
                     // pokud hodnota tak push
                     case E_NIL:
                         generate(IPUSHN, NULL);
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_NIL, NULL) );
                         break;
                     case E_BOOL:
                         generate((token == TRUE)? IPUSHT:IPUSHF, NULL); 
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_BOOL, NULL) );
                         break;
                     case E_NUM:
-                        generate(IPUSH, NULL); 
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_NUM, NULL) );
+                        data.type = T_NUMBER;
+                        data.value.num = strtod(str.str, NULL);
+                        // vegenerovani push
+                        try( insert_literal(data) );
+                        generate(IPUSH, last_literal);
                         break;                    
                     case E_STR:
-                        generate(IPUSH, NULL); 
-                        // TODO pridat do tabulky literalu
-                        // TODO generovat instrukce ted nebo az pri redukci?
-                        // ono je to asi jedno, stejne redukce nastane okamzite
-                        // ^^^ nebude to uplně konzistentní, ale imo lepší hned
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_STR, NULL) );
+                        data.type = T_STRING;
+                        data.value.str = str.str;
+                        try( insert_literal(data) );
+                        try( str_new(&str, STR_INIT_LEN) );
+                        // vegenerovani push
+                        generate(IPUSH, last_literal); 
                         break;
                     // ostatni nic mimoradneho nedelaji
                     default:

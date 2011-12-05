@@ -112,7 +112,7 @@ static int program(void)
 
     // tohle je kod, kterym by melo zacit vykonavani
     // TODO: vratit na to nejak adresu
-    for(int i = 0, j = last_function->vars + last_function->params; i < j; ++i)
+    for(int i = 0, j = last_function->params; i < j; ++i)
         generate(IPUSHN, NULL);
     generate(ICALL, last_function);
     generate(IHALT, NULL);

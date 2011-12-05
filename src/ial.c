@@ -82,7 +82,7 @@ LiteralTree *last_literal = NULL;
  * Prida funckci do tabulky funkci,
  * pokud jiz takova funkce existuje, vraci chybu, jinak 0
  */
-static inline int insert_function__(FunctionTree **root, char *str, PTapeItem *adr)
+static inline int insert_function__(FunctionTree **root, char *str, PTapeItem adr)
 {
     int cmp;
     if(*root == NULL) {
@@ -113,7 +113,7 @@ static inline int insert_function__(FunctionTree **root, char *str, PTapeItem *a
 /*
  * Wrapper
  */
-int insert_function(char *str, PTapeItem *adr)
+int insert_function(char *str, PTapeItem adr)
 {
     return insert_function__(&functions_table, str, adr);
 }

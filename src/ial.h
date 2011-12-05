@@ -46,7 +46,7 @@ typedef struct funcnode {
     char *name;
     LocalTree *symbols;
     int params, vars;
-    PTapeItem *adr;
+    PTapeItem adr;
     struct funcnode *left, *right;
 } FunctionTree;
 
@@ -58,7 +58,7 @@ typedef struct literalnode {
 } LiteralTree;
 
 
-int insert_function(char *, PTapeItem *);
+int insert_function(char *, PTapeItem);
 int insert_literal(Data);
 int insert_local_param(char *);
 int insert_local_var(char *);

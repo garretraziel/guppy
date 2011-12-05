@@ -310,7 +310,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype1, &value1) != 0) ExecError();
             if (pop_stack(&dattype2, &value2) != 0) ExecError();
             if (dattype1 != dattype2) {
-                retvalue.log = SFALSE;
+                retvalue.log = STRUE;
             } else if (dattype1 == DNUM) {
                 if (value1.num != value2.num)
                     retvalue.log = STRUE;
@@ -356,7 +356,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IREAD: {
             univalue value;
             LiteralTree *literal = (LiteralTree *) instr -> adr;
-            char *fmt = literal -> data.value;
+            char *fmt = literal -> data.value.str;
             //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
         }

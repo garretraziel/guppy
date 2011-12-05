@@ -84,13 +84,13 @@ static int program(void)
     // rezervovani jmen pro builtin funkce
     string str;
     try( str_init(&str, "sort") );
-    try( insert_function(str.str) );
+    try( insert_function(str.str, NULL) );
     try( str_init(&str, "type") );
-    try( insert_function(str.str) );
+    try( insert_function(str.str, NULL) );
     try( str_init(&str, "substr") );
-    try( insert_function(str.str) );
+    try( insert_function(str.str, NULL) );
     try( str_init(&str, "find") );
-    try( insert_function(str.str) );
+    try( insert_function(str.str, NULL) );
 
     // prvni funkce
     check_token(FUNCTION, ERROR_SYN_X_FUNC);
@@ -139,10 +139,13 @@ static int function(void)
     check_token(FUNCTION, ERROR_SYN_X_FUNC);
     get_token();
 
+    PTapeItem lab;
+    lab = generate(INOP, NULL);
+
     // identifier
     check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
     // funkce do tabulky
-    try( insert_function(str.str) );
+    try( insert_function(str.str, lab) );
     // potreba novy string, puvodni je v tabulce
     try( str_new(&str, STR_INIT_LEN) ); 
     get_token();

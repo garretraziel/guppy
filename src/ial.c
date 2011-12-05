@@ -82,7 +82,7 @@ LiteralTree *last_literal = NULL;
  * Prida funckci do tabulky funkci,
  * pokud jiz takova funkce existuje, vraci chybu, jinak 0
  */
-static inline int insert_function__(FunctionTree **root, char *str)
+static inline int insert_function__(FunctionTree **root, char *str, PTapeItem *adr)
 {
     int cmp;
     if(*root == NULL) {
@@ -96,14 +96,15 @@ static inline int insert_function__(FunctionTree **root, char *str)
         new->vars = 0;
         new->left = NULL;
         new->right = NULL;
+	new->adr = adr;
         last_function = new;
         return 0;
     }
     cmp = strcmp(str, (*root)->name);
     if(cmp < 0)
-        return insert_function__(&(*root)->left, str);
+        return insert_function__(&(*root)->left, str, adr);
     else if(cmp > 0)
-        return insert_function__(&(*root)->right, str);
+        return insert_function__(&(*root)->right, str, adr);
     else // == 0
         return ERROR_SYN_FUNC_REDEF;
 }
@@ -112,9 +113,9 @@ static inline int insert_function__(FunctionTree **root, char *str)
 /*
  * Wrapper
  */
-int insert_function(char *str)
+int insert_function(char *str, PTapeItem *adr)
 {
-    return insert_function__(&functions_table, str);
+    return insert_function__(&functions_table, str, adr);
 }
 
 

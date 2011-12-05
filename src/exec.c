@@ -353,8 +353,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             }
             break;
         }
-        case IREAD:
+        case IREAD: {
+            univalue value;
+            LiteralTree *literal = (LiteralTree *) instr -> adr;
+            char *fmt = literal -> data.value;
+            //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
+        }
         case ITYPE: {
             //TODO: ukladat ten string do stromu literalu
             univalue value, retvalue;

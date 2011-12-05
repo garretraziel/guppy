@@ -25,6 +25,7 @@
 
 typedef struct TStack {
     int esp;
+    int ebp;
     int size;
     Data *val;
 } Stack;
@@ -164,8 +165,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 try_push_stack(literal -> data.type, literal -> data.value);
             break;
         }
-        case IPUSHI:
+        case IPUSHI: {
+            Data ident;
+            int offset = ((LocalTree*) (instr -> adr)) -> offset;
+            ident = stack.val[stack.ebp-offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
+            try_push_stack(ident.type, ident.value); //TODO: stringy zkopirovat
             break;
+        }
         case IPUSHT: {
             univalue value;
             value.log = STRUE;
@@ -401,6 +407,7 @@ int init_stack(int size) /// inicializuje zasobnik
     if (stack.val == NULL) return -1; //TODO: err_mem
     stack.size = size;
     stack.esp = -1;
+    stack.ebp = -1;
     return 0;
 }
 

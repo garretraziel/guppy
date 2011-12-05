@@ -445,9 +445,9 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             ExecError(); //TODO: co to ma vracet za chybu?
         }
 
-/* #ifdef DEBUG */
-/*         print_stack(); */
-/* #endif */
+#ifdef DEBUG
+        print_stack();
+#endif
     }
     
     return 0;

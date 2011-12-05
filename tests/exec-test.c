@@ -13,16 +13,18 @@ int main(void) {
     init_tape();
     
     Data str;
-    str.type = T_STRING;
-    str.value.str = malloc(13);
-    strcpy(str.value.str,"mamamelemaso");
+    str.type = T_BOOLEAN;
+    str.value.log = SFALSE;
     insert_literal(str);
     
     generate(IPUSH, last_literal);
 
+    str.value.log = STRUE;
+    insert_literal(str);
 
-    generate(ISORT, NULL);
-    generate(IWRITE, NULL);
+    generate(IPUSH, last_literal);
+    
+    generate(ICMP, NULL);
     generate(IHALT, NULL);
 
 #ifdef DEBUG

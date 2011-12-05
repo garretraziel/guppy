@@ -191,8 +191,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DBOOL, value);
             break;
         }
-        case IPOPI:
+        case IPOPI: {
+            // tady se string kopirovat nemusi
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            int offset = ((LocalTree *) (instr -> adr)) -> offset;
+            stack.val[stack.ebp-offset].type = dattype;
+            stack.val[stack.ebp-offset].value = value;
             break;
+        }
         case IPUSHN: {
             univalue value;
             value.log = STRUE;

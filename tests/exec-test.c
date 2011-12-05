@@ -12,17 +12,8 @@ int main(void) {
     
     init_tape();
     
-    Data str;
-    str.type = T_BOOLEAN;
-    str.value.log = SFALSE;
-    insert_literal(str);
-    
-    generate(IPUSH, last_literal);
-
-    str.value.log = STRUE;
-    insert_literal(str);
-
-    generate(IPUSH, last_literal);
+    generate(IPUSHT, NULL);
+    generate(IPUSHF, NULL);
     
     generate(ICMP, NULL);
     generate(IHALT, NULL);

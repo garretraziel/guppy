@@ -304,8 +304,34 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DBOOL, retvalue);
             break;
         }
-        case ICMPN:
+        case ICMPN: {
+            univalue value1, value2, retvalue;
+            int dattype1, dattype2;
+            if (pop_stack(&dattype1, &value1) != 0) ExecError();
+            if (pop_stack(&dattype2, &value2) != 0) ExecError();
+            if (dattype1 != dattype2) {
+                retvalue.log = SFALSE;
+            } else if (dattype1 == DNUM) {
+                if (value1.num != value2.num)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+            } else if (dattype1 == DBOOL) {
+                if (value1.log != value2.log)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+            } else if (dattype1 == DSTRING) {
+                if (strcmp(value1.str, value2.str) == 0) //TODO: nemam to tady resit nejak vic?
+                    retvalue.log = SFALSE;
+                else
+                    retvalue.log = STRUE;
+                free(value1.str);
+                free(value2.str);
+            } else if (dattype1 == DNIL) retvalue.log = SFALSE;
+            try_push_stack(DBOOL, retvalue);
             break;
+        }
         case ICMPL:
             break;
         case ICMPG:

@@ -167,9 +167,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case IPUSHI: {
             Data ident;
+            univalue retvalue;
             int offset = ((LocalTree*) (instr -> adr)) -> offset;
             ident = stack.val[stack.ebp-offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
-            try_push_stack(ident.type, ident.value); //TODO: stringy zkopirovat
+            if (ident.type == T_STRING) {
+                retvalue.str = malloc(sizeof(char)*(strlen(ident.value.str) + 1));
+                if (retvalue.str == NULL) ExecError();
+                strcpy(retvalue.str, ident.value.str);
+            } else
+                retvalue = ident.value;
+            try_push_stack(ident.type, retvalue); //TODO: zkontrolovat kopirovani stringu
             break;
         }
         case IPUSHT: {
@@ -386,8 +393,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DSTRING, retvalue);
             break;
         }
-	case INOP:
-	    break;
+        case INOP:
+            break;
         default:
             //TODO: nedefinovana instrukce, POMOC!
             ExecError(); //TODO: co to ma vracet za chybu?

@@ -192,6 +192,15 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DBOOL, value);
             break;
         }
+        case IPOP: {
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            if (dattype = DSTRING) {
+                free(value.str);
+            }
+            break;
+        }
         case IPOPI: {
             // tady se string kopirovat nemusi
             univalue value;
@@ -550,7 +559,8 @@ int print_tape()
     "IPUSH  ",      
     "IPUSHI ",     
     "IPUSHT ",     
-    "IPUSHF ",     
+    "IPUSHF ",
+    "IPOP   ",
     "IPOPI  ",      
     "IPUSHN ",     
     "IADD   ",       

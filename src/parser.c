@@ -83,12 +83,19 @@ static int program(void)
     string str;
     try( str_init(&str, "sort") );
     try( insert_function(str.str, NULL) );
+    last_function->params = 1;
+
     try( str_init(&str, "type") );
     try( insert_function(str.str, NULL) );
+    last_function->params = 1;
+
     try( str_init(&str, "substr") );
     try( insert_function(str.str, NULL) );
+    last_function->params = 3;
+    
     try( str_init(&str, "find") );
     try( insert_function(str.str, NULL) );
+    last_function->params = 2;
 
     // prvni funkce
     check_token(FUNCTION, ERROR_SYN_X_FUNC);

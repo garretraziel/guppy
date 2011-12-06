@@ -10,8 +10,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "string.h"
+#include <string.h>
 
+#include "string.h"
 #include "expr.h"
 #include "defines.h"
 #include "lexical.h"
@@ -66,6 +67,11 @@ enum {
     E_UNKNOWN, // neznamy typ
     E_VAR, // identifikator promenne
     E_FUNC, // identifikator funkce
+    E_FIND, // vestavene funkce
+    E_SORT,
+    E_SUBSTR,
+    E_TYPE,
+    // NOTE: zadne dalsi konstanty nepridavat, kvuli kontrole >= E_FUNC
 } ESymbols;
 
 
@@ -471,8 +477,17 @@ static int s_oobely_boo(Stack *stack)
                         generate(IPUSHN, NULL);
                     for(int i = 1; i > ((FunctionTree*)stack->top->ptr)->params; --i)
                         generate(IPOP, NULL);
-                    // instrukce call
-                    generate(ICALL, stack->top->ptr);
+                    // instrukce call podle toho, co to je za funkce
+                    if(stack->top->e_type == E_FUNC)
+                        generate(ICALL, stack->top->ptr);
+                    else if(stack->top->e_type == E_FIND)
+                        generate(IFIND, stack->top->ptr);
+                    else if(stack->top->e_type == E_SORT)
+                        generate(ISORT, stack->top->ptr);
+                    else if(stack->top->e_type == E_SUBSTR)
+                        generate(ISUBSTR, stack->top->ptr);
+                    else // TYPE
+                        generate(ITYPE, stack->top->ptr);
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
                     func_pop();
@@ -492,15 +507,24 @@ static int s_oobely_boo(Stack *stack)
                 if(top != E_IDENT)
                     return ERROR_SYN_EXP_FAIL;
                 // identifikator musi byt funkce
-                if(stack->top->e_type != E_FUNC)
+                if(stack->top->e_type < E_FUNC)
                     return ERROR_SEM_CALL_VAR;
                 // overeni poctu parametru
                 for(int i = func_stack[F]; i < ((FunctionTree*)stack->top->ptr)->params; ++i)
                     generate(IPUSHN, NULL);
                 for(int i = func_stack[F]; i > ((FunctionTree*)stack->top->ptr)->params; --i)
                     generate(IPOP, NULL);
-                // instrukce call
-                generate(ICALL, stack->top->ptr);
+                // instrukce call podle toho, co to je za funkce
+                if(stack->top->e_type == E_FUNC)
+                    generate(ICALL, stack->top->ptr);
+                else if(stack->top->e_type == E_FIND)
+                    generate(IFIND, stack->top->ptr);
+                else if(stack->top->e_type == E_SORT)
+                    generate(ISORT, stack->top->ptr);
+                else if(stack->top->e_type == E_SUBSTR)
+                    generate(ISUBSTR, stack->top->ptr);
+                else // TYPE
+                    generate(ITYPE, stack->top->ptr);
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top != E_MARK)
@@ -607,7 +631,17 @@ static inline int expression__(Stack *stack)
                     case E_IDENT:
                         if((ptr = find_function(str.str))) {
                             func_push(); // nova funkce
-                            try( s_push(stack, a, E_FUNC, ptr) );
+                            // kontrola, co to je za funkci
+                            if(strcmp("find", str.str) == 0)
+                                try( s_push(stack, a, E_FIND, ptr) );
+                            else if(strcmp("sort", str.str) == 0)
+                                try( s_push(stack, a, E_SORT, ptr) );
+                            else if(strcmp("substr", str.str) == 0)
+                                try( s_push(stack, a, E_SUBSTR, ptr) );
+                            else if(strcmp("type", str.str) == 0)
+                                try( s_push(stack, a, E_TYPE, ptr) );
+                            else 
+                                try( s_push(stack, a, E_FUNC, ptr) );
                         } else if((ptr = find_local(str.str))) {
                             generate(IPUSHI, ptr); 
                             try( s_push(stack, a, E_VAR, ptr) );

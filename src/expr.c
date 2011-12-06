@@ -376,8 +376,8 @@ static int s_oobely_boo(Stack *stack)
         [E_GREAT] = ICMPG,
         [E_LESSEQ] = ICMPEL,
         [E_GREATEQ] = ICMPEG,
-        [E_NOTEQ] = ICMP,
-        [E_EQUAL] = ICMPN
+        [E_NOTEQ] = ICMPN,
+        [E_EQUAL] = ICMP,
     };
     enum states { START, VAL, VAR, RBRAC, EEEE, EEEE_COMM, BRAC_EEEE, FUNC_N, FUNC_CALL, OPER};
     const int translate[] = {

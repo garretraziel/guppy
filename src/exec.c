@@ -143,6 +143,17 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case ICALL: {
             //TODO: tady se jeste zasmejeme
+            univalue value;
+            //push retadr
+            value.adr = tape.act->next;
+            try_push_stack(DRETADR, value);
+            //push ebp
+            value.log = stack.ebp; //snad takto, to zas bude komentaru, co to je za hnuj
+            try_push_stack(DREGISTER, value);
+            //mov ebp, esp
+            stack.ebp = stack.esp;
+            //jmp adr
+            tape.act = /* magic */ ((FunctionTree *)tape.act->adr)->adr;
             break;
         }
         case IRET: {
@@ -196,7 +207,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue value;
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();
-            if (dattype = DSTRING) {
+            if (dattype == DSTRING) {
                 free(value.str);
             }
             break;

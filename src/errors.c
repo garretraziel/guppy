@@ -16,6 +16,7 @@ const char *LEX_ERRORS[] = {
     [(-ERROR_LEX_NUMBER) % 100] = "Neplatny ciselny literal",
     [(-ERROR_LEX_UX_CHAR) % 100] = "Neocekavany znak",
     [(-ERROR_LEX_ESC_SEC) % 100] = "Neplatna escape sekvence v retezci",
+    [(-ERROR_LEX_X_CMNT_END) % 100] = "Neukonceny komentar",
 };
 
 // [2] Chybova hlseni syntaktickych chyb

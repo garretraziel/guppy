@@ -16,6 +16,7 @@ enum {
     ERROR_LEX_NUMBER = -101,
     ERROR_LEX_UX_CHAR = -102,
     ERROR_LEX_ESC_SEC = -103,
+    ERROR_LEX_X_CMNT_END = -104,
 } ELexErrors;
 
 // [2]

@@ -4,6 +4,7 @@
 
 #include "lexical.h"
 #include "defines.h"
+#include "string.h"
 
 
 const char *TOKENS[] = {
@@ -69,7 +70,7 @@ void Error(const char *fmt, ...)
 
 int main(void)
 {
-    str_new(&str, STR_DEFAULT);
+    str_new(&str, STR_INIT_LEN); 
     input = stdin;
 
     while(get_token(), token) {

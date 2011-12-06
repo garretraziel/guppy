@@ -286,6 +286,7 @@ int s_clean(Stack * stack)
 // Pridani symbolu na zasobnik (to se hodi vzdycky)
 int s_push(Stack *stack, int type, int e_type, void *ptr)
 {
+//    printf("s_push, %d, %d, %p\n", type, e_type, ptr);
     Node *new = malloc(sizeof(Node));
     if(new == NULL)
         return ERROR_GEN_MEM;
@@ -426,8 +427,6 @@ static int s_oobely_boo(Stack *stack)
                     return ERROR_SYN_EXP_FAIL;
                 break;
             case VAR: // E -> id
-                generate(IPUSHI, NULL); 
-                //TODO: find_local() pro lokalni promenny...
             case VAL: // E -> string, bool, num, nil
                 // na zasobniku je hodnota, ocekava se konec a redukce
                 if(top != E_MARK)
@@ -560,6 +559,7 @@ static inline int expression__(Stack *stack)
 {
     int a, b;
     void *ptr = NULL;
+    Data data;
 
     // radsi kontrola, on to nikdo predtim asi nedela a to tabulky s tim nemuzu
     if(token < 0)
@@ -602,31 +602,37 @@ static inline int expression__(Stack *stack)
                         if((ptr = find_function(str.str))) {
                             func_push(); // nova funkce
                             try( s_push(stack, a, E_FUNC, ptr) );
-                        } else if((ptr = find_local(str.str)))
+                        } else if((ptr = find_local(str.str))) {
+                            generate(IPUSHI, ptr); 
                             try( s_push(stack, a, E_VAR, ptr) );
-                        else
+                        } else
                             return ERROR_SEM_VAR_UND;
                         break;
                     // pokud hodnota tak push
                     case E_NIL:
-                        generate(IPUSHI, NULL); 
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        generate(IPUSHN, NULL);
+                        try( s_push(stack, a, E_NIL, NULL) );
                         break;
                     case E_BOOL:
                         generate((token == TRUE)? IPUSHT:IPUSHF, NULL); 
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_BOOL, NULL) );
                         break;
                     case E_NUM:
-                        generate(IPUSH, NULL); 
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_NUM, NULL) );
+                        data.type = T_NUMBER;
+                        data.value.num = strtod(str.str, NULL);
+                        // vegenerovani push
+                        try( insert_literal(data) );
+                        generate(IPUSH, last_literal);
                         break;                    
                     case E_STR:
-                        generate(IPUSH, NULL); 
-                        // TODO pridat do tabulky literalu
-                        // TODO generovat instrukce ted nebo az pri redukci?
-                        // ono je to asi jedno, stejne redukce nastane okamzite
-                        // ^^^ nebude to uplně konzistentní, ale imo lepší hned
-                        try( s_push(stack, a, get_e_type(a), NULL) );
+                        try( s_push(stack, a, E_STR, NULL) );
+                        data.type = T_STRING;
+                        data.value.str = str.str;
+                        try( insert_literal(data) );
+                        try( str_new(&str, STR_INIT_LEN) );
+                        // vegenerovani push
+                        generate(IPUSH, last_literal); 
                         break;
                     // ostatni nic mimoradneho nedelaji
                     default:

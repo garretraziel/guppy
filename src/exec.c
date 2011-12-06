@@ -167,9 +167,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case IPUSHI: {
             Data ident;
+            univalue retvalue;
             int offset = ((LocalTree*) (instr -> adr)) -> offset;
             ident = stack.val[stack.ebp-offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
-            try_push_stack(ident.type, ident.value); //TODO: stringy zkopirovat
+            if (ident.type == T_STRING) {
+                retvalue.str = malloc(sizeof(char)*(strlen(ident.value.str) + 1));
+                if (retvalue.str == NULL) ExecError();
+                strcpy(retvalue.str, ident.value.str);
+            } else
+                retvalue = ident.value;
+            try_push_stack(ident.type, retvalue); //TODO: zkontrolovat kopirovani stringu
             break;
         }
         case IPUSHT: {
@@ -184,8 +191,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DBOOL, value);
             break;
         }
-        case IPOPI:
+        case IPOPI: {
+            // tady se string kopirovat nemusi
+            univalue value;
+            int dattype;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            int offset = ((LocalTree *) (instr -> adr)) -> offset;
+            stack.val[stack.ebp-offset].type = dattype;
+            stack.val[stack.ebp-offset].value = value;
             break;
+        }
         case IPUSHN: {
             univalue value;
             value.log = STRUE;
@@ -257,6 +272,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING)
                 ExecError();
             retvalue.str = concat(value2.str, value1.str);
+            free(value2.str);
+            free(value1.str);
             if (retvalue.str == NULL) ExecError();
             try_push_stack(DSTRING, retvalue);
             break;
@@ -267,6 +284,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             if (pop_stack(&dattype1, &value1) != 0) ExecError();
             if (pop_stack(&dattype2, &value2) != 0) ExecError();
             if (dattype1 != dattype2) {
+                if (dattype1 == DSTRING) free(value1.str);
+                if (dattype2 == DSTRING) free(value2.str);
                 retvalue.log = SFALSE;
             } else if (dattype1 == DNUM) {
                 if (value1.num == value2.num)
@@ -289,8 +308,36 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DBOOL, retvalue);
             break;
         }
-        case ICMPN:
+        case ICMPN: {
+            univalue value1, value2, retvalue;
+            int dattype1, dattype2;
+            if (pop_stack(&dattype1, &value1) != 0) ExecError();
+            if (pop_stack(&dattype2, &value2) != 0) ExecError();
+            if (dattype1 != dattype2) {
+                if (dattype1 == DSTRING) free(value1.str);
+                if (dattype2 == DSTRING) free(value2.str);
+                retvalue.log = STRUE;
+            } else if (dattype1 == DNUM) {
+                if (value1.num != value2.num)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+            } else if (dattype1 == DBOOL) {
+                if (value1.log != value2.log)
+                    retvalue.log = STRUE;
+                else
+                    retvalue.log = SFALSE;
+            } else if (dattype1 == DSTRING) {
+                if (strcmp(value1.str, value2.str) == 0) //TODO: nemam to tady resit nejak vic?
+                    retvalue.log = SFALSE;
+                else
+                    retvalue.log = STRUE;
+                free(value1.str);
+                free(value2.str);
+            } else if (dattype1 == DNIL) retvalue.log = SFALSE;
+            try_push_stack(DBOOL, retvalue);
             break;
+        }
         case ICMPL:
             break;
         case ICMPG:
@@ -312,8 +359,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             }
             break;
         }
-        case IREAD:
+        case IREAD: {
+            univalue value;
+            LiteralTree *literal = (LiteralTree *) instr -> adr;
+            char *fmt = literal -> data.value.str;
+            //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
+        }
         case ITYPE: {
             //TODO: ukladat ten string do stromu literalu
             univalue value, retvalue;
@@ -386,16 +438,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             try_push_stack(DSTRING, retvalue);
             break;
         }
-	case INOP:
-	    break;
+        case INOP:
+            break;
         default:
             //TODO: nedefinovana instrukce, POMOC!
             ExecError(); //TODO: co to ma vracet za chybu?
         }
 
-/* #ifdef DEBUG */
-/*         print_stack(); */
-/* #endif */
+#ifdef DEBUG
+        print_stack();
+#endif
     }
     
     return 0;

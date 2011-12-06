@@ -96,7 +96,7 @@ static inline int insert_function__(FunctionTree **root, char *str, PTapeItem ad
         new->vars = 0;
         new->left = NULL;
         new->right = NULL;
-	new->adr = adr;
+        new->adr = adr;
         last_function = new;
         return 0;
     }

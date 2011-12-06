@@ -12,17 +12,10 @@ int main(void) {
     
     init_tape();
     
-    Data str;
-    str.type = T_STRING;
-    str.value.str = malloc(13);
-    strcpy(str.value.str,"mamamelemaso");
-    insert_literal(str);
+    generate(IPUSHT, NULL);
+    generate(IPUSHF, NULL);
     
-    generate(IPUSH, last_literal);
-
-
-    generate(ISORT, NULL);
-    generate(IWRITE, NULL);
+    generate(ICMP, NULL);
     generate(IHALT, NULL);
 
 #ifdef DEBUG

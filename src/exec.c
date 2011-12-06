@@ -155,11 +155,32 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             break;
         }
         case IRET: {
-            //TODO: tady taky
             // v zasade musi popnout jednu vec, to bude navratova hodnota, pak bude popovat
             // dokud nebude na EBP, to obnovi, pak si ulozi navratovou adresu funkce
-            // a pak bude popovat, dokud nebude na zarazce. pote pushne navratovou hodnotu a
+            // a pak bude popovat, podle poctu promennych a argumentu. pote pushne navratovou hodnotu a
             // EIP prepise navratovou adresou
+            univalue retvalue, tempvalue;
+            int rettype, temptype;
+            // jedna navratova adresa
+            if (pop_stack(&rettype, &retvalue) != 0) ExecError();
+            // vypopuju bordel, ktery by tam nemel byt, ale radsi...
+            do {
+                if (pop_stack(&temptype, &tempvalue) != 0) ExecError();
+                if (temptype == DSTRING) free(tempvalue.str);
+            } while (temptype != DREGISTER); // az po EBP
+            stack.ebp = tempvalue.log;
+            if (pop_stack(&temptype, &tempvalue) != 0) ExecError(); //TODO: napsat makro, pouziva se to stejne casto
+            // obnoveni navratove adresy
+            if (temptype == DRETADR) ExecError();
+            // nastaveni adresy dalsi instrukce
+            tape.act = (PTapeItem) tempvalue.adr;
+            // pocet prvku, co musim na zasobniku uvolnit
+            int space = ((FunctionTree *) instr -> adr) -> vars + ((FunctionTree *) instr -> adr) -> params;
+            for (int i = 0; i<space; i++) {
+                if (pop_stack(&temptype, &tempvalue) != 0) ExecError();
+                if (temptype == DSTRING) free(tempvalue.str);
+            }
+            try_push_stack(rettype, retvalue);
             break;
         }
         case IPUSH: {

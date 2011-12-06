@@ -14,6 +14,8 @@ rebuild: clean build
 
 debug: CFLAGS += $(DFLAGS)
 debug: rebuild
+jendebug: CFLAGS += -g
+jendebug: rebuild
 
 $(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o expr.o exec.o
 	$(CC) $(CFLAGS) $^ -o $@

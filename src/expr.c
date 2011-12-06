@@ -417,9 +417,12 @@ static int s_oobely_boo(Stack *stack)
             case START: // startovaci stav
                 if(top == E_LIT)
                     state = VAL;
-                else if(top == E_IDENT)
+                else if(top == E_IDENT) {
+                    // kontrola, ze to neni funkce
+                    if(stack->top->e_type == E_FUNC)
+                        return ERROR_SEM_FUNC_VAR;
                     state = VAR;
-                else if(top == E_RBRAC)
+                } else if(top == E_RBRAC)
                     state = RBRAC;
                 else if(top == E_NET_E)
                     state = EEEE;

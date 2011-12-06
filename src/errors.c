@@ -45,6 +45,7 @@ const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_VAR_REDEF) % 100] = "Promenna je jiz definovana",
      [(-ERROR_SEM_WRONG_TYPES) % 100] = "Nekompatibilni typy operandu ve vyrazu",
      [(-ERROR_SEM_CALL_VAR) % 100] = "Nelze volat promenne",
+     [(-ERROR_SEM_FUNC_VAR) % 100] = "Funkce nelze pouzivat jako promenne",
 };
 
 // [4] Obecne chybove zpravy interpretace

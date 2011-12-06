@@ -201,7 +201,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             Data ident;
             univalue retvalue;
             int offset = ((LocalTree*) (instr -> adr)) -> offset;
-            ident = stack.val[stack.ebp-offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
+            ident = stack.val[stack.ebp+offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
             if (ident.type == T_STRING) {
                 retvalue.str = malloc(sizeof(char)*(strlen(ident.value.str) + 1));
                 if (retvalue.str == NULL) ExecError();
@@ -238,8 +238,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();
             int offset = ((LocalTree *) (instr -> adr)) -> offset;
-            stack.val[stack.ebp-offset].type = dattype;
-            stack.val[stack.ebp-offset].value = value;
+            stack.val[stack.ebp+offset].type = dattype;
+            stack.val[stack.ebp+offset].value = value;
             break;
         }
         case IPUSHN: {

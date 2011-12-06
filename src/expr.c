@@ -466,14 +466,15 @@ static int s_oobely_boo(Stack *stack)
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top == E_IDENT){ // volani funkce s 1 parametrem
+                    // overeni poctu parametru
+                    for(int i = 1; i < ((FunctionTree*)stack->top->ptr)->params; ++i)
+                        generate(IPUSHN, NULL);
+                    for(int i = 1; i > ((FunctionTree*)stack->top->ptr)->params; --i)
+                        generate(IPOP, NULL);
+                    // instrukce call
+                    generate(ICALL, stack->top->ptr);
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
-                    // asi bylo volani funkce a ja vim ze mela 1 parametr
-                    func_inc();
-#ifdef DEBUG
-    printf("Byla volana funkce s %d parametry\n", func_stack[F]);
-#endif
-                    generate(ICALL, NULL);
                     func_pop();
                     E1 = E_UNKNOWN;
                 }
@@ -493,17 +494,19 @@ static int s_oobely_boo(Stack *stack)
                 // identifikator musi byt funkce
                 if(stack->top->e_type != E_FUNC)
                     return ERROR_SEM_CALL_VAR;
+                // overeni poctu parametru
+                for(int i = func_stack[F]; i < ((FunctionTree*)stack->top->ptr)->params; ++i)
+                    generate(IPUSHN, NULL);
+                for(int i = func_stack[F]; i > ((FunctionTree*)stack->top->ptr)->params; --i)
+                    generate(IPOP, NULL);
+                // instrukce call
+                generate(ICALL, stack->top->ptr);
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top != E_MARK)
                     return ERROR_SYN_EXP_FAIL;
                 s_pop(stack); // oddelani znacky
                 try( s_push(stack, E_NET_E, E_UNKNOWN, NULL) );
-                // bylo volani funkce a ja vim, kolik mela parametru
-#ifdef DEBUG
-    printf("Byla volana funkce s %d parametry\n", func_stack[F]);
-#endif
-                generate(ICALL, NULL);
                 func_pop();
                 return 1;
                 break;
@@ -547,8 +550,8 @@ static int s_oobely_boo(Stack *stack)
                 else
                     return ERROR_SYN_EXP_FAIL;
                 break;
-        }
-    }
+        } /* switch */
+    } /* for */
 
     // TODO v cyklu chybi generovani instrukci
     // nejak se musi jeste pocitat parametry funci a pripadne je doplnit nil

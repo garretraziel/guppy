@@ -418,7 +418,8 @@ static inline int get_token__(void)
                 if(c == '\n') {
                     state = FSM_READ;
                     ++line;
-                }
+                } else if(c == EOF)
+                    return ERROR_LEX_X_CMNT_END;
                 break;
 
             case FSM_COMMENT_BLOCK:
@@ -427,6 +428,8 @@ static inline int get_token__(void)
                     state = FSM_COMMENT_BLOCK_END;
                 else if(c == '\n')
                     ++line;
+                else if(c == EOF)
+                    return ERROR_LEX_X_CMNT_END;
                 break;
 
             case FSM_COMMENT_BLOCK_END:

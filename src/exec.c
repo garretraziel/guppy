@@ -30,9 +30,10 @@ typedef struct TStack {
     Data *val;
 } Stack;
 
-//globalni promenne, paska pro ulozeni instrukci a zasobnik
+//globalni promenne, paska pro ulozeni instrukci, zasobnik a ukazatel na zacatek
 Tape tape;
 Stack stack;
+PTapeItem main_pointer;
 
 int init_stack(int size); /// inicializuje zasobnik
 int pop_stack(int *dattype, univalue *value); /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ

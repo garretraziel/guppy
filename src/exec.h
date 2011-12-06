@@ -83,5 +83,6 @@ int execute(); /// funkce, ktera vezme instrukce z globalni tabulky prvku a vyko
 
 // globalni paska instrukci
 extern Tape tape;
+extern PTapeItem main_pointer;
 
 #endif 

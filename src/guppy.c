@@ -32,7 +32,7 @@ void Error(int errcode, ...)
     va_start(args, errcode);
     fprintf(stderr, "CHYBA: ");
     int type = (-errcode) / 100;
-    if(type < ERROR_GEN)
+    if(type < ERROR_SEM)
         fprintf(stderr, "Na radku %d: ", line);
     vfprintf(stderr, ERROR_MSG[type][(-errcode) % 100], args);
     fprintf(stderr, "\n");

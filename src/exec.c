@@ -130,8 +130,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue value;
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();
-            
             if (dattype != DBOOL || value.log == STRUE) tape.act = (PTapeItem) instr -> adr;
+            if (dattype == DSTRING) free(value.str);
             break;
         }
         case IJMPF: {
@@ -139,6 +139,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();
             if ((dattype == DBOOL && value.log == SFALSE) || dattype == DNIL) tape.act = (PTapeItem) instr -> adr;
+            if (dattype == DSTRING) free(value.str);
             break;
         }
         case ICALL: {

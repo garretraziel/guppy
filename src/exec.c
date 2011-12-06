@@ -541,42 +541,50 @@ int print_tape()
 {
     //omg, hnuj
     char * i2s[] = {
-    "IHALT",      
-    "IJMP",       
-    "IJMPT",      
-    "IJMPF",      
-    "ICALL",      
-    "IRET",      
-    "IPUSH",      
-    "IPUSHI",     
-    "IPUSHT",     
-    "IPUSHF",     
-    "IPOPI",      
-    "IPUSHN",     
-    "IADD",       
-    "ISUB",       
-    "IMUL",       
-    "IDIV",       
-    "IPOW",       
+    "IHALT  ",      
+    "IJMP   ",       
+    "IJMPT  ",      
+    "IJMPF  ",      
+    "ICALL  ",      
+    "IRET   ",      
+    "IPUSH  ",      
+    "IPUSHI ",     
+    "IPUSHT ",     
+    "IPUSHF ",     
+    "IPOPI  ",      
+    "IPUSHN ",     
+    "IADD   ",       
+    "ISUB   ",       
+    "IMUL   ",       
+    "IDIV   ",       
+    "IPOW   ",       
     "ICONCAT",    
-    "ICMP",       
-    "ICMPN",      
-    "ICMPL",      
-    "ICMPG",      
-    "ICMPEL",     
-    "ICMPEG",     
-    "IWRITE",     
-    "IREAD",      
-    "ITYPE",      
+    "ICMP   ",       
+    "ICMPN  ",      
+    "ICMPL  ",      
+    "ICMPG  ",      
+    "ICMPEL ",     
+    "ICMPEG ",     
+    "IWRITE ",     
+    "IREAD  ",      
+    "ITYPE  ",      
     "ISUBSTR",    
-    "IFIND",      
-    "ISORT",      
-    "INOP"       
+    "IFIND  ",      
+    "ISORT  ",      
+    "INOP   "       
     };
+
+    int cnt = 0;
     PTapeItem temp = tape.top;
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
-        printf("I: %s  %p  ", i2s[temp -> instr], (void *) temp);
+        cnt++;
+        if(temp == main_pointer)
+            printf("m:%s %p |>  ", i2s[temp -> instr], (void *) temp);
+        else
+            printf("  %s %p |>  ", i2s[temp -> instr], (void *) temp);
+        if(!(cnt % 9))
+            putchar('\n');
         temp = temp -> next;
     }
     printf("\n---------------\nkonec pasky instrukci\n\n");

@@ -171,7 +171,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             stack.ebp = tempvalue.log;
             if (pop_stack(&temptype, &tempvalue) != 0) ExecError(); //TODO: napsat makro, pouziva se to stejne casto
             // obnoveni navratove adresy
-            if (temptype == DRETADR) ExecError();
+            if (temptype != DRETADR) ExecError();
             // nastaveni adresy dalsi instrukce
             tape.act = (PTapeItem) tempvalue.adr;
             // pocet prvku, co musim na zasobniku uvolnit

@@ -142,15 +142,18 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             break;
         }
         case ICALL: {
-            //TODO: tady se jeste zasmejeme
             univalue value;
             int locals = ((FunctionTree *) instr -> adr) -> vars;
             stack.esp += locals;
+            //push retadr
             value.adr = (void *) instr -> next;
             try_push_stack(DRETADR, value);
+            //push ebp
             value.log = stack.ebp;
             try_push_stack(DREGISTER, value);
+            //mov ebp, esp
             stack.ebp = stack.esp;
+            //jmp adr
             tape.act = ((FunctionTree *) instr -> adr) -> adr;
             break;
         }

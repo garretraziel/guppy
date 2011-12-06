@@ -72,12 +72,12 @@ int main(int argc, char *argv[])
     print_tape();
 #endif
     // vyhledove
-    execute();
+    x = execute();
 
     // uklid tabulky funkci
     drop_functions();
     // uklid tabulky literalu
     drop_literals();
     // uklid seznamu instrukci
-    return 0;
+    return (-x) / 100;
 }

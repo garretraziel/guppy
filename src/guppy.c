@@ -73,6 +73,8 @@ int main(int argc, char *argv[])
 #endif
     // vyhledove
     x = execute();
+    if(x < 0)
+        Error(x);
 
     // uklid tabulky funkci
     drop_functions();

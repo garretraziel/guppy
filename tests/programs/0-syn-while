@@ -1,6 +1,7 @@
 function main()
     local x = 5;
-    while x > 0 do
+    while 0 < x do
         write(x);
+        x = x - 1;
     end;
 end;

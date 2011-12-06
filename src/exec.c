@@ -429,7 +429,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IREAD: {
             univalue value;
             LiteralTree *literal = (LiteralTree *) instr -> adr;
-            char *fmt = literal -> data.value.str;
+            string input;
+            str_new(&input, STR_INIT_LEN);
+            if (literal -> data.type == T_NUMBER) {
+                int num_of_chars = literal -> data.value.num;
+            } else {
+                char *fmt = literal -> data.value.str;
+            }
+            value.str = input.str;
             //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
         }

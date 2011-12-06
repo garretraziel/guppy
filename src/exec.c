@@ -87,8 +87,6 @@ PTapeItem actnext_tape() /// posune aktivni prvek na dalsi a vrati ho
 
 PTapeItem generate(int instr, void *adr) /// funkce, ktera prebere typ instrukce a ukazatel a vygeneruje podle toho instrukci
 {
-    //TODO: takto jednoduse to samozrejme nejde, ale aspon aby byl mustr. joa funkce by mohla vracet adresu te vygenerovane instrukce
-    //TODO: jinak se asi bude muset switchovat podle typu instrukce a vytvaret vsechny ty dodatecny veci, co jsou k tomu potreba
     PTapeItem item = malloc(sizeof(struct TTapeItem));
     if (item == NULL) return NULL;
     item -> instr = instr;
@@ -143,16 +141,13 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case ICALL: {
             univalue value;
-            int locals = ((FunctionTree *) instr -> adr) -> vars;
-            stack.esp += locals;
+            stack.esp += ((FunctionTree *) instr -> adr) -> vars;
             //push retadr
             value.adr = (void *) instr -> next;
             try_push_stack(DRETADR, value);
             //push ebp
             value.log = stack.ebp;
             try_push_stack(DREGISTER, value);
-            //udelani mista pro lokalni promenne
-            stack.esp += ((FunctionTree *)tape.act->adr)->vars; //doufam, ze to nevybouchne
             //mov ebp, esp
             stack.ebp = stack.esp;
             //jmp adr

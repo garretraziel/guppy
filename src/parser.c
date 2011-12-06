@@ -278,6 +278,7 @@ static int statement_seq(void)
         case IF:
         case WHILE:
         case RETURN:
+        case REPEAT:
             // statement
             try( statement() );
             // strednik
@@ -385,6 +386,20 @@ static int statement(void)
             generate(IRET, last_function);
             return 1;
             // konec funkce heh
+
+        case REPEAT:
+            get_token();
+            lab1 = generate(INOP, NULL);
+            // sekvence prikazu
+            try( statement_seq() );
+            // until
+            check_token(UNTIL, ERROR_SYN_X_UNTIL);
+            get_token();
+            // vyraz a skok
+            try( expression() );
+            generate(IJMPF, lab1);
+            return 1;
+
 
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;

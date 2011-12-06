@@ -129,15 +129,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IJMPT: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) ExecError();
-            if (value.log == STRUE) tape.act = (PTapeItem) instr -> adr;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            
+            if (dattype != DBOOL || value.log == STRUE) tape.act = (PTapeItem) instr -> adr;
             break;
         }
         case IJMPF: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0 || dattype != DBOOL) ExecError();
-            if (value.log == SFALSE) tape.act = (PTapeItem) instr -> adr;
+            if (pop_stack(&dattype, &value) != 0) ExecError();
+            if ((dattype == DBOOL && value.log == SFALSE) || dattype == DNIL) tape.act = (PTapeItem) instr -> adr;
             break;
         }
         case ICALL: {

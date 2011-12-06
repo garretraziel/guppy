@@ -196,7 +196,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue value;
             int dattype;
             if (pop_stack(&dattype, &value) != 0) ExecError();
-            if (dattype = DSTRING) {
+            if (dattype == DSTRING) {
                 free(value.str);
             }
             break;

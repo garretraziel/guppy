@@ -446,7 +446,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             case DSTRING:
                 retvalue.str = malloc(sizeof(char)*7);
                 strcpy(retvalue.str, "string");
-                free(retvalue.str);
+                free(value.str);
                 break;
             case DBOOL:
                 retvalue.str = malloc(sizeof(char)*8);

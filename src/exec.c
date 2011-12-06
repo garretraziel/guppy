@@ -576,7 +576,7 @@ int print_tape()
     PTapeItem temp = tape.top;
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
-        printf("I: %s    ", i2s[temp -> instr]);
+        printf("I: %s  %p  ", i2s[temp -> instr], (void *) temp);
         temp = temp -> next;
     }
     printf("\n---------------\nkonec pasky instrukci\n\n");

@@ -110,6 +110,7 @@ static int program(void)
 
     // tohle je kod, kterym by melo zacit vykonavani
     // TODO: vratit na to nejak adresu
+    main_pointer = generate(INOP, NULL);
     for(int i = 0, j = last_function->params; i < j; ++i)
         generate(IPUSHN, NULL);
     generate(ICALL, last_function);
@@ -144,12 +145,6 @@ static int function(void)
     check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
     // funkce do tabulky
     try( insert_function(str.str, lab) );
-    if(strcmp(str.str,"main")==0){
-        main_pointer = lab;
-#ifdef DEBUG
-        printf("Main na adrese %p\n",(void *)main_pointer);   
-#endif        
-    }
     // potreba novy string, puvodni je v tabulce
     try( str_new(&str, STR_INIT_LEN) ); 
     get_token();

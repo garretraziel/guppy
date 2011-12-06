@@ -574,17 +574,10 @@ int print_tape()
     "INOP   "       
     };
 
-    int cnt = 0;
     PTapeItem temp = tape.top;
     printf("Paska instrukci:\n---------------\n");
     while (temp != NULL) {
-        cnt++;
-        if(temp == main_pointer)
-            printf("m:%s %p |>  ", i2s[temp -> instr], (void *) temp);
-        else
-            printf("  %s %p |>  ", i2s[temp -> instr], (void *) temp);
-        if(!(cnt % 9))
-            putchar('\n');
+        printf("%p: %s %p \n",(void*) temp, i2s[temp -> instr], (void *) temp->adr);
         temp = temp -> next;
     }
     printf("\n---------------\nkonec pasky instrukci\n\n");

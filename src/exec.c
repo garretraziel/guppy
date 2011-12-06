@@ -150,6 +150,8 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             //push ebp
             value.log = stack.ebp; //snad takto, to zas bude komentaru, co to je za hnuj
             try_push_stack(DREGISTER, value);
+            //udelani mista pro lokalni promenne
+            stack.esp += ((FunctionTree *)tape.act->adr)->vars; //doufam, ze to nevybouchne
             //mov ebp, esp
             stack.ebp = stack.esp;
             //jmp adr

@@ -108,7 +108,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         return 0;
     }
 
-    tape.act = tape.top;
+    tape.act = main_pointer;
     
     while (1) { // reknete mi duvod, proc by to nemohl byt nekonecny cyklus
         

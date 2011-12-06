@@ -1,0 +1,18 @@
+function hanoi(n, odkud, kam, p)
+    local c;
+    if(n == 0) then
+    else
+        c = hanoi(n-1, odkud, p, kam);
+        write(odkud, "->", kam, "\n");
+        c = hanoi(n-1, p, kam, odkud);
+    end;
+end
+
+function main()
+    local x;
+
+    x = 5;
+
+    x = hanoi(x, "A", "B", "C");
+
+end;

@@ -51,7 +51,12 @@ const char *SEM_ERRORS[] = {
 
 // [4] Obecne chybove zpravy interpretace
 const char *INT_ERRORS[] = {
-     [(-ERROR_INT_X) % 100] = "Chyba interpretace",
+     [(-ERROR_INT_EMPTY_STACK) % 100] = "Nelze cist ze zasobniku, nejspise je prazdny",
+     [(-ERROR_INT_DIVZERO) % 100] = "Deleni nulou",
+     [(-ERROR_INT_BADPARAM) % 100] = "Spatny typ parametru",
+     [(-ERROR_INT_INCOMP_TYPES) % 100] = "Nekompatibilni typy pro danou operaci",
+     [(-ERROR_INT_BAD_INSTR) % 100] = "Program provedl neplatnou operaci a bude ukoncen", //WIN!
+     [(-ERROR_INT_BAD_VAL) % 100] = "Spatny prvek pro interpretaci, vnitrni chyba programu",
 };
 
 // [5] Obecne chybove zpravy

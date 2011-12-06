@@ -50,7 +50,12 @@ enum {
 
 // [4]
 enum {
-    ERROR_INT_X = -401,
+    ERROR_INT_EMPTY_STACK = -401,
+    ERROR_INT_DIVZERO = -402,
+    ERROR_INT_BADPARAM = -403,
+    ERROR_INT_INCOMP_TYPES = -404,
+    ERROR_INT_BAD_INSTR = -405,
+    ERROR_INT_BAD_VAL = -406,
 } EIntErrors;
 
 // [5]

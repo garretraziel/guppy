@@ -22,6 +22,7 @@
 
 #define ExecError() do {delete_stack(); delete_tape(); return -1;} while(0)
 #define try_push_stack(type,val) do { if (push_stack(type, val) != 0) ExecError(); } while(0)
+#define try_pop_stack(type,val) do { if (pop_stack(&type, &val) != 0) ExecError(); } while(0)
 
 typedef struct TStack {
     int esp;

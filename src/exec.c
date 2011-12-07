@@ -440,14 +440,49 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IREAD: {
             univalue value;
             LiteralTree *literal = (LiteralTree *) instr -> adr;
-            string input;
-            str_new(&input, STR_INIT_LEN);
             if (literal -> data.type == T_NUMBER) {
+                string input;
+                str_new(&input, STR_INIT_LEN);
                 int num_of_chars = literal -> data.value.num;
-            } else {
+                for (int i = 0; i<num_of_chars; i++) {
+                    int c = fgetc(stdin);
+                    if (c == EOF) break; //TODO: co mam delat tady?
+                    str_push(&input, c);
+                }
+                value.str = input.str;
+                try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+            } else if (literal -> data.type == T_STRING){
                 char *fmt = literal -> data.value.str;
+                if (strcmp(fmt, "*n") == 0) {
+                    //TODO: nacitani cisla jeste nebude jen tak
+                } else if (strcmp(fmt, "*l") == 0) {
+                    string input;
+                    str_new(&input, STR_INIT_LEN);
+                    int c;
+                    do {
+                        c = fgetc(stdin);
+                        if (c != '\n' && c != EOF) str_push(&input, c); //TODO: nebo mam nacitat i EOF?
+                    } while (c != '\n');
+                    value.str = input.str;
+                    try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+                } else if (strcmp(fmt, "*a") == 0) {
+                    string input;
+                    str_new(&input, STR_INIT_LEN);
+                    int c;
+                    do {
+                        c = fgetc(stdin);
+                        if (c != EOF) str_push(&input, c);
+                    } while (c != EOF);
+                    value.str = input.str;
+                    try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+                } else {
+                    value.log = STRUE;
+                    try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                }
+            } else {
+                value.log = STRUE;
+                try_push_stack(DNIL, value, ERROR_GEN_MEM);
             }
-            value.str = input.str;
             //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
         }

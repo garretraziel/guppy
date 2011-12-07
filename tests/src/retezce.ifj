@@ -4,7 +4,9 @@ function main() --Hlavni telo programu
   local str2;
   local str3;
   local p;
-  str1 = substr(str1, 1, -25);
+  local j = 0;
+  j = j - 25;
+  str1 = substr(str1, 1, j);
   str2 = str1 .. ", ktery je ulozeny jako ";
   str3 = type(str2);
   str2 = str2 .. str3;

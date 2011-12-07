@@ -194,7 +194,12 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 stack.val = temp_val;
                 stack.size *= 2;
             }
-            stack.esp += localvars;
+            // udelam misto na zasobniku a inicializuji
+            for (int i = 0; i<localvars; i++) {
+                stack.esp++;
+                stack.val[stack.esp].type = DNIL;
+                stack.val[stack.esp].value.log = STRUE;
+            }
             //push retadr
             value.adr = (void *) instr -> next;
             try_push_stack(DRETADR, value, ERROR_GEN_MEM);
@@ -295,6 +300,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int dattype;
             try_pop_stack(dattype, value);
             int offset = ((LocalTree *) (instr -> adr)) -> offset;
+            if (stack.val[stack.ebp+offset].type == DSTRING) free(stack.val[stack.ebp+offset].value.str);
             stack.val[stack.ebp+offset].type = dattype;
             stack.val[stack.ebp+offset].value = value;
             break;

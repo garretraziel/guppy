@@ -165,7 +165,7 @@ static inline int get_token__(void)
     static int c;
     static int state = FSM_READ;
 
-    int num;
+    int num = 0;
 
     // buffer se musi vyprazdnit
     str_clean(&str);

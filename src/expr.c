@@ -413,7 +413,7 @@ static int s_oobely_boo(Stack *stack)
         [E_NET_P] = E_NET_P,
     };
 
-    int E1, E2, OP; // pro uchovani typu redukovanych E
+    int E1, E2, OP = 0; // pro uchovani typu redukovanych E
     int top;
     int state = START;
     // cyklus prochazeni zasobnikem

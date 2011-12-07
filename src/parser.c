@@ -303,20 +303,36 @@ static int statement(void)
     PTapeItem ptr1, ptr2;
     PTapeItem lab1, lab2;
     LocalTree *var;
+    PTapeItem instr;
 
     switch(token) {
         case IDENTIFIER:
             // kontrola, jestli je promenna definovana
-            if((var = find_local(str.str)) == NULL)
+            if((var = find_local(str.str)) != NULL)
+                ;
+            else if(find_function(str.str) != NULL)
+                ;
+            else
                 return ERROR_SEM_VAR_UND;
-            get_token();
-            // rovnitko
-            check_token(ASSIGN, ERROR_SYN_X_ASGN);
-            get_token();
-            // assign_z
-            try( assign_z() );
-            // generovani presunu vysledku do promenne
-            generate(IPOPI, var);
+            // ulozeni posledni instrukce
+            instr = tape.bot;
+            try( expression() );
+            // pokud se vygenerovala jen 1 instrukce (push x)
+            // pak se ocekava, ze ma byt prirazeni
+            if(instr->next == tape.bot && tape.bot->instr == IPUSHI) {
+                // udelam z toho NOP
+                tape.bot->instr = INOP;
+                tape.bot->adr = NULL;
+                // ted je tedy prirazeni do lok. promenne
+                // takze nejdriv rovnitko
+                check_token(ASSIGN, ERROR_SYN_X_ASGN);
+                get_token();
+                // a pak assign_z
+                try( assign_z() );
+                // generovani presunu vysledku do promenne
+                generate(IPOPI, var);
+            } else // jinak vyraz, ktery mam zahodit
+                generate(IPOP, NULL);
             return 1;
 
         case WRITE:

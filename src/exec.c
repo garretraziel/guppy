@@ -20,10 +20,22 @@
 #include "string.h"
 #include "ial.h"
 
-#define ExecError(errcode) do {delete_stack(); delete_tape(); return errcode;} while(0)
-#define try_push_stack(type,val,errcode) do { if (push_stack(type, val) != 0) ExecError(errcode); } while(0)
-#define free_try_push_stack(type,val,errcode,todelete) do { if (push_stack(type, val) != 0) {free(todelete); ExecError(errcode);} } while(0)
-#define try_pop_stack(type,val) do { if (pop_stack(&type, &val) != 0) ExecError(ERROR_INT_EMPTY_STACK); } while(0)
+#define ExecError(errcode) do {                 \
+        delete_stack(); delete_tape();          \
+        return errcode;                         \
+    } while(0)
+#define try_push_stack(type,val,errcode) do {   \
+        if (push_stack(type, val) != 0)         \
+            ExecError(errcode);                 \
+    } while(0)
+#define free_try_push_stack(type,val,errcode,todelete) do {             \
+        if (push_stack(type, val) != 0)                                 \
+        {free(todelete); ExecError(errcode);}                           \
+    } while(0)
+#define try_pop_stack(type,val) do {                            \
+        if (pop_stack(&type, &val) != 0)                        \
+            ExecError(ERROR_INT_EMPTY_STACK);                   \
+    } while(0)
 
 #define compare(operator) do {                                          \
         univalue value1, value2, retvalue;                              \

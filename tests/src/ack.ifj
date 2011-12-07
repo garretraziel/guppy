@@ -18,7 +18,7 @@ end
 
 function main() --Hlavni telo programu
   local ack;
-  ack = a(4,2);
+  ack = a(3,7);
   write(ack,"\n");
 end;
 

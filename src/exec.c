@@ -139,7 +139,7 @@ PTapeItem generate(int instr, void *adr) /// funkce, ktera prebere typ instrukce
     add_to_tape(item);    
     return item;
 }
-//TODO: spousta veci se opakuje a dala by se dat do nejakych maker, ale me uz je to proste vsechno jedno, budu jenom kopirovat
+
 int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykona je
 {
     init_stack(STACK_DEFAULT_SIZE);
@@ -156,7 +156,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         
         PTapeItem instr = actnext_tape();
 
-        if (instr == NULL) ExecError(ERROR_INT_BAD_INSTR); //TODO: neco se nepovedlo, popremyslet co by to mohlo byt za chybu
+        if (instr == NULL) ExecError(ERROR_INT_BAD_INSTR);
 
         switch (instr -> instr) {
         case IHALT: {
@@ -454,7 +454,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 else
                     retvalue.log = SFALSE;
             } else if (dattype1 == DSTRING) {
-                if (strcmp(value1.str, value2.str) == 0) //TODO: nemam to tady resit nejak vic?
+                if (strcmp(value1.str, value2.str) == 0)
                     retvalue.log = SFALSE;
                 else
                     retvalue.log = STRUE;
@@ -489,7 +489,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 printf("%s", value.str);
                 free(value.str);
             } else {
-                ExecError(ERROR_INT_BADPARAM); //TODO: write jenom string nebo num, jaka chyba kdyz je neco jineho?
+                ExecError(ERROR_INT_BADPARAM);
             }
             break;
         }

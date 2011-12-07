@@ -22,13 +22,17 @@
 
 #define ExecError(errcode) do {delete_stack(); delete_tape(); return errcode;} while(0)
 #define try_push_stack(type,val,errcode) do { if (push_stack(type, val) != 0) ExecError(errcode); } while(0)
-#define try_pop_stack(type,val,errcode) do { if (pop_stack(&type, &val) != 0) ExecError(errcode); } while(0)
+#define free_try_push_stack(type,val,errcode,todelete) do { if (push_stack(type, val) != 0) {free(todelete); ExecError(errcode);} } while(0)
+#define try_pop_stack(type,val) do { if (pop_stack(&type, &val) != 0) ExecError(ERROR_INT_EMPTY_STACK); } while(0)
 
 #define compare(operator) do {                                          \
         univalue value1, value2, retvalue;                              \
         int dattype1, dattype2;                                         \
-        if (pop_stack(&dattype1, &value1) != 0) ExecError(ERROR_INT_EMPTY_STACK); \
-        if (pop_stack(&dattype2, &value2) != 0) ExecError(ERROR_INT_EMPTY_STACK); \
+        try_pop_stack(dattype1, value1);                                \
+        if (pop_stack(&dattype2, &value2) != 0) {                       \
+            if (dattype1 == DSTRING) free(value1.str);                  \
+            ExecError(ERROR_INT_EMPTY_STACK);                           \
+        }                                                               \
         if (dattype1 != dattype2) {                                     \
             if (dattype1 == DSTRING) free(value1.str);                  \
             if (dattype2 == DSTRING) free(value2.str);                  \
@@ -156,7 +160,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IJMPT: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             if (dattype != DBOOL || value.log == STRUE) tape.act = (PTapeItem) instr -> adr;
             if (dattype == DSTRING) free(value.str);
             break;
@@ -164,7 +168,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IJMPF: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             if ((dattype == DBOOL && value.log == SFALSE) || dattype == DNIL) tape.act = (PTapeItem) instr -> adr;
             if (dattype == DSTRING) free(value.str);
             break;
@@ -174,7 +178,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int localvars = ((FunctionTree *) instr -> adr) -> vars;
             if ((stack.esp + localvars) >= stack.size) {
                 Data *temp_val = realloc(stack.val, (stack.size)*2*sizeof(Data));
-                if (temp_val == NULL) return -2;
+                if (temp_val == NULL) ExecError(ERROR_GEN_MEM);
                 stack.val = temp_val;
                 stack.size *= 2;
             }
@@ -199,22 +203,25 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue retvalue, tempvalue;
             int rettype, temptype;
             // jedna navratova adresa
-            if (pop_stack(&rettype, &retvalue) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(rettype, retvalue);
             // vypopuju bordel, ktery by tam nemel byt, ale radsi...
             do {
-                if (pop_stack(&temptype, &tempvalue) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+                try_pop_stack(temptype, tempvalue);
                 if (temptype == DSTRING) free(tempvalue.str);
             } while (temptype != DREGISTER); // az po EBP
             stack.ebp = tempvalue.log;
-            if (pop_stack(&temptype, &tempvalue) != 0) ExecError(ERROR_INT_EMPTY_STACK); //TODO: napsat makro, pouziva se to stejne casto
+            try_pop_stack(temptype, tempvalue);
             // obnoveni navratove adresy
-            if (temptype != DRETADR) ExecError(ERROR_INT_BAD_VAL);
+            if (temptype != DRETADR) {
+                if (temptype == DSTRING) free(tempvalue.str);
+                ExecError(ERROR_INT_BAD_VAL);
+            }
             // nastaveni adresy dalsi instrukce
             tape.act = (PTapeItem) tempvalue.adr;
             // pocet prvku, co musim na zasobniku uvolnit
             int space = ((FunctionTree *) instr -> adr) -> vars + ((FunctionTree *) instr -> adr) -> params;
             for (int i = 0; i<space; i++) {
-                if (pop_stack(&temptype, &tempvalue) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+                try_pop_stack(temptype, tempvalue);
                 if (temptype == DSTRING) free(tempvalue.str);
             }
             try_push_stack(rettype, retvalue, ERROR_GEN_MEM);
@@ -223,12 +230,12 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPUSH: {
             LiteralTree *literal = (LiteralTree *) instr -> adr;
             if (literal == NULL) ExecError(ERROR_INT_BAD_VAL);
-            if (literal -> data.type == T_STRING) { //TODO: kontrolovat kopirovani toho stringu z tabulky literalu
+            if (literal -> data.type == T_STRING) {
                 univalue str;
                 str.str = malloc(sizeof(char)*(strlen(literal -> data.value.str)+1));
                 if (str.str == NULL) ExecError(ERROR_GEN_MEM);
                 strcpy(str.str, literal -> data.value.str);
-                try_push_stack(literal -> data.type, str, ERROR_GEN_MEM); // T_TYP se prevede na DTYP, jsou kompatibilni
+                free_try_push_stack(literal -> data.type, str, ERROR_GEN_MEM, str.str); // T_TYP se prevede na DTYP, jsou kompatibilni
             } else
                 try_push_stack(literal -> data.type, literal -> data.value, ERROR_GEN_MEM);
             break;
@@ -237,14 +244,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             Data ident;
             univalue retvalue;
             int offset = ((LocalTree*) (instr -> adr)) -> offset;
-            ident = stack.val[stack.ebp+offset]; //TODO: zkusit, jestli je ten offset spravny. tady kontrolovat zda nepristupuju za pole
+            ident = stack.val[stack.ebp+offset];
             if (ident.type == T_STRING) {
                 retvalue.str = malloc(sizeof(char)*(strlen(ident.value.str) + 1));
                 if (retvalue.str == NULL) ExecError(ERROR_GEN_MEM);
                 strcpy(retvalue.str, ident.value.str);
-            } else
+                free_try_push_stack(ident.type, retvalue, ERROR_GEN_MEM, retvalue.str);
+            } else {
                 retvalue = ident.value;
-            try_push_stack(ident.type, retvalue, ERROR_GEN_MEM); //TODO: zkontrolovat kopirovani stringu
+                try_push_stack(ident.type, retvalue, ERROR_GEN_MEM);
+            }
             break;
         }
         case IPUSHT: {
@@ -262,7 +271,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPOP: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             if (dattype == DSTRING) {
                 free(value.str);
             }
@@ -272,7 +281,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             // tady se string kopirovat nemusi
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             int offset = ((LocalTree *) (instr -> adr)) -> offset;
             stack.val[stack.ebp+offset].type = dattype;
             stack.val[stack.ebp+offset].value = value;
@@ -287,10 +296,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IADD: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(value1.str);
                 ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(value2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             retvalue.num = value2.num + value1.num;
             try_push_stack(DNUM, retvalue, ERROR_GEN_MEM);
             break;
@@ -298,10 +311,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case ISUB: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(value1.str);
                 ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(value2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             retvalue.num = value2.num - value1.num;
             try_push_stack(DNUM, retvalue, ERROR_GEN_MEM);
             break;
@@ -309,10 +326,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IMUL: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(value1.str);
                 ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(value2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             retvalue.num = value1.num * value2.num;
             try_push_stack(DNUM, retvalue, ERROR_GEN_MEM);
             break;
@@ -320,12 +341,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IDIV: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(value1.str);
                 ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(value2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             if (value1.num == 0)
-                ExecError(ERROR_INT_DIVZERO); //TODO: tady mam vracet nejakou dulezitou chybu, ne? ne?
+                ExecError(ERROR_INT_DIVZERO);
             retvalue.num = value2.num / value1.num;
             try_push_stack(DNUM, retvalue, ERROR_GEN_MEM);
             break;
@@ -333,10 +358,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IPOW: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM)
+            if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(value1.str);
                 ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(value2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             retvalue.num = pow(value2.num, value1.num);
             try_push_stack(DNUM, retvalue, ERROR_GEN_MEM);
             break;
@@ -345,21 +374,26 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
             if (pop_stack(&dattype1, &value1) != 0 || dattype1 != DSTRING)
-                ExecError(ERROR_INT_BADPARAM); //TODO: nema to nekdy vracet nil?
-            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING)
                 ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype2, &value2) != 0 || dattype2 != DSTRING) {
+                free(value1.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             retvalue.str = concat(value2.str, value1.str);
             free(value2.str);
             free(value1.str);
             if (retvalue.str == NULL) ExecError(ERROR_GEN_MEM);
-            try_push_stack(DSTRING, retvalue, ERROR_GEN_MEM);
+            free_try_push_stack(DSTRING, retvalue, ERROR_GEN_MEM, retvalue.str);
             break;
         }
         case ICMP: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0) ExecError(ERROR_INT_EMPTY_STACK);
-            if (pop_stack(&dattype2, &value2) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype1, value1);
+            if (pop_stack(&dattype2, &value2) != 0) {
+                if (dattype1 == DSTRING) free(value1.str);
+                ExecError(ERROR_INT_EMPTY_STACK);
+            }
             if (dattype1 != dattype2) {
                 if (dattype1 == DSTRING) free(value1.str);
                 if (dattype2 == DSTRING) free(value2.str);
@@ -375,7 +409,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 else
                     retvalue.log = SFALSE;
             } else if (dattype1 == DSTRING) {
-                if (strcmp(value1.str, value2.str) == 0) //TODO: nemam to tady resit nejak vic?
+                if (strcmp(value1.str, value2.str) == 0)
                     retvalue.log = STRUE;
                 else
                     retvalue.log = SFALSE;
@@ -388,8 +422,11 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case ICMPN: {
             univalue value1, value2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype1, &value1) != 0) ExecError(ERROR_INT_EMPTY_STACK);
-            if (pop_stack(&dattype2, &value2) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype1, value1);
+            if (pop_stack(&dattype2, &value2) != 0) {
+                if (dattype1 == DSTRING) free(value1.str);
+                ExecError(ERROR_INT_EMPTY_STACK);
+            }
             if (dattype1 != dattype2) {
                 if (dattype1 == DSTRING) free(value1.str);
                 if (dattype2 == DSTRING) free(value2.str);
@@ -434,7 +471,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IWRITE: {
             univalue value;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             if (dattype == DNUM) printf("%g", value.num);
             else if (dattype == DSTRING) {
                 printf("%s", value.str);

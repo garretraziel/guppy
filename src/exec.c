@@ -531,26 +531,32 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             break;
         }
         case ITYPE: {
-            //TODO: ukladat ten string do stromu literalu
             univalue value, retvalue;
             int dattype;
-            if (pop_stack(&dattype, &value) != 0) ExecError(ERROR_INT_EMPTY_STACK);
+            try_pop_stack(dattype, value);
             switch (dattype) {
             case DNUM:
                 retvalue.str = malloc(sizeof(char)*7);
+                if (retvalue.str == NULL) ExecError(ERROR_GEN_MEM);
                 strcpy(retvalue.str, "number");
                 break;
             case DSTRING:
                 retvalue.str = malloc(sizeof(char)*7);
+                if (retvalue.str == NULL) {
+                    free(value.str);
+                    ExecError(ERROR_GEN_MEM);
+                }
                 strcpy(retvalue.str, "string");
                 free(value.str);
                 break;
             case DBOOL:
                 retvalue.str = malloc(sizeof(char)*8);
+                if (retvalue.str == NULL) ExecError(ERROR_GEN_MEM);
                 strcpy(retvalue.str, "boolean");
                 break;
             case DNIL:
                 retvalue.str = malloc(sizeof(char)*4);
+                if (retvalue.str == NULL) ExecError(ERROR_GEN_MEM);
                 strcpy(retvalue.str, "nil");
                 break;
             default:
@@ -563,25 +569,46 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case ISUBSTR: {
             univalue i, j, str, fin;
             int dattype1, dattype2, dattype3;
-            if (pop_stack(&dattype2, &j) != 0 || dattype2 != DNUM) ExecError(ERROR_INT_BADPARAM);
-            if (pop_stack(&dattype1, &i) != 0 || dattype1 != DNUM) ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype2, &j) != 0 || dattype2 != DNUM) {
+                if (dattype2 == DSTRING) free(j.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
+            if (pop_stack(&dattype1, &i) != 0 || dattype1 != DNUM) {
+                if (dattype1 == DSTRING) free(i.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             if (pop_stack(&dattype3, &str) != 0 || dattype3 != DSTRING) ExecError(ERROR_INT_BADPARAM);
             string conv;
-            if (str_init(&conv, str.str) != 1) ExecError(ERROR_GEN_MEM);
+            if (str_init(&conv, str.str) != 1) {
+                free(str.str);
+                ExecError(ERROR_GEN_MEM);
+            }
             fin.str = substr(&conv, i.num, j.num); //TODO: zkontrolovat, zda spravne pouzivam poradi indexu
             free(str.str);
             str_free(&conv);
-            try_push_stack(DSTRING, fin, ERROR_GEN_MEM);
+            free_try_push_stack(DSTRING, fin, ERROR_GEN_MEM, fin.str);
             break;
         }
         case IFIND: {
             univalue str1, str2, retvalue;
             int dattype1, dattype2;
             if (pop_stack(&dattype2, &str2) != 0 || dattype2 != DSTRING) ExecError(ERROR_INT_BADPARAM);
-            if (pop_stack(&dattype1, &str1) != 0 || dattype1 != DSTRING) ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype1, &str1) != 0 || dattype1 != DSTRING) {
+                free(str2.str);
+                ExecError(ERROR_INT_BADPARAM);
+            }
             string conv1, conv2;
-            if (str_init(&conv1, str1.str) != 1) ExecError(ERROR_GEN_MEM);
-            if (str_init(&conv2, str2.str) != 1) ExecError(ERROR_GEN_MEM);
+            if (str_init(&conv1, str1.str) != 1) {
+                free(str1.str);
+                free(str2.str);
+                ExecError(ERROR_GEN_MEM);
+            }
+            if (str_init(&conv2, str2.str) != 1) {
+                free(str1.str);
+                free(str2.str);
+                str_free(&conv1);
+                ExecError(ERROR_GEN_MEM);
+            }
             free(str1.str);
             free(str2.str);
             retvalue.num = find(&conv1, &conv2);
@@ -595,11 +622,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int dattype;
             if (pop_stack(&dattype, &str) != 0 || dattype != DSTRING) ExecError(ERROR_INT_BADPARAM);
             string conv;
-            if (str_init(&conv, str.str) != 1) ExecError(ERROR_GEN_MEM);
+            if (str_init(&conv, str.str) != 1) {
+                free(str.str);
+                ExecError(ERROR_GEN_MEM);
+            }
             free(str.str);
             sort(&conv);
             retvalue.str = conv.str;
-            try_push_stack(DSTRING, retvalue, ERROR_GEN_MEM);
+            free_try_push_stack(DSTRING, retvalue, ERROR_GEN_MEM, retvalue.str);
             break;
         }
         case INOP:

@@ -171,7 +171,14 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         }
         case ICALL: {
             univalue value;
-            stack.esp += ((FunctionTree *) instr -> adr) -> vars;
+            int localvars = ((FunctionTree *) instr -> adr) -> vars;
+            if ((stack.esp + localvars) >= stack.size) {
+                Data *temp_val = realloc(stack.val, (stack.size)*2*sizeof(Data));
+                if (temp_val == NULL) return -2;
+                stack.val = temp_val;
+                stack.size *= 2;
+            }
+            stack.esp += localvars;
             //push retadr
             value.adr = (void *) instr -> next;
             try_push_stack(DRETADR, value, ERROR_GEN_MEM);

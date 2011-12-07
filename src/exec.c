@@ -595,7 +595,7 @@ int pop_stack(int *dattype, univalue *value) /// popne ze zasobniku vrchni hodno
 int push_stack(int dattype, univalue value) /// pushne na zasobnik hodnotu i jeji datovy typ
 {
     if (stack.esp == (stack.size)-1) {
-        Data *temp_val = realloc(stack.val, (stack.size)*2);
+        Data *temp_val = realloc(stack.val, (stack.size)*2*sizeof(Data));
         if (temp_val == NULL) return -2;
         stack.val = temp_val;
         stack.size *= 2;

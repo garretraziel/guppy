@@ -1,0 +1,55 @@
+-- test inicializaci lok. promennych literalem a vyrazem
+
+function main()
+    local a = nil;
+    local b = true;
+    local c = "kure";
+    local d = 42;
+
+    local x = 2 == 3 == "kure";
+    local y = "k".."u".."r".."e";
+    local z = 3 * ( 4 + 3) ^ 2 - 3 * 5 * 7 ;
+
+    if a == nil then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+
+    if true == b then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+
+    if c == "kure" then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+
+    if 42 == d then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+
+
+    if x == false then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+
+    if y == "kure" then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+    
+    if z == d then
+        write("OK ");
+    else 
+        write("FAIL ");
+    end;
+end;

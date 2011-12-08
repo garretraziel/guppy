@@ -1,0 +1,9 @@
+-- precte radek ze vstupu a vrati na vystup
+
+function main()
+    local x;
+
+    x = read("*l");
+    write(x, "\n");
+
+end;

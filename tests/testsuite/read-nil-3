@@ -1,0 +1,9 @@
+-- test, co dela read, pokud dostane nil jako param
+
+function main()
+    local x;
+
+    x = read(nil);
+    write(x);
+
+end;

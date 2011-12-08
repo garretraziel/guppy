@@ -1,0 +1,150 @@
+-- velky test vsech relacnich operatoru
+function main()
+
+    local x = nil;
+
+    write("  1 ");
+    if 0 < 3e3 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write("  2 ");
+    if 5 < 0 - 1 then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+
+        
+    write("  3 ");
+    if 45 <= 100 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write("  4 ");
+    if 42 <= 42 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write("  5 ");
+    if 8 <= 7 then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+        
+
+    write("  6 ");
+    if "cola" < "pivo" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write("  7 ");
+    if "dzus" < "cola" then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+
+    write("  8 ");
+    if "cola" <= "cola" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write("  9 ");
+    if "foo" <= "bar" then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+        
+    write(" 10 ");
+    if "bar" <= "foo" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+       
+    write(" 11 ");
+    if 0 > 3e3 then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+        
+    write(" 12 ");
+    if 5 > 0 - 1 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+    
+    write(" 13 ");
+    if 45 >= 100 then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+        
+    write(" 14 ");
+    if 42 >= 42 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write(" 15 ");
+    if 8 >= 7 then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+
+    write(" 16 ");
+    if "cola" > "pivo" then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+        
+    write(" 17 ");
+    if "dzus" > "cola" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+    
+    write(" 18 ");
+    if "cola" >= "cola" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write(" 19 ");
+    if "foo" >= "bar" then
+        write(" OK");
+    else
+        write(" FAIL");
+    end;
+        
+    write(" 20 ");
+    if "bar" >= "foo" then
+        write(" FAIL");
+    else
+        write(" OK");
+    end;
+
+    write("\n");
+        
+end;

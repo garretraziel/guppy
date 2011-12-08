@@ -1,0 +1,18 @@
+-- napocita do 100 rekurzivne
+
+function foo(a)
+    local x;
+    if a > 0 then
+        x = foo(a - 1);
+        write(a, " ");
+    else
+    end;
+end
+
+function main()
+    local x = 100 ;
+
+    x = foo(x);
+    
+    write("\n");
+end;

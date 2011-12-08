@@ -1,0 +1,9 @@
+-- test, co dela read, pokud dostane cislo jako param
+
+function main()
+    local x;
+
+    x = read(7);
+    write(x, "\n");
+
+end;

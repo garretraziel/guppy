@@ -49,6 +49,7 @@ const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_CALL_VAR) % 100] = "Nelze volat promenne",
      [(-ERROR_SEM_FUNC_VAR) % 100] = "Funkce nelze pouzivat jako promenne",
      [(-ERROR_SEM_WRITE_WRPR) % 100] = "Spatny typ parametru prikazu write",
+     [(-ERROR_SEM_READ_WRPR) % 100] = "Spatny parametr prikazu read",
 };
 
 // [4] Obecne chybove zpravy interpretace

@@ -423,13 +423,19 @@ static int assign_z(void)
         // jeden parametr (string nebo cislo)
         Data data;
         if(token == STRING) {
+            if(strcmp(str.str, "*n") != 0 && strcmp(str.str, "*l") != 0 && strcmp(str.str, "*a") != 0)
+                return ERROR_SEM_READ_WRPR;
             data.type = T_STRING;
             data.value.str = str.str;
             try( str_new(&str, STR_INIT_LEN) );
         } else if(token == NUMBER) {
             data.type = T_NUMBER;
             data.value.num = strtod(str.str, NULL);
-        } else
+            if(data.value.num == 0)
+                return ERROR_SEM_READ_WRPR;
+        } else if(token == TRUE || token == FALSE || token == NIL)
+            return ERROR_SEM_READ_WRPR;
+        else
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
         // generovani instrukci
         try( insert_literal(data) );

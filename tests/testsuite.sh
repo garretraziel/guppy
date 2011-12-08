@@ -16,7 +16,7 @@ ERRORS=0
 
 
 # Kontrola existente binarky
-if [ ! -x "guppy" ] ; then
+if [ ! -x "../src/guppy" ] ; then
     printf "Chybi spustitelny soubor\n"
     exit 1
 fi
@@ -24,7 +24,7 @@ fi
 
 # testy vseho
 for i in {0..5}; do
-    for file in ../tests/testsuite/*-$i; do
+    for file in testsuite/*-$i; do
         # pokud nejsou soubory, vynechat
         if [ ! -e "$file" ]; then
             continue
@@ -35,9 +35,9 @@ for i in {0..5}; do
         printf "\e[0m"
         # pokud existuje vstup, pouzit
         if [ -e $file.in ]; then
-            ./guppy $file < $file.in
+            ../src/guppy $file < $file.in
         else
-            ./guppy $file
+            ../src/guppy $file
         fi
         # report vysledku
         if [ "$?" == "$i" ]; then
@@ -60,7 +60,7 @@ if [ ! "$1" == "--full" ]; then
 fi
 
 # tyhle testy maji skoncit OK, jedou pres valgrind
-for file in ../tests/testsuite/*; do
+for file in testsuite/*; do
     echo "Testuji  $file "
-    valgrind --leak-check=full --show-reachable=yes -q ./guppy $file < /dev/null
+    valgrind --leak-check=full --show-reachable=yes -q ../src/guppy $file < /dev/null
 done

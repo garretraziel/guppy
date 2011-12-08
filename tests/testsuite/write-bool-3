@@ -2,6 +2,6 @@
 
 function main()
 
-    write( 4 == 5 );
+    write("", 4 == 5 );
 
 end;

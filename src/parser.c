@@ -27,6 +27,10 @@
 #define check_token(exptok, errcode) do { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
+// makro try s kontrolou typu pro write
+#define try_write_expr() do { int x = expression(); if(x<0) return x; if(x == E_BOOL || x == E_NIL) return ERROR_SEM_WRITE_WRPR; } while(0)
+
+
 #ifdef DEBUG
 void print_functions(FunctionTree *);
 #endif
@@ -332,7 +336,7 @@ static int statement_seq(void)
 }
 
 // S -> id = Az
-// S -> write ( EL )
+// S -> write ( ES )
 // S -> if E then SPS else SPS end
 // S -> while E do SPS end
 // S -> ret E
@@ -469,13 +473,14 @@ static int assign_z(void)
 }
 
 
-// // // // // // // // // // // // // // // // // // // // // // // // //
-// Co je dal uz nefunguje ani zatim nema:
+// seznam vyrazu pro write
+// nesmi mit typ boolean ani nil
 
 // ES -> E ESz
 static int expression_seq(void)
 {
-    try( expression() );
+    // vyraz
+    try_write_expr();
     // pro prvni parametr write
     generate(IWRITE, NULL);
     return expression_seq_z();
@@ -487,7 +492,8 @@ static int expression_seq_z(void)
 {
     if(token == COMMA) {
         get_token();
-        try( expression() );
+        // vyraz
+        try_write_expr();
         // pro kazdy parametr write
         generate(IWRITE, NULL);
         return expression_seq_z();

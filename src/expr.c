@@ -20,62 +20,6 @@
 #include "ial.h"
 
 
-// Symboly se kterymi pracuje zasobnikovy automat
-enum {
-    E_POW, //0 
-
-    E_MUL,
-    E_DIV, //2
-    E_PLUS,
-    E_MINUS, //4
-
-    E_STRCONCAT,
-
-    E_LESS, //6
-    E_GREAT,
-    E_LESSEQ, //8
-    E_GREATEQ,
-    E_NOTEQ, //10
-    E_EQUAL,
-
-    E_IDENT, //12
-    E_NUM,
-    E_STR,  // 14
-    E_BOOL,
-    E_NIL,  // 16
-    
-    E_LBRAC,           
-    E_RBRAC, // 18
-    E_COMMA,
-    E_DOLLAR, //20
-/*    E_MOD,
-    E_STRLEN,
-    E_AND,
-    E_OR,
-    E_NOT, */ // Tohle je do rozsireni, zatim nic
-
-    // Znacka zacatku handle ( < do zasobniku )
-    E_MARK, //21
-
-    // jeste jsou potreba neterminaly
-    E_NET_E,
-    E_NET_P,
-
-    // tohle jsou jen pomocne konstanty pro oobely-boo a spol.
-    E_OP, // obecne operator
-    E_LIT, // obecne literal
-    E_UNKNOWN, // neznamy typ
-    E_VAR, // identifikator promenne
-    E_FUNC, // identifikator funkce
-    E_FIND, // vestavene funkce
-    E_SORT,
-    E_SUBSTR,
-    E_TYPE,
-    // NOTE: zadne dalsi konstanty nepridavat, kvuli kontrole >= E_FUNC
-} ESymbols;
-
-
-
 // Normalni clovek nezanori vice volani funkci nez 3, 20 musi stacit kazdemu
 #define FUNC_STACK_SIZE 20
 
@@ -712,7 +656,7 @@ static inline int expression__(Stack *stack)
 #endif
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
-    return 1;
+    return stack->top->e_type;
 }
 
 

@@ -42,6 +42,7 @@ static int formal_parametr_seq(void);
 static int formal_parametr_seq_z(void);
 static int local_declaration_seq(void);
 static int local_declaration_z(void);
+static int literal(void);
 static int statement_seq(void);
 static int statement(void);
 static int assign_z(void);
@@ -241,7 +242,7 @@ static int local_declaration_seq(void)
         return 1;
 }
 
-// SDSz -> = expression ;
+// SDSz -> = LIT ;
 // SDSz -> ;
 static int local_declaration_z(void)
 {
@@ -256,9 +257,8 @@ static int local_declaration_z(void)
     // rovnitko
     else if(token == ASSIGN) {
         get_token();
-        // vyraz
-        try( expression() ); 
-        generate(IPOPI, last_local);
+        // literal
+        try( literal() ); 
         // strednik
         check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();
@@ -266,6 +266,46 @@ static int local_declaration_z(void)
     }
     else
         return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+}
+
+// LIT -> num
+// LIT -> str
+// LIT -> nil
+// LIT -> true
+// LIT -> false
+static int literal()
+{
+    Data data;
+    switch(token) {
+        case NUMBER:
+            data.type = T_NUMBER;
+            data.value.num = strtod(str.str, NULL);
+            break;
+        case STRING:
+            data.type = T_STRING;
+            data.value.str = str.str;
+            try( str_new(&str, STR_INIT_LEN) );
+            break;
+        case NIL:
+            data.type = T_NIL;
+            break;
+        case TRUE:
+            data.type = T_BOOLEAN;
+            data.value.log = 1;
+            break;
+        case FALSE:
+            data.type = T_BOOLEAN;
+            data.value.log = 0;
+            break;
+        default:
+            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
+    }
+    try( insert_literal(data) );
+    // inicializace lok. promenne
+    generate(IPUSH, last_literal);
+    generate(IPOPI, last_local);
+    get_token();
+    return 1;
 }
 
 // SPS -> S ; SPS

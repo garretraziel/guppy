@@ -1,0 +1,9 @@
+-- read s parametrem 0
+
+function main()
+    local x;
+
+    x = read(0);
+    write(x, "\n");
+
+end;

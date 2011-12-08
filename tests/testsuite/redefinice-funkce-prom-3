@@ -1,0 +1,10 @@
+-- co kdyz ma funkce lok. promennou jako se uz jmenuje funkce
+
+function bar()
+end
+
+function main()
+
+    local bar;
+
+end;

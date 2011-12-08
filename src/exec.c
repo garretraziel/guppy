@@ -524,7 +524,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                     do {
                         c = fgetc(stdin);
                         if (c != '\n' && c != EOF) str_push(&input, c); //TODO: nebo mam nacitat i EOF?
-                    } while (c != '\n');
+                    } while (c != '\n' && c != EOF);
                     value.str = input.str;
                     try_push_stack(DSTRING, value, ERROR_GEN_MEM);
                 } else if (strcmp(fmt, "*a") == 0) {

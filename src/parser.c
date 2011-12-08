@@ -242,7 +242,7 @@ static int local_declaration_seq(void)
         return 1;
 }
 
-// SDSz -> = LIT ;
+// SDSz -> = E ;
 // SDSz -> ;
 static int local_declaration_z(void)
 {
@@ -257,8 +257,9 @@ static int local_declaration_z(void)
     // rovnitko
     else if(token == ASSIGN) {
         get_token();
-        // literal
-        try( literal() ); 
+        // vyraz
+        try( expression() ); 
+        generate(IPOPI, last_local);
         // strednik
         check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
         get_token();

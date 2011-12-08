@@ -419,7 +419,7 @@ static inline int get_token__(void)
                     state = FSM_READ;
                     ++line;
                 } else if(c == EOF)
-                    return ERROR_LEX_X_CMNT_END;
+                    return NOTHING;
                 break;
 
             case FSM_COMMENT_BLOCK:

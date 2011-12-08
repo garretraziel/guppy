@@ -302,9 +302,6 @@ static int literal()
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
     }
     try( insert_literal(data) );
-    // inicializace lok. promenne
-    generate(IPUSH, last_literal);
-    generate(IPOPI, last_local);
     get_token();
     return 1;
 }
@@ -457,21 +454,10 @@ static int assign_z(void)
         // leva zavorka
         check_token(LBRAC, ERROR_SYN_X_LBRC);
         get_token();
-        // jeden parametr (string nebo cislo)
-        Data data;
-        if(token == STRING) {
-            data.type = T_STRING;
-            data.value.str = str.str;
-            try( str_new(&str, STR_INIT_LEN) );
-        } else if(token == NUMBER) {
-            data.type = T_NUMBER;
-            data.value.num = strtod(str.str, NULL);
-        } else
-            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
-        // generovani instrukci
-        try( insert_literal(data) );
+        // parametr - literal
+        try( literal() );
+        // instrukce read
         generate(IREAD, last_literal);
-        get_token();
         // prava zavorka
         check_token(RBRAC, ERROR_SYN_X_RBRC);
         get_token();

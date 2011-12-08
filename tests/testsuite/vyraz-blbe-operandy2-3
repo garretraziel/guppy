@@ -1,0 +1,7 @@
+-- test operaci s blbymi typy operandu 2
+
+function main()
+
+    write( 3 .. 3 );
+
+end;

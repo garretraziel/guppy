@@ -11,6 +11,9 @@ yell() {
     printf "$1 \n"
 }
 
+TOTAL=0
+ERRORS=0
+
 
 # Kontrola existente binarky
 if [ ! -x "guppy" ] ; then
@@ -41,10 +44,15 @@ for i in {0..5}; do
             yell "\e[32m OK\e[0m"
         else
             yell "\e[31mFAIL\e[0m"
+            let "ERRORS=$ERRORS+1"
         fi
+        let "TOTAL=$TOTAL+1"
         printf "\n"
     done
 done
+
+printf "Shrnuti: \n\n"
+printf "     $ERRORS chyb v $TOTAL testech \n"
 
 # pokud je para --full, tak se pokracuje dale
 if [ ! "$1" == "--full" ]; then
@@ -52,7 +60,7 @@ if [ ! "$1" == "--full" ]; then
 fi
 
 # tyhle testy maji skoncit OK, jedou pres valgrind
-for file in ../tests/programs/0-syn-*; do
+for file in ../tests/testsuite/*; do
     echo "Testuji  $file "
-    valgrind --leak-check=full --show-reachable=yes -q ./guppy $file && yell "\e[32mOK\e[0m" || yell "\e[31mFAIL\e[0m"
+    valgrind --leak-check=full --show-reachable=yes -q ./guppy $file < /dev/null
 done

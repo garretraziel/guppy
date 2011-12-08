@@ -589,13 +589,21 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             int dattype1, dattype2, dattype3;
             if (pop_stack(&dattype2, &j) != 0 || dattype2 != DNUM) {
                 if (dattype2 == DSTRING) free(j.str);
-                ExecError(ERROR_INT_BADPARAM);
+                fin.log = STRUE;
+                try_push_stack(DNIL, fin, ERROR_GEN_MEM);
+                break;
             }
             if (pop_stack(&dattype1, &i) != 0 || dattype1 != DNUM) {
                 if (dattype1 == DSTRING) free(i.str);
-                ExecError(ERROR_INT_BADPARAM);
+                fin.log = STRUE;
+                try_push_stack(DNIL, fin, ERROR_GEN_MEM);
+                break;
             }
-            if (pop_stack(&dattype3, &str) != 0 || dattype3 != DSTRING) ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype3, &str) != 0 || dattype3 != DSTRING) {
+                fin.log = STRUE;
+                try_push_stack(DNIL, fin, ERROR_GEN_MEM);
+                break;
+            }
             string conv;
             if (str_init(&conv, str.str) != 1) {
                 free(str.str);
@@ -610,10 +618,16 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case IFIND: {
             univalue str1, str2, retvalue;
             int dattype1, dattype2;
-            if (pop_stack(&dattype2, &str2) != 0 || dattype2 != DSTRING) ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype2, &str2) != 0 || dattype2 != DSTRING) {
+                retvalue.log = STRUE;
+                try_push_stack(DNIL, retvalue, ERROR_GEN_MEM);
+                break;
+            }
             if (pop_stack(&dattype1, &str1) != 0 || dattype1 != DSTRING) {
                 free(str2.str);
-                ExecError(ERROR_INT_BADPARAM);
+                retvalue.log = STRUE;
+                try_push_stack(DNIL, retvalue, ERROR_GEN_MEM);
+                break;
             }
             string conv1, conv2;
             if (str_init(&conv1, str1.str) != 1) {
@@ -638,11 +652,17 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
         case ISORT: {
             univalue str, retvalue;
             int dattype;
-            if (pop_stack(&dattype, &str) != 0 || dattype != DSTRING) ExecError(ERROR_INT_BADPARAM);
+            if (pop_stack(&dattype, &str) != 0 || dattype != DSTRING) {
+                retvalue.log = STRUE;
+                try_push_stack(DNIL, retvalue, ERROR_GEN_MEM);
+                break;
+            }
             string conv;
             if (str_init(&conv, str.str) != 1) {
                 free(str.str);
-                ExecError(ERROR_GEN_MEM);
+                retvalue.log = STRUE;
+                try_push_stack(DNIL, retvalue, ERROR_GEN_MEM);
+                break;
             }
             free(str.str);
             sort(&conv);

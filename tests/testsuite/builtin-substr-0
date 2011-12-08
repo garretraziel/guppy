@@ -1,0 +1,51 @@
+-- test builtin funkce substr
+
+function main()
+
+    local x = "..........<---9--->..........";
+
+    write(substr(x, 11, 19), "\n");
+    write(substr(x, 0-19, 0-11), "\n");
+    write(substr(x, 0-19, 19), "\n");
+    write(substr(x, 11, 0-11), "\n");
+
+    write(">", substr(x, 19, 11), "< \n");
+    write(">", substr(x, 0-11, 0-19), "< \n");
+    write(">", substr(x, 30, 40), "< \n");
+    write(">", substr(x, 0-40, 0-30), "< \n");
+
+
+    if substr(nil, 1, 1) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if substr(1, 1, 1) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if substr(x, nil, 1) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if substr(x, 1, nil) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if substr(x, x, 1) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if substr(x, 1, x) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+    write("\n");
+
+end;

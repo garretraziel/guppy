@@ -1,0 +1,28 @@
+-- test builtin funkce sort
+
+function main()
+    local x;
+
+    write(sort("kocka leze dirou pes oknem"), "\n");
+    write(sort("qwertyuioplkjhgfdsazxcvbnm,./1234567890"), "\n");
+    write(sort("BADCHGFEa 1"), "\n");
+
+    if sort(5 ^ 3) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+    if sort(true) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+    if sort(nil) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+end;

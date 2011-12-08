@@ -1,0 +1,10 @@
+-- write nema mezi >< nic vypsat
+
+function main()
+
+    write(">");
+    write();
+    write("<");
+    write("\n");
+
+end;

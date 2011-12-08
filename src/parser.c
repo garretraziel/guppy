@@ -328,6 +328,11 @@ static int statement(void)
             // left bracket
             check_token(LBRAC, ERROR_SYN_X_LBRC);
             get_token();
+            // pokud neni zadny parametr, nic se nedeje
+            if(token == RBRAC) {
+                get_token();
+                return 1;
+            }
             // expression list
             try( expression_seq() );
             // right bracket

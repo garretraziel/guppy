@@ -1,0 +1,77 @@
+-- test porovnavacich operatoru
+
+function main()
+
+    if nil == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if true == true then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if false == false then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+    if 3 == 3 then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if "akoz" == sort("koza") then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if 43 ~= 42 then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if "FFFUUUU" ~= "Like a boss" then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+
+    if true == false then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+    if nil ~= nil then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+    if true == 1 then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+    if 0 == false then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+    if false == nil then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+    if "12" == 12 then
+        write("FAIL ");
+    else
+        write("OK ");
+    end;
+
+
+    write("\n");
+
+end;

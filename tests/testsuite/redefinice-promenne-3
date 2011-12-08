@@ -1,0 +1,9 @@
+-- redefinice promenne
+
+function main()
+
+    local x;
+    local y;
+    local x;
+
+end;

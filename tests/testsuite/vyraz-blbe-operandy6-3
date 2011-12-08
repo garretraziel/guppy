@@ -1,0 +1,7 @@
+-- test operaci s blbymi typy operandu 6
+
+function main()
+
+    write( 3 .. "nil" );
+
+end;

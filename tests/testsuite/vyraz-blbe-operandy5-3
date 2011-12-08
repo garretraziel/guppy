@@ -1,0 +1,7 @@
+-- test operaci s blbymi typy operandu 5
+
+function main()
+
+    write( nil .. "s" );
+
+end;

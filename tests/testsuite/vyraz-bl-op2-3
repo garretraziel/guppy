@@ -1,0 +1,7 @@
+-- test vyrazu s blbym operandem
+
+function main()
+
+    local x = type(4) > 0;
+
+end;

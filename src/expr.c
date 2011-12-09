@@ -416,6 +416,7 @@ static int s_oobely_boo(Stack *stack)
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top == E_IDENT){ // volani funkce s 1 parametrem
+                    E1 = E_UNKNOWN;
                     // overeni poctu parametru
                     for(int i = 1; i < ((FunctionTree*)stack->top->ptr)->params; ++i)
                         generate(IPUSHN, NULL);
@@ -430,12 +431,13 @@ static int s_oobely_boo(Stack *stack)
                         generate(ISORT, stack->top->ptr);
                     else if(stack->top->e_type == E_SUBSTR)
                         generate(ISUBSTR, stack->top->ptr);
-                    else // TYPE
+                    else { // TYPE
                         generate(ITYPE, stack->top->ptr);
+                        E1 = E_STR;
+                    }
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
                     func_pop();
-                    E1 = E_UNKNOWN;
                 }
                 // bud vyraz v zavorce, nebo volani funkce
                 if(top == E_MARK) {

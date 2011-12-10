@@ -31,4 +31,4 @@ clean:
 	rm -f *.o $(PROJECT) dep.list
 
 zip:
-	tar czf $(LOGIN).tgz *.c *.h rozdeleni Makefile
+	tar czf $(LOGIN).tgz *.c *.h rozdeleni rozsireni Makefile

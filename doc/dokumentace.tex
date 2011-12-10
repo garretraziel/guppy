@@ -10,4 +10,18 @@
 \maketitle
 \tableofcontents
 Příliš žluťoučký kůň úpěl ďábelské ódy.
+\section{Interpretace}
+Pro účely našeho interpreteru používáme variantu tříadresného kódu. Pro\-to\-že veškeré aritmetické a porovnávací instrukce pracují se zásobníkem, je v instrukcích potřeba maximálně jediná adresa.
+\subsection{Zásobník}
+V našem interpreteru hraje zásobník důležitou roli. Používá se jak pro lokální proměnné a předávání argumentů funkcím tak pro veškeré výpočty. Jelikož parser pro výrazy dokáže výraz jednoduše převést do postfixové formy, rozhodli jsme se, že instrukce ADD, SUB apod. budou pracovat s čísly, které jsou uloženy na zásobníku. Například kód {\tt a = 3 + 4} se převede do instrukcí {\tt push 4; push 3; add; popi a}. Toto sice není nejlepší řešení z pohledu rychlosti interpretace a optimalizací, za to je velice snadný pro implementaci. Pro implementaci zásobníku používáme dynamicky alokované (a realokovatelné) pole. Používáme také \uv{registry} ESP, EBP a EIP po řadě pro ukazatel na vrchol zásobníku, ukazatel pro přístup k lokálním proměnným a ukazatel na aktuálně prováděnou instrukci.
+\subsection{Páska instrukcí}
+Páska instrukcí je implementována pomocí zřetězeného lineárního jedno\-směr\-né\-ho seznamu, jelikož není potřeba se mezi instrukcemi posouvat zpět (a při skocích je známa adresa, na kterou instrukci musí interpret skočit). Vhodně se také dá využít aktuální prvek seznamu (jako příznak pro instrukci, která bude aktuálně prováděná).
+\subsection{Volání funkcí a návrat z funkce}
+Pro volání funkcí jsme se inspirovali u assembleru pro platformu x86 a překladače GCC. Argumenty funkce byly již před voláním CALL vloženy na zásobník. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimojiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru ESP. Poté uloží obsah registru EBP na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
+
+
+Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr EBP. Protože je zásobník implementovám dynamicky alokovaným polem, umožňuje to přímý přístup.
+
+
+Při návratu z funkce (při volání instrukce RET) se vybere návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr EBP. Obnoví se obsah registru EBP a návratová adresa. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
 \end{document}

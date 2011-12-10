@@ -14,6 +14,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "exec.h"
 #include "defines.h"
@@ -79,10 +80,23 @@ Tape tape;
 Stack stack;
 PTapeItem main_pointer;
 
+enum {
+    NSTART,
+    NNUM,
+    NESTATE,
+    NFLOAT0,
+    NFLOAT,
+    NEXP0,
+    NEXP,
+    NEND,
+} NumReadStates;
+
 int init_stack(int size); /// inicializuje zasobnik
 int pop_stack(int *dattype, univalue *value); /// popne ze zasobniku vrchni hodnotu, vrati take jeji typ
 int push_stack(int dattype, univalue value); /// pushne na zasobnik hodnotu i jeji datovy typ
 int delete_stack(); /// smaze cely zasobnik
+
+int read_number();
 
 #ifdef DEBUG
 int print_stack();
@@ -516,7 +530,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
             } else if (literal -> data.type == T_STRING){
                 char *fmt = literal -> data.value.str;
                 if (strcmp(fmt, "*n") == 0) {
-                    //TODO: nacitani cisla jeste nebude jen tak
+                    if (read_number() == ERROR_GEN_MEM) return ERROR_GEN_MEM;
                 } else if (strcmp(fmt, "*l") == 0) {
                     string input;
                     str_new(&input, STR_INIT_LEN);
@@ -729,6 +743,138 @@ int delete_stack() /// smaze cely zasobnik
     free(stack.val);
     stack.esp = -1;
     stack.val = NULL;
+    return 0;
+}
+
+int read_number()
+{
+    //TODO: nacitani cisla jeste nebude jen tak
+    string input;
+    str_new(&input, STR_INIT_LEN);
+    int state = NSTART;
+    while (1) {
+        
+        if (state == NEND) break;
+        int in;
+        
+        switch (state){
+        case NSTART:
+            in = fgetc(stdin);
+            if (isspace(in)) {
+                state = NNUM;
+            } else if (!isdigit(in)) {
+                str_free(&input);
+                ungetc(in, stdin);
+                univalue value;
+                value.log = STRUE;
+                try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                state = NEND;
+            } else {
+                str_push(&input, in);
+                state = NNUM;
+            }
+            break;
+        case NNUM:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NNUM;
+            } else if (in == 'e' || in == 'E') {
+                str_push(&input, in);
+                state = NESTATE;
+            } else if (in == '.') {
+                str_push(&input, in);
+                state = NFLOAT0;
+            } else {
+                ungetc(in, stdin);
+                univalue value;
+                value.num = strtod(input.str, NULL);
+                str_free(&input);
+                try_push_stack(DNUM, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        case NESTATE:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NEXP;
+            } else if (in == '+' || in == '-') {
+                str_push(&input, in);
+                state = NEXP0;
+            } else {
+                ungetc(in, stdin);
+                str_free(&input);
+                univalue value;
+                value.log = STRUE;
+                try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        case NFLOAT0:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NFLOAT;
+            } else {
+                ungetc(in, stdin);
+                str_free(&input);
+                univalue value;
+                value.log = STRUE;
+                try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        case NFLOAT:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NFLOAT;
+            } else if (in == 'e' || in == 'E') {
+                str_push(&input, in);
+                state = NESTATE;
+            } else {
+                ungetc(in, stdin);
+                univalue value;
+                value.num = strtod(input.str, NULL);
+                str_free(&input);
+                try_push_stack(DNUM, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        case NEXP0:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NEXP;
+            } else {
+                ungetc(in, stdin);
+                str_free(&input);
+                univalue value;
+                value.log = STRUE;
+                try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        case NEXP:
+            in = fgetc(stdin);
+            if (isdigit(in)) {
+                str_push(&input, in);
+                state = NEXP;
+            } else {
+                ungetc(in, stdin);
+                univalue value;
+                value.num = strtod(input.str, NULL);
+                str_free(&input);
+                try_push_stack(DNUM, value, ERROR_GEN_MEM);
+                state = NEND;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
     return 0;
 }
 

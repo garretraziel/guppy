@@ -1,0 +1,7 @@
+function foo()
+end
+
+function main()
+    local a;
+    a = foo(3) + a() + 3;
+end;

@@ -15,6 +15,8 @@
 #include "lexical.h"
 #include "parser.h"
 #include "defines.h"
+#include "exec.h"
+#include "ial.h"
 
 /// Zprava napovedy.
 const char HELP_MSG[] =
@@ -30,7 +32,7 @@ void Error(int errcode, ...)
     va_start(args, errcode);
     fprintf(stderr, "CHYBA: ");
     int type = (-errcode) / 100;
-    if(type < ERROR_GEN)
+    if(type <= ERROR_SEM)
         fprintf(stderr, "Na radku %d: ", line);
     vfprintf(stderr, ERROR_MSG[type][(-errcode) % 100], args);
     fprintf(stderr, "\n");
@@ -51,15 +53,33 @@ int main(int argc, char *argv[])
         Error(ERROR_GEN_FILE, argv[1]);
         return ERROR_GEN;
     }
-
-    int x = program(file);
+    // nastaveni vstupu
+    input = file;
+    // inicializace pasky instrukci
+    init_tape();
+    int x = parser();
     if(x < 0) {
         Error(x);
         fclose(file);
+        delete_tape();
+        drop_functions();
+        drop_literals();
         return (-x) / 100;
     }
-
     fclose(file);
+    
+#ifdef DEBUG
+    print_tape();
+#endif
+    // vyhledove
+    x = execute();
+    if(x < 0)
+        Error(x);
 
-    return 0;
+    // uklid tabulky funkci
+    drop_functions();
+    // uklid tabulky literalu
+    drop_literals();
+    // uklid seznamu instrukci
+    return (-x) / 100;
 }

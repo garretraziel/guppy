@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IFJ_GUPPY_H
-#define IFJ_GUPPY_H
+#ifndef GUPPY_GUPPY_H
+#define GUPPY_GUPPY_H
 
 /// Navratove kody programu
 enum {

@@ -1,0 +1,12 @@
+-- scitani ve vyrazu, ma vyjit 127
+
+function main()
+
+    local x;
+
+    x = 1 + 2 + 4 + 8;
+    x = x + 16 + 32 + 64;
+
+    write(x, "\n");
+
+end;

@@ -1,0 +1,11 @@
+function foo(m, a, x)
+end
+
+function bar(i, p, e)
+end
+
+function baz(s, f, i)
+end
+
+function main(k)
+end;

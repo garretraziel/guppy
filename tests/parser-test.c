@@ -4,6 +4,8 @@
 #include "parser.h"
 #include "lexical.h"
 #include "defines.h"
+#include "expr.h"
+#include "exec.h"
 
 void Error(const char *fmt, ...)
 {
@@ -17,7 +19,8 @@ void Error(const char *fmt, ...)
 int main(void)
 {
 
-    int x = program(stdin);
+    input = stdin;
+    int x = parser();
     
     if(x < 0) {
         Error("Na radku %d: %s\n", line, ERROR_MSG[(-x)/100][(-x)%100]);

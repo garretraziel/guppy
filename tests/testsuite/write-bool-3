@@ -1,0 +1,7 @@
+-- co kdyz write dostane bool
+
+function main()
+
+    write("", 4 == 5 );
+
+end;

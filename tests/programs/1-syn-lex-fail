@@ -1,0 +1,3 @@
+function main ()
+    local x = 34e ;
+end;

@@ -1,0 +1,9 @@
+-- co kdyz chybi za prikazem strednik
+
+function main()
+
+    local x;
+
+    x = 3 + 4
+
+end;

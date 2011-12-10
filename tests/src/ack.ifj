@@ -1,0 +1,24 @@
+function a(m, n)
+  local tmp;
+  local tmp2;
+
+  if m==0 then
+           return n+1;
+  else 
+    if m > 0 then
+      if n ==0 then 
+        return a(m-1,1);
+      else
+        return a(m-1,a(m,n-1));
+      end;
+    else
+    end;
+  end;
+end
+
+function main() --Hlavni telo programu
+  local ack;
+  ack = a(3,7);
+  write(ack,"\n");
+end;
+

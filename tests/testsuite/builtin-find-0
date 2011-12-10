@@ -1,0 +1,35 @@
+-- test builtin funkce find
+-- ma byt 1 2 14 -1 33 a pak OK...
+
+function main()
+
+    local x = "Quick brown lazy fox jumps over ...";
+    
+    write(find(x, "Q"), "\n");
+    write(find(x, "u"), "\n");
+    write(find(x, "a"), "\n");
+    write(find(x, "d"), "\n");
+    write(find(x, "."), "\n");
+
+    if find() == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if find(x, 3) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if find(3, x) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+    if find(true, x) == nil then
+        write("OK ");
+    else
+        write("FAIL ");
+    end;
+
+end;

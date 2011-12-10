@@ -9,9 +9,10 @@
  */
 
 #include <stdlib.h>
-#include <string.h> //TODO: pouzivat? nebo definovat vlastni strlen a strcmp?
+#include <string.h>
 #include "ial.h"
 #include "string.h"
+#include "defines.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -21,7 +22,7 @@
  * @param a znaky v intervalu <a,b> budou razeny
  * @param b
  */
-void quicksort(char *str, int a, int b)
+static inline void quicksort(char *str, int a, int b)
 {
     int l = a;
     int r = b;
@@ -64,7 +65,317 @@ void sort(string *str)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: tabulka symbolu pomoci BST
+
+// Globalni tabulky symbolu
+FunctionTree *functions_table = NULL;
+LiteralTree *literals_table = NULL;
+
+// Ukazatele na posledni pridanou funkci, lokalni promennou a literal
+FunctionTree *last_function = NULL;
+LocalTree *last_local = NULL;
+LiteralTree *last_literal = NULL;
+
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Prida funckci do tabulky funkci,
+ * pokud jiz takova funkce existuje, vraci chybu, jinak 0
+ */
+static inline int insert_function__(FunctionTree **root, char *str, PTapeItem adr)
+{
+    int cmp;
+    if(*root == NULL) {
+        FunctionTree *new = malloc(sizeof(FunctionTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->name = str; // nebo kopirovat?
+        new->symbols = NULL;
+        new->params = 0;
+        new->vars = 0;
+        new->left = NULL;
+        new->right = NULL;
+        new->adr = adr;
+        last_function = new;
+        return 0;
+    }
+    cmp = strcmp(str, (*root)->name);
+    if(cmp < 0)
+        return insert_function__(&(*root)->left, str, adr);
+    else if(cmp > 0)
+        return insert_function__(&(*root)->right, str, adr);
+    else // == 0
+        return ERROR_SYN_FUNC_REDEF;
+}
+
+
+/*
+ * Wrapper
+ */
+int insert_function(char *str, PTapeItem adr)
+{
+    return insert_function__(&functions_table, str, adr);
+}
+
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Vlozi literal do tabulky literalu
+ * Vklada se s nahodnym klicem s virou, ze to bude vytvaret nahodne dobre
+ * vyvazeny strom
+ */
+static inline int insert_literal__(LiteralTree **root, int key, Data data)
+{
+    if(*root == NULL) {
+        LiteralTree *new = malloc(sizeof(LiteralTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->key = key;
+        new->data = data;
+        new->left = NULL;
+        new->right = NULL;
+        last_literal = new;
+        return 1;
+    }
+    if(key < (*root)->key)
+        return insert_literal__(&(*root)->left, key, data);
+    else if(key > (*root)->key)
+        return insert_literal__(&(*root)->right, key, data);
+    else
+        return insert_literal__(&(*root)->left, key-1, data);
+}
+
+/*
+ * Wrapper pro vlozeni literalu do tabulky
+ *
+ * do *dst je ulozen ukazatel na vlozeny prvek
+ */
+int insert_literal(Data data)
+{
+    return insert_literal__(&literals_table, rand(), data);
+}
+
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Prida do tabulky symbolu jmeno indentifikatoru
+ * kazda funkce ma svuj
+ */
+static inline int insert_local__(LocalTree **root, char *str)
+{
+    int cmp;
+    if(*root == NULL) {
+        LocalTree *new = malloc(sizeof(LocalTree));
+        if(new == NULL)
+            return ERROR_GEN_MEM;
+        *root = new;
+        new->name = str;
+        new->offset = last_function->params + last_function->vars;
+        new->left = NULL;
+        new->right = NULL;
+        last_local = new;
+        return 1;
+    }
+    cmp = strcmp(str, (*root)->name);
+    if(cmp < 0)
+        return insert_local__(&(*root)->left, str);
+    else if(cmp > 0)
+        return insert_local__(&(*root)->right, str);
+    else // == 0
+        return ERROR_SEM_VAR_REDEF;
+}
+
+/*
+ * Pridani jmena parametru do tabulky symbolu posledni funkce
+ */
+int insert_local_param(char *str)
+{
+    if(find_function(str) != NULL)
+        return ERROR_SEM_VAR_REDEF;
+    ++last_function->params;
+    return insert_local__(&last_function->symbols, str);
+}
+
+/*
+ * Pridani jmena lokalni promenne do tabulky symbolu posledni funkce
+ */
+int insert_local_var(char *str)
+{
+    if(find_function(str) != NULL)
+        return ERROR_SEM_VAR_REDEF;
+    ++last_function->vars;
+    return insert_local__(&last_function->symbols, str);
+}
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Rekurzivni pruchod stromem a uvolneni kazdeho uzlu
+ */
+static inline void drop_locals(LocalTree *root)
+{
+    if(root != NULL) {
+        drop_locals(root->left);
+        drop_locals(root->right);
+        free(root->name);
+        free(root);
+    }
+}
+
+/*
+ * Rekurzivni pruchod stromem a uvolneni kazdeho uzlu
+ */
+static inline void drop_functions__(FunctionTree *root)
+{
+    if(root != NULL) {
+        drop_functions__(root->left);
+        drop_functions__(root->right);
+        drop_locals(root->symbols);
+        free(root->name);
+        free(root);
+    }
+}
+
+/*
+ * Smaze strom funkci, nenastavuje null
+ */
+void drop_functions(void)
+{
+    drop_functions__(functions_table);
+}
+
+
+/*
+ * Rekurzivni pruchod stromem, uvolneni kazdeho uzlu
+ */
+static inline void drop_literals__(LiteralTree *root)
+{
+    if(root != NULL) {
+        drop_literals__(root->left);
+        drop_literals__(root->right);
+        if(root->data.type == T_STRING)
+            free(root->data.value.str);
+        free(root);
+    }
+}
+
+/*
+ * Wrapper pro smazani stromu literalu
+ */
+void drop_literals(void)
+{
+    drop_literals__(literals_table);
+}
+
+
+/* * * * * * * * * * * * * * * * * * * */
+
+
+static inline void recount_offsets__(LocalTree *root, int num)
+{
+    if(root == NULL)
+        return;
+    root->offset -= num;
+    recount_offsets__(root->left, num);
+    recount_offsets__(root->right, num);
+
+}
+
+/*
+ * Prepocita offsety lokalnich symbolu podle jejich poctu s ohledem 
+ * na EIP a EBP, ktere bude taky na zasobniku
+ */
+void recount_offsets(void)
+{
+    int num = last_function->params + last_function->vars + 2;
+    recount_offsets__(last_function->symbols, num);
+}
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Vyhleda v tabulce funkci funkci a vrati ukazatel na ni
+ * pokud nenajde, vraci NULL
+ */
+static inline FunctionTree * find_function__(FunctionTree *root, char *str)
+{
+    if(root == NULL)
+        return NULL; // tohle je, ze nenasel
+    int cmp = strcmp(str, root->name);
+    if(cmp == 0)
+        return root;
+    else if(cmp < 0)
+        return find_function__(root->left, str);
+    else // cmp > 0
+        return find_function__(root->right, str);
+}
+
+/*
+ * Wrapper pro vyhledani funkce v tabulce
+ */
+FunctionTree * find_function(char *str)
+{
+    return find_function__(functions_table, str);
+}
+
+
+/* * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Vyhleda v tabulce posledni funkce lokalni promennou a vrati ukazatel na ni
+ * pokud nenajde, vraci NULL
+ */
+static inline LocalTree * find_local__(LocalTree *root, char *str)
+{
+    if(root == NULL)
+        return NULL; // tohle je, ze nenasel
+    int cmp = strcmp(str, root->name);
+    if(cmp == 0)
+        return root;
+    else if(cmp < 0)
+        return find_local__(root->left, str);
+    else // cmp > 0
+        return find_local__(root->right, str);
+    return 0;
+}
+
+/*
+ * Wrapper pro hledani lokalnich promennych
+ */
+LocalTree * find_local(char *str)
+{
+    return find_local__(last_function->symbols, str);
+}
+
+/* * * * * * * * * * * * * * * * * * * */
+
+#ifdef DEBUG
+
+#include <stdio.h>
+void print_locals(LocalTree *root)
+{
+    if(root == NULL)
+        return;
+    print_locals(root->left);
+    printf("  %s (%2d)\n", root->name, root->offset);
+    print_locals(root->right);
+}
+
+void print_functions(FunctionTree *root)
+{
+    if(root == NULL)
+        return;
+    print_functions(root->left);
+    printf("%s\n", root->name);
+    print_locals(root->symbols);
+    print_functions(root->right);
+}
+
+#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -142,68 +453,6 @@ int find(string *str1, string *str2)
     if (str2->length == 0) return 0;
     if (str1->length == 0) return -1; //TODO: vraci false
     int pozice = find_kmp(str1->str, str1->length, str2->str, str2->length);
-    if (pozice == -1) return -1; //TODO: vraci false
-    else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
-    else return pozice+1;
-}
-
-//FIXME: nasledujici funkce je deprecated. az si budu jist s p. JMH, smazu to
-int *find_prefix2(char *str, int len)
-{
-    int *tabulka = malloc(sizeof(int)*(len+1)); /// pro zjednoduseni nechame misto i pro '\0'
-
-    if (tabulka == NULL) {
-        return NULL;
-    }
-    
-    int i = 0;
-    int j = tabulka[0] = -1;
-    
-    while (i < len) {
-        while (j > -1 && str[i] != str[j])
-            j = tabulka[j];
-        i++;
-        j++;
-        if (str[i] == str[j])
-            tabulka[i] = tabulka[j];
-        else
-            tabulka[i] = j;
-    }
-    
-    return tabulka;
-}
-
-//FIXME: nasledujici funkce je deprecated. az si budu jist s p. JMH, smazu to
-int find_kmp2(char *str1, int len1, char *str2, int len2)
-{
-    int *tabulka = find_prefix2(str2, len2);
-    
-    if (tabulka == NULL) return -2; //TODO: vracet opravdovou chybu
-    
-    int i = 0;
-    int j = 0;
-    
-    while (j < len1) {
-        while (i > -1 && str2[i] != str1[j])
-            i = tabulka[i];
-        i++;
-        j++;
-        if (i >= len2) {
-            free(tabulka);
-            return j-i;
-        }
-    }
-    
-    free(tabulka);
-    return -1;
-}
-
-//FIXME: nasledujici funkce je deprecated. az si budu jist s p. JMH, smazu to
-int find2(string *str1, string *str2)
-{
-    if (str2->length == 0) return 0;
-    if (str1->length == 0) return -1; //TODO: vraci false
-    int pozice = find_kmp2(str1->str, str1->length, str2->str, str2->length);
     if (pozice == -1) return -1; //TODO: vraci false
     else if (pozice == -2) return -2; //TODO: vracet error o nedostatku pameti
     else return pozice+1;

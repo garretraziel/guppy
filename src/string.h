@@ -8,10 +8,10 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_STRING_H
-#define IJC_STRING_H
+#ifndef GUPPY_STRING_H
+#define GUPPY_STRING_H
 
-#define STR_DEFAULT 255
+#define STR_INIT_LEN 16
 
 /// Struktura pro "nekonecny" string
 typedef struct {
@@ -43,5 +43,8 @@ char *substr_c(char *, int, int, int);
 
 /// Vrati substring ze stringu podle zadanych indexu
 char *substr(string *, int, int);
+
+/// Spoji dva stringy do jednoho, ten vrati, stringy free
+char *concat(char *, char *);
 
 #endif

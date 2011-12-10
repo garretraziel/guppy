@@ -8,10 +8,9 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IFJ_PARSER_H
-#define IFJ_PARSER_H
+#ifndef GUPPY_PARSER_H
+#define GUPPY_PARSER_H
 
-// Zpracuje pocatacni neterminalni symbol
-int program(FILE *);
+int parser(void);
 
 #endif

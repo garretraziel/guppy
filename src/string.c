@@ -15,6 +15,7 @@
 #endif
 
 #include "string.h"
+#include "defines.h"
 
 // interni funkce, zjisti, zda jsou indexy spravne
 int index_sane(int x, int y, int len);
@@ -24,7 +25,7 @@ int str_new(string *str, int size)
 {
     str->str = malloc(size * sizeof(char));
     if(str->str == NULL)
-        return 0; // TODO celkem fatalni chyba :( jak to osetrit?
+        return ERROR_GEN_MEM;
     str->alloc = size;
     str->length = 0;
     str->str[0] = 0;
@@ -37,7 +38,7 @@ int str_init(string *str, const char *data)
     int len = strlen(data);
     str->str = malloc(len + 1);
     if(str->str == NULL)
-        return 0;
+        return ERROR_GEN_MEM;
     strcpy(str->str, data);
     str->length = len;
     str->alloc = len + 1;
@@ -52,7 +53,7 @@ int str_push(string *str, char c)
     if(str->alloc == str->length + 1) { 
         tmp = realloc(str->str, str->alloc << 1);
         if(tmp == NULL)
-            return 0; // TODO celkem fatalni chyba :( jak to osetrit?
+            return ERROR_GEN_MEM;
         str->str = tmp;
         str->alloc <<= 1;
     }
@@ -107,7 +108,7 @@ char *substr_c(char *str, int len, int from, int to)
         y = len + to; // prepocitam index pro zaporne cislo
         if (y < 0) {
 #ifdef DEBUG
-            fpritnf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
+            fprintf(stderr,"Warning: substr by vyjel ze stringu doleva.\n");
 #endif
             y = 0;
         }
@@ -170,4 +171,15 @@ char *substr(string *str, int x, int y)
     y = y < 0? y : y - 1;
 
     return substr_c(str->str, str->length, x, y);
+}
+
+char *concat(char *str1, char *str2)
+{
+    int length = strlen(str1) + strlen(str2);
+    char *retstr = malloc(sizeof(char)*(length+1));
+    if (retstr == NULL) return NULL;
+    strcpy(retstr, str1);
+    strcat(retstr, str2);
+
+    return retstr;
 }

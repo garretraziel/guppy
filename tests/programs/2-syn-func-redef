@@ -1,0 +1,8 @@
+function foo()
+end
+
+function foo()
+end
+
+function main()
+end;

@@ -10,161 +10,196 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "defines.h"
 #include "lexical.h"
 #include "parser.h"
 #include "guppy.h"
-#include "defines.h"
+#include "expr.h"
+#include "ial.h"
+#include "exec.h"
+#include "expr.h"
 
-#define STR_INIT_LEN 16
 
-// TODO chybi generovani vnitrniho kodu
-//  chybi jeho implementace
+// Pokud je token jiny nez ocekavany token, je vracen token,
+// pokud byl sam zaporny, jinak zadany chybovy kod
+#define check_token(exptok, errcode) do { if(token != exptok) \
+    return (token < 0) ? token : errcode; } while(0)
 
-// TODO: ono to nepozna, ze je konec souboru driv nez ma
-//  povazuje to za neocekavany token
+// makro try s kontrolou typu pro write
+#define try_write_expr() do { int x = expression(); if(x<0) return x; if(x == E_BOOL || x == E_NIL) return ERROR_SEM_WRITE_WRPR; } while(0)
 
+
+#ifdef DEBUG
+void print_functions(FunctionTree *);
+#endif
+
+// TODO kotrolovat navratovou hodnotu generate, makrem ? ]:->
 
 
 // prototypy funci, asi nepatri do hlavicky, nejsou soucasti rozhrani
-int functions_seq();
-int function();
-int formal_parametr_seq();
-int formal_parametr_seq_z();
-int local_declaration_seq();
-int local_declaration_z();
-int literal();
-int statement_seq();
-int statement();
-int assign_z();
-int literal_identifier_list();
-int literal_identifier_list_a();
-int literal_identifier_list_z();
+static int program(void);
+static int functions_seq(void);
+static int function(void);
+static int formal_parametr_seq(void);
+static int formal_parametr_seq_z(void);
+static int local_declaration_seq(void);
+static int local_declaration_z(void);
+static int statement_seq(void);
+static int statement(void);
+static int assign_z(void);
 
-int expression_seq();
-int expression_seq_z();
-int expression();
+static int expression_seq(void);
+static int expression_seq_z(void);
+
+
+
+/*
+ * Spousti syntaktickou analyzu
+ */
+int parser(void)
+{
+    try( str_new(&str, STR_INIT_LEN) );
+
+    int x = program();
+
+#ifdef DEBUG
+    print_functions(functions_table);
+#endif
+
+    str_free(&str);
+    return x;
+}
+
+
 
 
 // P -> DF DFS ; EOF
-int program(FILE *in)
+static int program(void)
 {
-    input = in;
-    int x;
-    if(str_new(&str, STR_INIT_LEN) == 0)
-        return ERROR_GEN_MEM;
-
     // nacteni uplne prvniho tokenu
     // to ma byt predem, ale to by musel byt token uplne globalni
-    token = get_token();
+    get_token();
+
+    // rezervovani jmen pro builtin funkce
+    string str;
+    try( str_init(&str, "sort") );
+    try( insert_function(str.str, NULL) );
+    last_function->params = 1;
+
+    try( str_init(&str, "type") );
+    try( insert_function(str.str, NULL) );
+    last_function->params = 1;
+
+    try( str_init(&str, "substr") );
+    try( insert_function(str.str, NULL) );
+    last_function->params = 3;
+    
+    try( str_init(&str, "find") );
+    try( insert_function(str.str, NULL) );
+    last_function->params = 2;
 
     // prvni funkce
-    if(token != FUNCTION) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_FUNC;
-    }
-    x = function();
-    if(x < 0) {
-        str_free(&str);
-        return x;
-    }
+    check_token(FUNCTION, ERROR_SYN_X_FUNC);
+    try( function() );
 
     // ostatni funkce
-    x = functions_seq();
-    if(x < 0) {
-        str_free(&str);
-        return x;
-    }
+    try( functions_seq() );
 
     // strednik za posledni funkci
-    if(token != SEMICOLON) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-    }
+    check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
 
     // EOF (ukoncivac dolar)
-    token = get_token();
-    if(token != NOTHING) {
-        str_free(&str);
-        return (token < 0) ? token : ERROR_SYN_X_EOF;
-    }
+    get_token();
+    check_token(NOTHING, ERROR_SYN_X_EOF);
 
-    str_free(&str);
+    // kontrola, zda je main posledni
+    if(strcmp(last_function->name, "main") != 0)
+        return ERROR_SYN_MAIN;
+
+    // tohle je kod, kterym by melo zacit vykonavani
+    // TODO: vratit na to nejak adresu
+    main_pointer = generate(INOP, NULL);
+    for(int i = 0, j = last_function->params; i < j; ++i)
+        generate(IPUSHN, NULL);
+    generate(ICALL, last_function);
+    generate(IHALT, NULL);
     return 1;
 }
 
 // DFS -> DF DFS
 // DFS -> epsilon
-int functions_seq()
+static int functions_seq(void)
 {
-    int x;
-
     // funkce
     if(token == FUNCTION) {
-        x = function();
-        if(x < 0)
-            return x;
-        x = functions_seq();
-        return x;
+        try ( function() );
+        return functions_seq();
     }
     else // epsilon
         return 1;
 }
 
 // DF -> function id ( FPS ) SDS SPS end
-int function()
+static int function(void)
 {
-    int x;
     // function
-    if(token != FUNCTION)
-        return (token < 0) ? token : ERROR_SYN_X_FUNC;
-    token = get_token();
+    check_token(FUNCTION, ERROR_SYN_X_FUNC);
+    get_token();
+
+    PTapeItem lab;
+    lab = generate(INOP, NULL);
 
     // identifier
-    if(token != IDENTIFIER)
-        return (token < 0) ? token : ERROR_SYN_X_IDENT;
-    token = get_token();
+    check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+    // funkce do tabulky
+    try( insert_function(str.str, lab) );
+    // potreba novy string, puvodni je v tabulce
+    try( str_new(&str, STR_INIT_LEN) ); 
+    get_token();
 
     // left bracket
-    if(token != LBRAC)
-        return (token < 0) ? token : ERROR_SYN_X_LBRC;
-    token = get_token();
+    check_token(LBRAC, ERROR_SYN_X_LBRC);
+    get_token();
 
     // formal parametr seq
-    x = formal_parametr_seq();
-    if(x < 0)
-        return x;
+    try( formal_parametr_seq() );
 
     // right bracket
-    if(token != RBRAC)
-        return (token < 0) ? token : ERROR_SYN_X_RBRC;
-    token = get_token();
+    check_token(RBRAC, ERROR_SYN_X_RBRC);
+    get_token();
 
     // local declaration seq
-    x = local_declaration_seq();
-    if(x < 0)
-        return x;
+    try( local_declaration_seq() );
+
+    // konec definic lokalnich symbolu, musi se prepocitat offsety
+    recount_offsets();
 
     // statement seq
-    x = statement_seq();
-    if(x < 0)
-        return x;
+    try( statement_seq() );
 
     // end
-    if(token != END)
-        return (token < 0) ? token : ERROR_SYN_X_END;
-    token = get_token();
+    check_token(END, ERROR_SYN_X_END);
+    get_token();
 
+    // pri neuvedeni return to tenhle zachrani
+    generate(IPUSHN, NULL);
+    generate(IRET, last_function);
     return 1;
 }
 
 // FPS -> id FPz
 // epsilon
-int formal_parametr_seq()
+static int formal_parametr_seq(void)
 {
     // identifikator
     if(token == IDENTIFIER) {
-        token = get_token();
+        // pridat parametr do tabulky symbolu aktualni funkce
+        try( insert_local_param(str.str) );
+        // potreba novy string
+        try( str_new(&str, STR_INIT_LEN) );
+        get_token();
         return formal_parametr_seq_z();
     }
     else // epsilon
@@ -173,15 +208,16 @@ int formal_parametr_seq()
 
 // FPz -> , id FPz
 // FPz -> epsilon
-int formal_parametr_seq_z()
+static int formal_parametr_seq_z(void)
 {
     // carka
     if(token == COMMA) {
-        token = get_token();
+        get_token();
         // identifikator
-        if(token != IDENTIFIER)
-            return (token < 0) ? token : ERROR_SYN_X_IDENT;
-        token = get_token();
+        check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+        try( insert_local_param(str.str) ); // pridat do stromu
+        try( str_new(&str, STR_INIT_LEN) ); // novy string
+        get_token();
         return formal_parametr_seq_z();
     }
     else // epsilon
@@ -190,20 +226,18 @@ int formal_parametr_seq_z()
 
 // SDS -> local id SDSz SDS
 // SDS -> epsilon
-int local_declaration_seq()
+static int local_declaration_seq(void)
 {
-    int x;
     // local
     if(token == LOCAL) {
-        token = get_token();
+        get_token();
         // identifier
-        if(token != IDENTIFIER)
-            return (token < 0) ? token : ERROR_SYN_X_IDENT;
-        token = get_token();
+        check_token(IDENTIFIER, ERROR_SYN_X_IDENT);
+        try( insert_local_var(str.str) ); // pridat do tabulky
+        try( str_new(&str, STR_INIT_LEN) ); // novy string
+        get_token();
         // local declaration z
-        x = local_declaration_z();
-        if(x < 0)
-            return x;
+        try( local_declaration_z() );
         // local declaration seq
         return local_declaration_seq();
     }
@@ -211,73 +245,49 @@ int local_declaration_seq()
         return 1;
 }
 
-// SDSz -> = LIT ;
+// SDSz -> = expression ;
 // SDSz -> ;
-int local_declaration_z()
+static int local_declaration_z(void)
 {
-    int x;
     // strednik
     if(token == SEMICOLON) {
-        token = get_token();
+        // inicializace na nil
+        generate(IPUSHN, NULL);
+        generate(IPOPI, last_local);
+        get_token();
         return 1;
     }
     // rovnitko
     else if(token == ASSIGN) {
-        token = get_token();
-        // literal
-        x = literal();
-        if(x < 0)
-            return x;
+        get_token();
+        // vyraz
+        try( expression() ); 
+        generate(IPOPI, last_local);
         // strednik
-        if(token != SEMICOLON)
-            return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-        token = get_token();
+        check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
+        get_token();
         return 1;
     }
     else
         return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
 }
 
-// LIT -> num
-// LIT -> str
-// LIT -> nil
-// LIT -> true
-// LIT -> false
-int literal()
-{
-    switch(token) {
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case TRUE:
-        case FALSE:
-            // ulozit na stack s hodnotou
-            token = get_token();
-            return 1;
-        default:
-            return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
-    }
-}
-
 // SPS -> S ; SPS
 // SPS -> epsilon
-int statement_seq()
+static int statement_seq(void)
 {
-    int x;
     switch(token) {
         case IDENTIFIER:
         case WRITE:
         case IF:
         case WHILE:
         case RETURN:
+        case REPEAT:
             // statement
-            x = statement();
-            if(x < 0)
-                return x;
+            try( statement() );
             // strednik
-            if(token != SEMICOLON)
-                return (token < 0) ? token : ERROR_SYN_X_SMCLN;
-            token = get_token();
+            check_token(SEMICOLON, ERROR_SYN_X_SMCLN);
+            get_token();
             // statement_seq
             return statement_seq();
             break;
@@ -288,93 +298,133 @@ int statement_seq()
 }
 
 // S -> id = Az
-// S -> write ( EL )
+// S -> write ( ES )
 // S -> if E then SPS else SPS end
 // S -> while E do SPS end
 // S -> ret E
-int statement()
+static int statement(void)
 {
-    int x;
+    PTapeItem ptr1, ptr2;
+    PTapeItem lab1, lab2;
+    LocalTree *var;
+    PTapeItem instr;
+
     switch(token) {
         case IDENTIFIER:
-            token = get_token();
-            // rovnitko
-            if(token != ASSIGN)
-                return (token < 0) ? token : ERROR_SYN_X_ASGN;
-            token = get_token();
-            // assign_z
-            return assign_z();
+            // kontrola, jestli je promenna definovana
+            if((var = find_local(str.str)) != NULL)
+                ;
+            else if(find_function(str.str) != NULL)
+                ;
+            else
+                return ERROR_SEM_VAR_UND;
+            // ulozeni posledni instrukce
+            instr = tape.bot;
+            try( expression() );
+            // pokud se vygenerovala jen 1 instrukce (push x)
+            // pak se ocekava, ze ma byt prirazeni
+            if(instr->next == tape.bot && tape.bot->instr == IPUSHI) {
+                // udelam z toho NOP
+                tape.bot->instr = INOP;
+                tape.bot->adr = NULL;
+                // ted je tedy prirazeni do lok. promenne
+                // takze nejdriv rovnitko
+                check_token(ASSIGN, ERROR_SYN_X_ASGN);
+                get_token();
+                // a pak assign_z
+                try( assign_z() );
+                // generovani presunu vysledku do promenne
+                generate(IPOPI, var);
+            } else // jinak vyraz, ktery mam zahodit
+                generate(IPOP, NULL);
+            return 1;
 
         case WRITE:
-            token = get_token();
+            get_token();
             // left bracket
-            if(token != LBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_LBRC;
-            token = get_token();
+            check_token(LBRAC, ERROR_SYN_X_LBRC);
+            get_token();
+            // pokud neni zadny parametr, nic se nedeje
+            if(token == RBRAC) {
+                get_token();
+                return 1;
+            }
             // expression list
-            x = expression_seq();
-            if(x < 0)
-                return x;
+            try( expression_seq() );
             // right bracket
-            if(token != RBRAC)
-                return (token < 0) ? token : ERROR_SYN_X_RBRC;
-            token = get_token();
+            check_token(RBRAC, ERROR_SYN_X_RBRC);
+            get_token();
             return 1;
 
         case IF:
-            token = get_token();
+            get_token();
             // vyraz
-            x = expression();
-            if(x < 0)
-                return x;
+            try( expression() );
+            ptr1 = generate(IJMPF, NULL); // skok na else pri false
             // then
-            if(token != THEN)
-                return (token < 0) ? token : ERROR_SYN_X_THEN;
-            token = get_token();
+            check_token(THEN, ERROR_SYN_X_THEN);
+            get_token();
             // prikazy
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
+            ptr2 = generate(IJMP, NULL); // skok na konec
             // else
-            if(token != ELSE)
-                return (token < 0) ? token : ERROR_SYN_X_ELSE;
-            token = get_token();
+            check_token(ELSE, ERROR_SYN_X_ELSE);
+            get_token();
+            lab1 = generate(INOP, NULL); // zacatek else
+            ptr1->adr = lab1; // doplneni
             // sekvence prikazu
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
             // end
-            if(token != END)
-                return (token < 0) ? token : ERROR_SYN_X_END;
-            token = get_token();
+            check_token(END, ERROR_SYN_X_END);
+            get_token();
+            lab2 = generate(INOP, NULL); // konec
+            ptr2->adr = lab2;
             return 1;
 
         case WHILE:
-            token = get_token();
+            get_token();
+            // label
+            lab1 = generate(INOP, NULL);
             // vyraz
-            x = expression();
-            if(x < 0)
-                return x;
+            try( expression() );
+            // skok
+            ptr1 = generate(IJMPF, NULL);
             // do
-            if(token != DO)
-                return (token < 0) ? token : ERROR_SYN_X_DO;
-            token = get_token();
+            check_token(DO, ERROR_SYN_X_DO);
+            get_token();
             // sekvence prikazu
-            x = statement_seq();
-            if(x < 0)
-                return x;
+            try( statement_seq() );
             // end
-            if(token != END)
-                return (token < 0) ? token : ERROR_SYN_X_END;
-            token = get_token();
+            check_token(END, ERROR_SYN_X_END);
+            // jmp zpet a label konce
+            generate(IJMP, lab1);
+            lab2 = generate(INOP, NULL);
+            ptr1->adr = lab2;
+            get_token();
             return 1;
 
         case RETURN:
-            token = get_token();
+            get_token();
             // vyraz
-            x = expression();
-            return x;
+            try( expression() );
+            // return
+            generate(IRET, last_function);
+            return 1;
             // konec funkce heh
+
+        case REPEAT:
+            get_token();
+            lab1 = generate(INOP, NULL);
+            // sekvence prikazu
+            try( statement_seq() );
+            // until
+            check_token(UNTIL, ERROR_SYN_X_UNTIL);
+            get_token();
+            // vyraz a skok
+            try( expression() );
+            generate(IJMPF, lab1);
+            return 1;
+
 
         default:
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
@@ -382,44 +432,39 @@ int statement()
 }
 
 // Az -> read ( LIT )
-// Az -> E // TODO
-// Az -> id ( LIL )
-int assign_z()
+// Az -> vyraz
+static int assign_z(void)
 {
-    int x;
     // read
     if(token == READ) {
-        token = get_token();
+        get_token();
         // leva zavorka
-        if(token != LBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_LBRC;
-        token = get_token();
-        // jeden parametr (string nebo cislo) FIXME
-        if(token != STRING && token != NUMBER)
+        check_token(LBRAC, ERROR_SYN_X_LBRC);
+        get_token();
+        // jeden parametr (string nebo cislo)
+        Data data;
+        if(token == STRING) {
+            if(strcmp(str.str, "*n") != 0 && strcmp(str.str, "*l") != 0 && strcmp(str.str, "*a") != 0)
+                return ERROR_SEM_READ_WRPR;
+            data.type = T_STRING;
+            data.value.str = str.str;
+            try( str_new(&str, STR_INIT_LEN) );
+        } else if(token == NUMBER) {
+            data.type = T_NUMBER;
+            data.value.num = strtod(str.str, NULL);
+            if(data.value.num == 0)
+                return ERROR_SEM_READ_WRPR;
+        } else if(token == TRUE || token == FALSE || token == NIL)
+            return ERROR_SEM_READ_WRPR;
+        else
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
-        token = get_token();
+        // generovani instrukci
+        try( insert_literal(data) );
+        generate(IREAD, last_literal);
+        get_token();
         // prava zavorka
-        if(token != RBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_RBRC;
-        token = get_token();
-        return 1;
-    }
-    // volani funkce
-    else if(token == IDENTIFIER) {
-        token = get_token();
-        // leva zavorka
-        if(token != LBRAC)
-//            return (token < 0) ? token : ERROR_SYN_X_LBRC;
-            return (token < 0) ? token : expression();
-        token = get_token();
-        // parametry
-        x = literal_identifier_list(); // TODO
-        if(x < 0)
-            return x;
-        // prava zavorka
-        if(token != RBRAC)
-            return (token < 0) ? token : ERROR_SYN_X_RBRC;
-        token = get_token();
+        check_token(RBRAC, ERROR_SYN_X_RBRC);
+        get_token();
         return 1;
     }
     // vyraz
@@ -427,133 +472,33 @@ int assign_z()
         return expression();
 }
 
-// LIL -> LIT LILa
-// LIL -> id LILa
-// LIL -> epsilon
-int literal_identifier_list()
-{
-    int x;
-    switch(token) {
-        // literal
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case TRUE:
-        case FALSE:
-            x = literal();
-            if(x < 0)
-                return x;
-            return literal_identifier_list_a();
-        case IDENTIFIER:
-            token = get_token();
-            return literal_identifier_list_a();
-        default:
-            return 1;
-    }
 
-}
-
-// LILa -> , LILz LILa
-// LILa -> epsilon
-int literal_identifier_list_a()
-{
-    int x;
-    if(token == COMMA) {
-        token = get_token();
-        x = literal_identifier_list_z();
-        if(x < 0)
-            return 0;
-        return literal_identifier_list_a();
-    }
-    else
-        return 1;
-}
-
-// LILz -> LIT
-// LILz -> id
-int literal_identifier_list_z()
-{
-    switch(token) {
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case TRUE:
-        case FALSE:
-            return literal();
-        case IDENTIFIER:
-            token = get_token();
-            return 1;
-            break;
-        default:
-            return 1;
-    }
-
-}
-
-// // // // // // // // // // // // // // // // // // // // // // // // //
-// Co je dal uz nefunguje ani zatim nema:
+// seznam vyrazu pro write
+// nesmi mit typ boolean ani nil
 
 // ES -> E ESz
-int expression_seq()
+static int expression_seq(void)
 {
-    int x;
-    x = expression();
-    if(x < 0)
-        return x;
+    // vyraz
+    try_write_expr();
+    // pro prvni parametr write
+    generate(IWRITE, NULL);
     return expression_seq_z();
 }
 
-// ESz -> , E Elz
+// ESz -> , E ESz
 // ESz -> epsilon
-int expression_seq_z()
+static int expression_seq_z(void)
 {
-    int x;
     if(token == COMMA) {
-        token = get_token();
-        x = expression();
-        if(x < 0)
-            return x;
+        get_token();
+        // vyraz
+        try_write_expr();
+        // pro kazdy parametr write
+        generate(IWRITE, NULL);
         return expression_seq_z();
     }
     // epsilon
     else
         return 1;
-}
-
-// tohle je jen nouzovka, preskakuje to
-int expression()
-{
-    // zatim se proste vyraz preskoci a bude se predpokladat jeho spravnost
-    // nesmi v nem byt zavorky
-    switch(token) {
-        // literal
-        case NUMBER:
-        case STRING:
-        case NIL:
-        case FALSE:
-        case TRUE:
-        // ident
-        case IDENTIFIER:
-        // zavorky 
-//        case LBRAC:
-//        case RBRAC:
-        // operatory
-        case PLUS:
-        case MINUS:
-        case DIV:
-        case MUL:
-        case POWER:
-        case STRCONCAT:
-        case LESS:
-        case GREAT:
-        case LESS_EQ:
-        case GREAT_EQ:
-        case EQUAL:
-        case NOT_EQUAL:
-            token = get_token();
-            return expression();
-            break;
-        default:
-            return 1;
-    }
 }

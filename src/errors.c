@@ -16,11 +16,11 @@ const char *LEX_ERRORS[] = {
     [(-ERROR_LEX_NUMBER) % 100] = "Neplatny ciselny literal",
     [(-ERROR_LEX_UX_CHAR) % 100] = "Neocekavany znak",
     [(-ERROR_LEX_ESC_SEC) % 100] = "Neplatna escape sekvence v retezci",
+    [(-ERROR_LEX_X_CMNT_END) % 100] = "Neukonceny komentar",
 };
 
 // [2] Chybova hlseni syntaktickych chyb
 const char *SYN_ERRORS[] = {
-    [0] = "<null>",
     [(-ERROR_SYN_UX_TOKEN) % 100] = "Neocekavany token",
     [(-ERROR_SYN_X_EOF) % 100] = "Ocekavan konec zdrojoveho souboru",
     [(-ERROR_SYN_X_FUNC) % 100] = "Ocekavana definice funkce",
@@ -34,17 +34,33 @@ const char *SYN_ERRORS[] = {
     [(-ERROR_SYN_X_ELSE) % 100] = "Ocekavano ELSE",
     [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
     [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
+    [(-ERROR_SYN_EXP_FAIL) % 100] = "Neplatny vyraz",
+    [(-ERROR_SYN_MAIN) % 100] = "Funkce main neni definovana nebo neni definovana jako posledni",
+    [(-ERROR_SYN_X_UNTIL) % 100] = "Ocekavano UNTIL",
 };
 
 
-// [3] Chybove zpravy semantice analyzy
+// [3] Chybove zpravy semanticke analyzy
 const char *SEM_ERRORS[] = {
-     [(-ERROR_SEM_X) % 100] = "Semanticka chyba",
+     [(-ERROR_SEM_VAR_UND) % 100] = "Nedeklarovana promenna",
+     [(-ERROR_SEM_VAR_REDEF) % 100] = "Promenna je jiz definovana",
+     [(-ERROR_SEM_WRONG_TYPES) % 100] = "Nekompatibilni typy operandu ve vyrazu",
+     [(-ERROR_SEM_CALL_VAR) % 100] = "Nelze volat promenne",
+     [(-ERROR_SEM_FUNC_VAR) % 100] = "Funkce nelze pouzivat jako promenne",
+     [(-ERROR_SEM_WRITE_WRPR) % 100] = "Spatny typ parametru prikazu write",
+     [(-ERROR_SEM_READ_WRPR) % 100] = "Spatny parametr prikazu read",
+     [(-ERROR_SYN_FUNC_REDEF) % 100] = "Funkce je jiz definovana",
 };
+
 
 // [4] Obecne chybove zpravy interpretace
 const char *INT_ERRORS[] = {
-     [(-ERROR_INT_X) % 100] = "Chyba interpretace",
+     [(-ERROR_INT_EMPTY_STACK) % 100] = "Nelze cist ze zasobniku, nejspise je prazdny",
+     [(-ERROR_INT_DIVZERO) % 100] = "Deleni nulou",
+     [(-ERROR_INT_BADPARAM) % 100] = "Spatny typ parametru",
+     [(-ERROR_INT_INCOMP_TYPES) % 100] = "Nekompatibilni typy pro danou operaci",
+     [(-ERROR_INT_BAD_INSTR) % 100] = "Program provedl neplatnou operaci a bude ukoncen", //WIN!
+     [(-ERROR_INT_BAD_VAL) % 100] = "Spatny prvek pro interpretaci, vnitrni chyba programu",
 };
 
 // [5] Obecne chybove zpravy

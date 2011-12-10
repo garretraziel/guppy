@@ -160,12 +160,12 @@ int check_keyword(string *str)
  * @param string slozi k navratu identifikatoru a cisel
  * vraci ciselnou reprezentaci tokenu
  */
-int get_token(void)
+static inline int get_token__(void)
 {
     static int c;
     static int state = FSM_READ;
 
-    int num;
+    int num = 0;
 
     // buffer se musi vyprazdnit
     str_clean(&str);
@@ -421,7 +421,8 @@ int get_token(void)
                 if(c == '\n') {
                     state = FSM_READ;
                     ++line;
-                }
+                } else if(c == EOF)
+                    return NOTHING;
                 break;
 
             case FSM_COMMENT_BLOCK:
@@ -430,6 +431,8 @@ int get_token(void)
                     state = FSM_COMMENT_BLOCK_END;
                 else if(c == '\n')
                     ++line;
+                else if(c == EOF)
+                    return ERROR_LEX_X_CMNT_END;
                 break;
 
             case FSM_COMMENT_BLOCK_END:
@@ -506,4 +509,12 @@ int get_token(void)
 #endif
         } /* switch */
     } /* for */
+}
+
+/*
+ *  Wrapper funkce pro nacteni dalsiho tokenu
+ */
+void get_token(void)
+{
+    token = get_token__();
 }

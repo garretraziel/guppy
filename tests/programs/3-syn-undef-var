@@ -1,0 +1,7 @@
+function foo(x)
+    local y;
+    A = 15;
+end
+
+function main()
+end;

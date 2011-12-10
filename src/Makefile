@@ -2,16 +2,22 @@ LOGIN=xmokra00
 PROJECT=guppy
 
 CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -g
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -lm
+DFLAGS=-g -DDEBUG
 
-.PHONY: rebuild build dep clean zip
+.PHONY: rebuild build dep clean zip debug
 
 
 build: dep $(PROJECT)
 
 rebuild: clean build
 
-$(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o exec.o
+debug: CFLAGS += $(DFLAGS)
+debug: rebuild
+jendebug: CFLAGS += -g
+jendebug: rebuild
+
+$(PROJECT): guppy.o string.o lexical.o parser.o ial.o errors.o expr.o exec.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 

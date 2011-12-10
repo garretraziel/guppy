@@ -1,0 +1,12 @@
+-- odecitani ve vyrazu, ma vyjit 2
+
+function main()
+
+    local x = 1024;
+
+    x = x - 100 - 200;
+    x = x - 300 - 400 - 22;
+
+    write(x, "\n");
+
+end;

@@ -1,0 +1,7 @@
+-- write papinka spravne parametry
+
+function main()
+
+    write( "Venuji penize. Volejte: ", 73, 62, 6, 9869, "\n");
+
+end;

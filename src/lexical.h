@@ -8,8 +8,8 @@
  *   xsedla85 Sedlak Jan
  */
 
-#ifndef IJC_LEXICAL_H
-#define IJC_LEXICAL_H
+#ifndef GUPPY_LEXICAL_H
+#define GUPPY_LEXICAL_H
 
 #include "string.h"
 
@@ -76,7 +76,7 @@ enum {
 
 
 /// Vrati nasledujici token ze souboru
-int get_token(void);
+void get_token(void);
 
 /// globalni pocitadlo radku
 extern int line;

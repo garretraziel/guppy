@@ -774,9 +774,8 @@ int read_number()
     string input;
     str_new(&input, STR_INIT_LEN);
     int state = NSTART;
-    while (1) {
+    while (state != NEND) {
         
-        if (state == NEND) break;
         int in;
         
         switch (state){

@@ -520,13 +520,25 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 string input;
                 str_new(&input, STR_INIT_LEN);
                 int num_of_chars = literal -> data.value.num;
+                int c;
                 for (int i = 0; i<num_of_chars; i++) {
-                    int c = fgetc(stdin);
-                    if (c == EOF) break; //TODO: co mam delat tady?
+                    c = fgetc(stdin);
+                    if (c == EOF) break;
                     str_push(&input, c);
                 }
-                value.str = input.str;
-                try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+                if (c == EOF) {
+                    if (input.str[0] == '\0') {
+                        str_free(&input);
+                        value.log = STRUE;
+                        try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                    } else {
+                        value.str = input.str;
+                        free_try_push_stack(DSTRING, value, ERROR_GEN_MEM, value.str);
+                    }
+                } else {
+                    value.str = input.str;
+                    free_try_push_stack(DSTRING, value, ERROR_GEN_MEM, value.str);
+                }
             } else if (literal -> data.type == T_STRING){
                 char *fmt = literal -> data.value.str;
                 if (strcmp(fmt, "*n") == 0) {
@@ -537,10 +549,21 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                     int c;
                     do {
                         c = fgetc(stdin);
-                        if (c != '\n' && c != EOF) str_push(&input, c); //TODO: nebo mam nacitat i EOF?
+                        if (c != '\n' && c != EOF) str_push(&input, c);
                     } while (c != '\n' && c != EOF);
-                    value.str = input.str;
-                    try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+                    if (c == EOF) {
+                        if (input.str[0] == '\0') {
+                            str_free(&input);
+                            value.log = STRUE;
+                            try_push_stack(DNIL, value, ERROR_GEN_MEM);
+                        } else {
+                            value.str = input.str;
+                            free_try_push_stack(DSTRING, value, ERROR_GEN_MEM, value.str);
+                        }
+                    } else {
+                        value.str = input.str;
+                        free_try_push_stack(DSTRING, value, ERROR_GEN_MEM, value.str);
+                    }
                 } else if (strcmp(fmt, "*a") == 0) {
                     string input;
                     str_new(&input, STR_INIT_LEN);
@@ -550,7 +573,7 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                         if (c != EOF) str_push(&input, c);
                     } while (c != EOF);
                     value.str = input.str;
-                    try_push_stack(DSTRING, value, ERROR_GEN_MEM);
+                    free_try_push_stack(DSTRING, value, ERROR_GEN_MEM, value.str);
                 } else {
                     value.log = STRUE;
                     try_push_stack(DNIL, value, ERROR_GEN_MEM);
@@ -559,7 +582,6 @@ int execute() /// funkce, ktera vezme instrukce z globalni tabulky prvku a vykon
                 value.log = STRUE;
                 try_push_stack(DNIL, value, ERROR_GEN_MEM);
             }
-            //TODO: sakra, tady bude zase dva kybly sracek nacitani, tohle v C DOOPRAVDY nemam rad
             break;
         }
         case ITYPE: {

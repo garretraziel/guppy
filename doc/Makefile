@@ -1,3 +1,2 @@
 default:
-	latex dokumentace.tex
-	dvipdf dokumentace.dvi
+	pdfcslatex dokumentace.tex

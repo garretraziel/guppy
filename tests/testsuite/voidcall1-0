@@ -1,0 +1,19 @@
+-- test voidcall
+
+function foo()
+    write("OK ");
+end
+
+function main()
+    
+    local x;
+
+    foo();
+    foo(1);
+    foo(1, 2);
+    foo(1, 2, 3);
+    x = foo();
+    x == 4;
+
+    write("\n");
+end;

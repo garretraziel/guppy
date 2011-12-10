@@ -1,0 +1,9 @@
+-- kdyz ma read moc parametru
+
+function main()
+    local x;
+
+    x = read(45, 54);
+    write(x);
+
+end;

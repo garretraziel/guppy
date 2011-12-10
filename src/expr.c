@@ -20,62 +20,6 @@
 #include "ial.h"
 
 
-// Symboly se kterymi pracuje zasobnikovy automat
-enum {
-    E_POW, //0 
-
-    E_MUL,
-    E_DIV, //2
-    E_PLUS,
-    E_MINUS, //4
-
-    E_STRCONCAT,
-
-    E_LESS, //6
-    E_GREAT,
-    E_LESSEQ, //8
-    E_GREATEQ,
-    E_NOTEQ, //10
-    E_EQUAL,
-
-    E_IDENT, //12
-    E_NUM,
-    E_STR,  // 14
-    E_BOOL,
-    E_NIL,  // 16
-    
-    E_LBRAC,           
-    E_RBRAC, // 18
-    E_COMMA,
-    E_DOLLAR, //20
-/*    E_MOD,
-    E_STRLEN,
-    E_AND,
-    E_OR,
-    E_NOT, */ // Tohle je do rozsireni, zatim nic
-
-    // Znacka zacatku handle ( < do zasobniku )
-    E_MARK, //21
-
-    // jeste jsou potreba neterminaly
-    E_NET_E,
-    E_NET_P,
-
-    // tohle jsou jen pomocne konstanty pro oobely-boo a spol.
-    E_OP, // obecne operator
-    E_LIT, // obecne literal
-    E_UNKNOWN, // neznamy typ
-    E_VAR, // identifikator promenne
-    E_FUNC, // identifikator funkce
-    E_FIND, // vestavene funkce
-    E_SORT,
-    E_SUBSTR,
-    E_TYPE,
-    // NOTE: zadne dalsi konstanty nepridavat, kvuli kontrole >= E_FUNC
-} ESymbols;
-
-
-
 // Normalni clovek nezanori vice volani funkci nez 3, 20 musi stacit kazdemu
 #define FUNC_STACK_SIZE 20
 
@@ -222,23 +166,23 @@ const int translatetoken[] = {
 // Precedencni tabulka
 const int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka <
        /*    ^   *   /   +   -   ..  <   >   <=  >=  ~=  ==  id  nu  st  bl  ni  (   )   ,   $   */
-/* ^    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
-/* *    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
-/* /    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
-/* +    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
-/* -    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, OO, OO, OO, LT, GT, GT, GT, },
-/* ..   */ { LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, LT, OO, LT, OO, OO, LT, GT, GT, GT, },
-/* <    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
-/* >    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
-/* <=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
-/* >=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, OO, OO, LT, GT, GT, GT, },
+/* ^    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* *    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* /    */ { LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* +    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* -    */ { LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* ..   */ { LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* <    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* >    */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* <=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
+/* >=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
 /* ~=   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
 /* ==   */ { LT, LT, LT, LT, LT, LT, GT, GT, GT, GT, GT, GT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
 /* id   */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, EQ, GT, GT, GT, },
-/* num  */ { GT, GT, GT, GT, GT, OO, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
-/* str  */ { OO, OO, OO, OO, OO, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
-/* bool */ { OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
-/* nil  */ { OO, OO, OO, OO, OO, OO, OO, OO, OO, OO, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* num  */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* str  */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* bool */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
+/* nil  */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
 /* (    */ { LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, EQ, LT, OO, },
 /* )    */ { GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, GT, OO, OO, OO, OO, OO, OO, GT, GT, GT, },
 /* ,    */ { LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, LT, GT, GT, GT, },
@@ -249,7 +193,7 @@ const int prec_table[][E_MARK] = { // ma sirku poctu symbolu, posledni je znacka
 /* or   */
 /* not  */
 };
-
+ 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -413,7 +357,7 @@ static int s_oobely_boo(Stack *stack)
         [E_NET_P] = E_NET_P,
     };
 
-    int E1, E2, OP; // pro uchovani typu redukovanych E
+    int E1, E2, OP = 0; // pro uchovani typu redukovanych E
     int top;
     int state = START;
     // cyklus prochazeni zasobnikem
@@ -472,6 +416,7 @@ static int s_oobely_boo(Stack *stack)
                 s_pop(stack);
                 top = translate[stack->top->type];
                 if(top == E_IDENT){ // volani funkce s 1 parametrem
+                    E1 = E_UNKNOWN;
                     // overeni poctu parametru
                     for(int i = 1; i < ((FunctionTree*)stack->top->ptr)->params; ++i)
                         generate(IPUSHN, NULL);
@@ -486,12 +431,13 @@ static int s_oobely_boo(Stack *stack)
                         generate(ISORT, stack->top->ptr);
                     else if(stack->top->e_type == E_SUBSTR)
                         generate(ISUBSTR, stack->top->ptr);
-                    else // TYPE
+                    else { // TYPE
                         generate(ITYPE, stack->top->ptr);
+                        E1 = E_STR;
+                    }
                     s_pop(stack); // oddelani identifikatoru
                     top = translate[stack->top->type];
                     func_pop();
-                    E1 = E_UNKNOWN;
                 }
                 // bud vyraz v zavorce, nebo volani funkce
                 if(top == E_MARK) {
@@ -712,7 +658,7 @@ static inline int expression__(Stack *stack)
 #endif
     } while(a != E_DOLLAR || b != E_DOLLAR);
 
-    return 1;
+    return stack->top->e_type;
 }
 
 

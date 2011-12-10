@@ -1,0 +1,9 @@
+-- test, co dela read, pokud dostane bool jako param
+
+function main()
+    local x;
+
+    x = read(true);
+    write(x);
+
+end;

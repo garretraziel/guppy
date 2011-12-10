@@ -35,7 +35,6 @@ const char *SYN_ERRORS[] = {
     [(-ERROR_SYN_X_DO) % 100] = "Ocekavano DO",
     [(-ERROR_SYN_X_OPRTR) % 100] = "Ocekavan operator",
     [(-ERROR_SYN_EXP_FAIL) % 100] = "Neplatny vyraz",
-    [(-ERROR_SYN_FUNC_REDEF) % 100] = "Funkce je jiz definovana",
     [(-ERROR_SYN_MAIN) % 100] = "Funkce main neni definovana nebo neni definovana jako posledni",
     [(-ERROR_SYN_X_UNTIL) % 100] = "Ocekavano UNTIL",
 };
@@ -48,7 +47,11 @@ const char *SEM_ERRORS[] = {
      [(-ERROR_SEM_WRONG_TYPES) % 100] = "Nekompatibilni typy operandu ve vyrazu",
      [(-ERROR_SEM_CALL_VAR) % 100] = "Nelze volat promenne",
      [(-ERROR_SEM_FUNC_VAR) % 100] = "Funkce nelze pouzivat jako promenne",
+     [(-ERROR_SEM_WRITE_WRPR) % 100] = "Spatny typ parametru prikazu write",
+     [(-ERROR_SEM_READ_WRPR) % 100] = "Spatny parametr prikazu read",
+     [(-ERROR_SYN_FUNC_REDEF) % 100] = "Funkce je jiz definovana",
 };
+
 
 // [4] Obecne chybove zpravy interpretace
 const char *INT_ERRORS[] = {

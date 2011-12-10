@@ -27,6 +27,10 @@
 #define check_token(exptok, errcode) do { if(token != exptok) \
     return (token < 0) ? token : errcode; } while(0)
 
+// makro try s kontrolou typu pro write
+#define try_write_expr() do { int x = expression(); if(x<0) return x; if(x == E_BOOL || x == E_NIL) return ERROR_SEM_WRITE_WRPR; } while(0)
+
+
 #ifdef DEBUG
 void print_functions(FunctionTree *);
 #endif
@@ -294,7 +298,7 @@ static int statement_seq(void)
 }
 
 // S -> id = Az
-// S -> write ( EL )
+// S -> write ( ES )
 // S -> if E then SPS else SPS end
 // S -> while E do SPS end
 // S -> ret E
@@ -340,6 +344,11 @@ static int statement(void)
             // left bracket
             check_token(LBRAC, ERROR_SYN_X_LBRC);
             get_token();
+            // pokud neni zadny parametr, nic se nedeje
+            if(token == RBRAC) {
+                get_token();
+                return 1;
+            }
             // expression list
             try( expression_seq() );
             // right bracket
@@ -435,13 +444,19 @@ static int assign_z(void)
         // jeden parametr (string nebo cislo)
         Data data;
         if(token == STRING) {
+            if(strcmp(str.str, "*n") != 0 && strcmp(str.str, "*l") != 0 && strcmp(str.str, "*a") != 0)
+                return ERROR_SEM_READ_WRPR;
             data.type = T_STRING;
             data.value.str = str.str;
             try( str_new(&str, STR_INIT_LEN) );
         } else if(token == NUMBER) {
             data.type = T_NUMBER;
             data.value.num = strtod(str.str, NULL);
-        } else
+            if(data.value.num == 0)
+                return ERROR_SEM_READ_WRPR;
+        } else if(token == TRUE || token == FALSE || token == NIL)
+            return ERROR_SEM_READ_WRPR;
+        else
             return (token < 0) ? token : ERROR_SYN_UX_TOKEN;
         // generovani instrukci
         try( insert_literal(data) );
@@ -458,13 +473,14 @@ static int assign_z(void)
 }
 
 
-// // // // // // // // // // // // // // // // // // // // // // // // //
-// Co je dal uz nefunguje ani zatim nema:
+// seznam vyrazu pro write
+// nesmi mit typ boolean ani nil
 
 // ES -> E ESz
 static int expression_seq(void)
 {
-    try( expression() );
+    // vyraz
+    try_write_expr();
     // pro prvni parametr write
     generate(IWRITE, NULL);
     return expression_seq_z();
@@ -476,7 +492,8 @@ static int expression_seq_z(void)
 {
     if(token == COMMA) {
         get_token();
-        try( expression() );
+        // vyraz
+        try_write_expr();
         // pro kazdy parametr write
         generate(IWRITE, NULL);
         return expression_seq_z();

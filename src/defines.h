@@ -35,9 +35,8 @@ enum {
     ERROR_SYN_X_DO = -212,
     ERROR_SYN_X_OPRTR = -213,
     ERROR_SYN_EXP_FAIL = -214,
-    ERROR_SYN_FUNC_REDEF = -215,
-    ERROR_SYN_MAIN= -216,
-    ERROR_SYN_X_UNTIL= -217,
+    ERROR_SYN_MAIN= -215,
+    ERROR_SYN_X_UNTIL= -216,
 } ESynErrors;
 
 // [3]
@@ -47,6 +46,9 @@ enum {
     ERROR_SEM_WRONG_TYPES = -303,
     ERROR_SEM_CALL_VAR = -304,
     ERROR_SEM_FUNC_VAR = -305,
+    ERROR_SEM_WRITE_WRPR = -306,
+    ERROR_SEM_READ_WRPR = -307,
+    ERROR_SYN_FUNC_REDEF = -308,
 } ESemErrors;
 
 // [4]

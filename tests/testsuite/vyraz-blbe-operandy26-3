@@ -1,0 +1,5 @@
+-- test operaci s blbymi typy operandu
+
+function main()
+    write( 42 ^ "42");
+end;

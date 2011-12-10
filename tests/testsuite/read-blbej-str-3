@@ -1,0 +1,9 @@
+-- read se spatnym stringem jako parametr
+
+function main()
+    local x;
+
+    x = read("X");
+    write(x, "\n");
+
+end;

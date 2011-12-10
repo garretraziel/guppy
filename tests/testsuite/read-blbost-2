@@ -1,0 +1,9 @@
+-- test, co dela read, kdyz dostane jako param uplnou blbost
+
+function main()
+    local x;
+
+    x = read( not );
+    write(x, "\n");
+
+end;

@@ -1,0 +1,7 @@
+-- co kdyz write dostane nil
+
+function main()
+
+    write( nil );
+
+end;

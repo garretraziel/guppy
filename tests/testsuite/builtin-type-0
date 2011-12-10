@@ -1,0 +1,10 @@
+-- test builtin funkce type
+
+function main()
+
+    write(type(42), "\n");
+    write(type(42 < 23), "\n");
+    write(type(nil), "\n");
+    write(type(type(nil)), "\n");
+
+end;

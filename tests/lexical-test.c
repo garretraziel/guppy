@@ -70,6 +70,7 @@ void Error(const char *fmt, ...)
 
 int main(void)
 {
+    int error;
     str_new(&str, STR_INIT_LEN); 
     input = stdin;
 

@@ -13,7 +13,7 @@ debug: DEBUG=debug
 debug: rebuild
 
 clean:
-	rm -f *.o lexical-test quicksort-test knuth-test parser-test substr-test expr-test
+	rm -f *.o lexical-test quicksort-test knuth-test parser-test substr-test expr-test exec-test
 
 guppy:
 	make -C ../src/ -f ../src/Makefile $(DEBUG)

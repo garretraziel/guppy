@@ -1,0 +1,7 @@
+function main()
+	local a;
+	local b;
+	a = read("*n");
+	b = read(2);
+	write(a,"\n",b);
+end;

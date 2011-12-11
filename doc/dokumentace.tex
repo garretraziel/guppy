@@ -29,6 +29,8 @@ Analýza výrazů je obstrána funkcí {\tt expression()}, kterou zavolá parser
 Výrazy jsou tvořeny literály, již definovanými proměnnými, závorkami nebo výrazy tvořenými binárními aritmetickými a relačními o\-pe\-rá\-to\-ry. Na rozdíl od jazyka Lua nejsou implicitní konverze povoleny až na specifikované výjimky. Případy, kdy je operand dané operace nekompatibilního typu, se dělí na dvě možnosti. Pokud je operand literál, je o chybě rozhodnouto již v době analýzy zdrojového kódu a jedná se o sémantickou chybu. V případě, že operand není literál, jedná se o chybu interpretace. 
 Volání funkcí je zpracováno jako výraz a funkce mohou být součástí výrazu, zároveň mohou být výrazy v parametrech funkcí.
 
+\input{gram-vyrazy.tex}
+
 \section{Sémantická analýza}
 
 \section{Interpretace}

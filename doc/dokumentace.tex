@@ -38,37 +38,33 @@ Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parse
 Pokud je znám typ operandu nějaké operace už v době překladu, analyzátor kontroluje kompatibilitu typu tohoto operandu vzhledem k prováděné operaci. To je realizováno tak, že zásobníkový automat uchovává symboly ve svém zásobníku i s informací o jejich typu.
 
 Při nahrazení literálu na zásobníku symbolem $E$, je uložen na zásobník symbol $E$ s informací o typu nahrazovaného literálu.
-Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratové hodnoty funkcí jsou vždy neznámého typu, který je povolen pro všechny operace a jeho typ je kontrolován až v době interpretace. Toto šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly, než kdyby se typ kontroloval jen u litérálů.
+Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratové hodnoty funkcí jsou vždy neznámého typu, který je povolen pro všechny operace a jeho typ je kontrolován až v době interpretace. Toto šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly, než kdyby se typ kontroloval jen u literálů.
 
 \subsection{Generování instrukcí}
 
 Syntaktický analyzátor během překladu hlaviček funkcí a sekvence definic lo\-kál\-ních proměnných ukládá informace, získané ze zdrojového kódu pře\-klá\-da\-ného programu a potřebné k dalšímu překladu, do tabulek symbolů, kterých používáme hned několik. V tabulce funkcí je pro každou funkci uložen identifikátor funkce, adresa začátku jejího kódu, počet parametrů, počet lokálních pro\-měn\-ných a ukazatel do tabulky lokálních symbolů. Do tabulek lokálních symbolů jsou ukládány identifikátory parametrů a lokálních proměnných funkce, ke která tabulka patří, a offsety těchto proměnných, které slouží interpretru k vypočítání polohy dané proměnné na zásobníku. Klíčem pro vyhledávání v tabulce funkcí a tabulce lokálních symbolů je identifikátor.
 
-V průběhu zpracovaní literálů a výrazů je využíváva tabulka literálů, kam jsou ukládány řetězcové a číselné  literály. Uložen je typ a hodnota literálu.
+V průběhu zpracovaní literálů a výrazů je využívána tabulka literálů, kam jsou ukládány řetězcové a číselné  literály. Uložen je typ a hodnota literálu.
 
 Během překladu jednotlivých příkazů a výrazů analyzátor vyhledává v~tabulkách symbolů a generuje instrukce, kterým předává ukazatele do těchto tabulek. Např. při překladu příkazu přiřazení do proměnné se vygenerují instrukce pro výpočet výrazu. Tyto instrukce generuje analyzátor výrazů v~okamžiku, kdy na zásobníku nahrazuje pravou stranu pravidla za levou. Nakonec je identifikátor proměnné vyhledán v tabulce symbolů a je vygenerována instrukce pro přesun výsledku výrazu z vrcholu zásobníku na místo, které má na zásobníku rezervované daná proměnná.
 
 \section{Interpretace}
 
-Pro účely našeho interpretru používáme variantu tříadresného kódu. Pro\-to\-že veškeré aritmetické a porovnávací instrukce pracují se zásobníkem, je v instrukcích potřeba maximálně jediná adresa.
+Pro účely našeho interpretru používáme jednoadresný kód. Pro\-to\-že veškeré aritmetické a porovnávací instrukce pracují se zásobníkem, je v instrukcích potřeba maximálně jediná adresa.
 
 \subsection{Zásobník}
 
-V našem interpretru hraje zásobník důležitou roli. Používá se jak pro lokální proměnné a předávání argumentů funkcím tak pro veškeré výpočty. Jelikož parser pro výrazy dokáže výraz jednoduše převést do postfixové formy, rozhodli jsme se, že instrukce ADD, SUB apod. budou pracovat s čísly, které jsou uloženy na zásobníku. Například kód {\tt a = 3 + 4} se převede do instrukcí {\tt push 4; push 3; add; popi a}. Toto sice není nejlepší řešení z pohledu rychlosti interpretace a optimalizací, za to je velice snadný pro implementaci. Pro implementaci zásobníku používáme dynamicky alokované (a realokovatelné) pole. Používáme také \uv{registry} ESP, EBP a EIP po řadě pro ukazatel na vrchol zásobníku, ukazatel pro přístup k lokálním proměnným a ukazatel na aktuálně prováděnou instrukci.
-
-\subsection{Páska instrukcí}
-
-Páska instrukcí je implementována pomocí zřetězeného lineárního jedno\-směr\-né\-ho seznamu, jelikož není potřeba se mezi instrukcemi posouvat zpět (a při skocích je známa adresa, na kterou instrukci musí interpret skočit). Vhodně se také dá využít aktuální prvek seznamu (jako příznak pro instrukci, která bude aktuálně prováděná).
+V našem interpretru hraje zásobník důležitou roli. Používá se jak pro lokální proměnné a předávání argumentů funkcím tak pro veškeré výpočty. Jelikož parser pro výrazy dokáže výraz jednoduše převést do postfixové formy, rozhodli jsme se, že instrukce ADD, SUB apod. budou pracovat s čísly, které jsou uloženy na zásobníku. Například kód {\tt a = 3 + 4} se převede do instrukcí {\tt push 4; push 3; add; popi a}. Toto sice není nejlepší řešení z pohledu rychlosti interpretace a optimalizací, za to je velice snadný pro implementaci. Pro implementaci zásobníku používáme dynamicky alokované (a realokovatelné) pole. Dále používáme obdobu registrů $ESP$, $EBP$ a $EIP$ po řadě pro ukazatel na vrchol zásobníku, ukazatel pro přístup k lokálním proměnným a ukazatel na aktuálně prováděnou instrukci.
 
 \subsection{Volání funkcí a návrat z funkce}
 
-Pro volání funkcí jsme se inspirovali u assembleru pro platformu x86 a volání funkcí typu stdcall (nicméně argumenty funkce jsou, kvůli proměnlivému počtu argumentů, zpracovávány zleva doprava). Argumenty funkce byly již před voláním CALL vloženy na zásobník. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru ESP. Poté uloží obsah registru EBP na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
+Pro volání funkcí jsme se inspirovali v kurzu IAS. Argumenty funkce byly již před voláním CALL vloženy na zásobník. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
 
 
-Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr EBP. Protože je zásobník implementovaný dynamicky alokovaným polem, umožňuje to přímý přístup.
+Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr $EBP$. Protože je zásobník implementovaný dynamicky alokovaným polem, umožňuje to přímý přístup.
 
 
-Při návratu z funkce (při volání instrukce RET) se vybere návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr EBP. Obnoví se obsah registru EBP a návratová adresa. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
+Při návratu z funkce (při volání instrukce RET) se vybere návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr $EBP$. Obnoví se obsah registru $EBP$ a návratová adresa. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
 
 \section{Popis použitých algoritmů}
 
@@ -76,7 +72,7 @@ Při návratu z funkce (při volání instrukce RET) se vybere návratová hodno
 
 Quicksort je rozdělovací metodou řazení, která se snaží řazenou posloupnost rozdělit na 2 nejlépe stejně velké části tak, aby v jedné byly jen prvky menší nebo rovny než nějaká vybraná hodnota a v druhém jen větší nebo rovny než tato hodnota. Optimální je výběr mediánu, ale jeho výpočet je časově náročný a proto nevhodný. My vybíráme prvek uprostřed řazené posloupnosti. 
 
-Quicksort patří mezi nejrychlejší algoritmy řazení. Implementovali jsme jeho rekurzívní variantu, která by sice nebyla natolik efektivní jako nerekurzivní varianta, nicméně jsou řazena spíše menší pole, tudíž rozdíl není zas až tak značný.
+Quicksort patří mezi nejrychlejší algoritmy řazení. Implementovali jsme jeho rekurzívní variantu.
 
 \subsection{Strom pro uchování symbolů}
 
@@ -84,14 +80,14 @@ Binární vyhledávací strom v našem interpretru používáme pro u\-cho\-vá\
 
 \subsection{Knuth-Morris-Prattův algoritmus}
 
-Pro vyhledávání podřetězců v řetězci jsme podle zadání použili Knuth-Morris-Prattův algoritmus. Tento se sestává z dvou funkcí, první vytvoří na zadaném podřetězci tzv. failvektor, který se poté použije v druhé funkci pro posunutí v případě nesouhlasných znaků na té které pozici.
+Pro vyhledávání podřetězců v řetězci jsme podle zadání použili Knuth-Morris-Prattův algoritmus. Tento se sestává z dvou funkcí, první vytvoří na zadaném podřetězci tzv. vektor FAIL, který se poté použije v druhé funkci pro posunutí v případě nesouhlasných znaků na té které pozici.
 
 \subsection{Vytváření podřetězců}
 
 V případě vytváření podřetězců nastal pouze jediný problém - převod z `C konvence' (pole je počítáno od 0) do konvence, použité v jazyce IFJ11 (pole je počítáno od 1). Toto zapříčiňuje mimo jiné také to, že zatímco kladné indexy se musí přepočítat, záporné indexy jsou v obou konvencích stejné.
 
-\section{Rozdělení bodů}
+\section{Závěr a rozdělení bodů}
 
-Radka Mokrá, vedoucí týmu, odvedla svou práci dobře, úspěšně se jí dařilo podporovat tým v průběžné práci na projektu v průběhu celého semestru. Bez její podpory bychom to určitě nezvládli, proto má na projektu zaslouženě podíl 34\%. Jan Sedlák a Aleš Dujíček spolu celý překladač navrhli a implementovali. Jan Sedlák se věnoval syntaktické analýze výrazů, sestrojení precedenční tabulky a implementaci interpretru vygenerovaných instrukcí. Aleš Dujíček zase lexikální analýze a syntaktické analýze shora dolů. Oba pracovali se stejným nasazením, proto má každý podíl 33\%. Práce Lukáše Brabce nestojí za řeč, na projektu neudělal téměř nic, tak má 0\%.
+Pro práci v týmu jsme používali specializovaný verzovací software git. Ten nám umožnil nejenom efektivně odhalovat chyby a dopodrobna zálohovat veškeré změny ale i pohodlnou práci ve skupině. Díky tomu jsme mohli rovnoměrně rozdělit pracovní náplň a proto máme také rovnoměrné rozdělení bodů. Radka Mokrá se postarala o implementaci vestavěných funkcí, algoritmů pro vyhledávání podřetězců, vytváření podřetězců a další. Aleš Dujíček navrhl a implementoval lexikální analýzu a spolu s Lukášem Brab\-cem dále syntaktickou i sémantickou analýzu zdrojového kódu, včetně vý\-ra\-zů. Jan Sedlák navrhl vnitřní kód našeho interpretru a postaral se také o jeho samotnou interpretaci. Velmi nám pomohlo webové rozhraní GitHub\footnote{www.github.com} firmy GitHub inc., která nám zdarma poskytla soukromé repozitáře a které bychom chtěli touto cestou poděkovat.
 
 \end{document}

@@ -56,8 +56,8 @@ static int F = -1;
         return ERROR_SEM_WRONG_TYPES; \
     switch(OP) { \
         case E_LESS: case E_LESSEQ: case E_GREAT: case E_GREATEQ: \
-            if(a != E_UNKNOWN && a != E_NUM && a != E_STR && \
-               b != E_UNKNOWN && b != E_NUM && b != E_STR) \
+            if((a != E_UNKNOWN && a != E_NUM && a != E_STR) || \
+               (b != E_UNKNOWN && b != E_NUM && b != E_STR)) \
                 return ERROR_SEM_WRONG_TYPES; \
             break; \
         case E_STRCONCAT: \

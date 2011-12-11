@@ -8,13 +8,24 @@
 \frenchspacing
 
 \begin{document}
-\maketitle
+%\maketitle
+\input{title.tex}
+
 \tableofcontents
 
-\section{Stáj}
-Příliš žluťoučký kůň úpěl ďábelské ódy.
+\newpage
+
+\section{Úvod}
+
+\section{Lexikální analýza}
+
 \section{Syntaktická analýza}
+
+\subsection{Analýza výrazů}
 \input{prectabulka.tex}
+
+\section{Sémantická analýza}
+
 \section{Interpretace}
 Pro účely našeho interpreteru používáme variantu tříadresného kódu. Pro\-to\-že veškeré aritmetické a porovnávací instrukce pracují se zásobníkem, je v instrukcích potřeba maximálně jediná adresa.
 \subsection{Zásobník}
@@ -29,4 +40,11 @@ Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn
 
 
 Při návratu z funkce (při volání instrukce RET) se vybere návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr EBP. Obnoví se obsah registru EBP a návratová adresa. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
+
+\section{Popis algoritmů v ial.c}
+
+\section{Rozdělení bodů}
+
+Radka Mokrá, vedoucí týmu, odvedla svou práci dobře, úspěšně se jí dařilo podporovat tým v průběžné práci na projektu v průběhu celého semestru. Bez její podpory bychom to určitě nezvládli, proto má na projektu zaslouženě podíl 34\%. Jan Sedlák a Aleš Dujíček spolu celý překladač navrhli a implementovali. Jan Sedlák se věnoval syntaktické analýze výrazů, sestrojení precedenční tabulky a implementaci interpreteru vygenerovaných instrukcí. Aleš Dujíček zase lexikální analýze a syntaktické analýze shora dolů. Oba pracovali se stejným nasazením, proto má každý podíl 33\%. Práce Lukáše Brabce nestojí za řeč, na projektu neudělal téměř nic, tak má 0\%.
+
 \end{document}

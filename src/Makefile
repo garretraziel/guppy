@@ -31,4 +31,5 @@ clean:
 	rm -f *.o $(PROJECT) dep.list
 
 zip:
-	tar czf $(LOGIN).tgz *.c *.h rozdeleni rozsireni ../doc/dokumentace.pdf Makefile
+	cp ../doc/dokumentace.pdf ./
+	tar czf $(LOGIN).tgz *.c *.h rozdeleni rozsireni dokumentace.pdf Makefile

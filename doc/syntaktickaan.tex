@@ -1,0 +1,7 @@
+Syntaktická analýza je prováděna rekurzívním sestupem shora dolů. Vytvořili jsme proto bezkontextovou gramatiku, pro kterou jsou terminálními symboly tokeny, které vrací lexikální analyzátor. Neterminální symboly popisují jednotlivé konstrukce jazyka IFJ11. Tuto gramatiku jsme vytýkáním a odstraněním levé rekurze převedli na LL-gramatiku, jejíž pravidla jsou na obrázku \ref{syn.prog}.
+
+Počátečním neterminálním symbolem je symbol {\tt program}. Každý neterminální symbol je v analyzátoru reprezentován funkcí, která zpracovává pravou stranu pravidla. Pokud je na pravé straně pravidla terminální symbol, je kontrolováno, zda lexikální analyzátor právě takový token načetl. Pokud ne, jedná se o syntaktickou chybu. Neterminální symboly na pravé straně vedou k volání funkce, která tento symbol reprezentuje.
+
+\input{gram-prog.tex}
+
+Výrazy jsou zpracovávány metodou zdola nahoru a je jim věnována následující podkapitola.

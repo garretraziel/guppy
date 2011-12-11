@@ -23,12 +23,13 @@ Tento text je dokumentací k týmovému projektu do kurzu IFJ (Formální jazyky
 \input{lexikalnian.tex}
 
 \section{Syntaktická analýza}
+
 \input{syntaktickaan.tex}
 
-\input{gram-prog.tex}
-
 \subsection{Analýza výrazů}
-Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru, která je realizována zásobníkovým automatem. Pro tuto potřebu byla vytvořena precedenční tabulka zobrazená v tabulce \ref{tab.prec}, která určuje jak zásobníkový automat reaguje na vstupní token v závislosti na terminálním symbolu nejblíže vrcholu zásobníku.
+Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru, která je realizována zásobníkovým automatem. Pro tuto potřebu byla vytvořena precedenční tabulka zobrazená v tabulce \ref{tab.prec}, která určuje jak zásobníkový automat reaguje na vstupní token v závislosti na terminálním symbolu nejblíže vrcholu zásobníku. Gramatika popisující výrazu je uvedena na obrázku \ref{syn.expr}.
+
+\input{gram-vyrazy.tex}
 
 \input{prectabulka.tex}
 
@@ -36,9 +37,6 @@ Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parse
 Případy, kdy je operand dané operace nekompatibilního typu, se dělí na dvě možnosti. Pokud je operand literál, je o chybě rozhodnuto již v době analýzy zdrojového kódu a jedná se o sémantickou chybu. V případě, že operand není literál, jedná se o chybu interpretace. 
 Volání funkcí je zpracováno jako výraz a funkce mohou být součástí výrazu, zároveň mohou být výrazy v parametrech funkcí.
 
-\input{gram-vyrazy.tex}
-
-\section{Sémantická analýza}
 
 \section{Interpretace}
 

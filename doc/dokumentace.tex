@@ -22,7 +22,10 @@
 \section{Syntaktická analýza}
 
 \subsection{Analýza výrazů}
+Analýza výrazů je obstrána funkcí{\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru. Pro tuto potřebu byla vytvořena precedenční tabulka, ktérá určuje pořadí, v jakém jsou vyhodnoceny jedntlivé části výrazu. 
 \input{prectabulka.tex}
+Výrazy jsou tvořeny literály, již definovanými proměnnými, závorkami nebo výrazy tvořenými binárními aritmetickými a relačními operátory. Na rozdíl od jazyka Lua nejsou implicitní konverze povoleny až na specifikované výjimky. Případy, kdy je operand dané operace nekompatibilního typu, se dělí na dvě možnosti. Pokud je operand literál, je o chybě rozhodnouto již v době analýzy zdrojového kódu a jedná se o sémantickou chybu. V případě, že operand není literál, jedná se o chybu interpretace. 
+Volání funkcí je zpracováno jako výraz a funkce mohou být součástí výrazu, zároveň mohou být výrazy v parametrech funkcí.
 
 \section{Sémantická analýza}
 

@@ -2,6 +2,7 @@
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{rotating}
+\usepackage{graphicx}
 \pagestyle{headings}
 \author{Radka Mokrá (xmokra00), Lukáš Brabec (xbrabe09), Aleš Dujíček(xdujic01), Jan Sedlák (xsedla85)}
 \title{Gagaga}
@@ -16,13 +17,17 @@
 \newpage
 
 \section{Úvod}
-
+Tento text je dokumentací k týmovému projektu do kurzu IFJ (Formální jazyky a překladače) a IAL (Algoritmy). Popisuje implementaci interpretru jazyka inspirovaného programovacím jazykem Lua. Pro řešení byla vybrána varianta a/1/I, řazení je implementováno algoritmem quicksort, tabulka symbolů binárním stromem a vyhledávání podřetězců Knuth-Morris-Prattovým algoritmem.
 \section{Lexikální analýza}
+\input{lexikalnian.tex}
 
 \section{Syntaktická analýza}
 
 \subsection{Analýza výrazů}
+Analýza výrazů je obstrána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru. Pro tuto potřebu byla vytvořena precedenční tabulka, ktérá určuje pořadí, v jakém jsou vyhodnoceny jedntlivé části výrazu. 
 \input{prectabulka.tex}
+Výrazy jsou tvořeny literály, již definovanými proměnnými, závorkami nebo výrazy tvořenými binárními aritmetickými a relačními o\-pe\-rá\-to\-ry. Na rozdíl od jazyka Lua nejsou implicitní konverze povoleny až na specifikované výjimky. Případy, kdy je operand dané operace nekompatibilního typu, se dělí na dvě možnosti. Pokud je operand literál, je o chybě rozhodnouto již v době analýzy zdrojového kódu a jedná se o sémantickou chybu. V případě, že operand není literál, jedná se o chybu interpretace. 
+Volání funkcí je zpracováno jako výraz a funkce mohou být součástí výrazu, zároveň mohou být výrazy v parametrech funkcí.
 
 \section{Sémantická analýza}
 

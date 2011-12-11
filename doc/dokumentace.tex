@@ -18,10 +18,12 @@
 
 \section{Úvod}
 Tento text je dokumentací k týmovému projektu do kurzu IFJ (Formální jazyky a překladače) a IAL (Algoritmy). Popisuje implementaci interpretru jazyka inspirovaného programovacím jazykem Lua. Pro řešení byla vybrána varianta a/1/I, řazení je implementováno algoritmem quicksort, tabulka symbolů binárním stromem a vyhledávání podřetězců Knuth-Morris-Prat\-to\-vým algoritmem.
+
 \section{Lexikální analýza}
 \input{lexikalnian.tex}
 
 \section{Syntaktická analýza}
+\input{gram-prog.tex}
 
 \subsection{Analýza výrazů}
 Analýza výrazů je obstrána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru. Pro tuto potřebu byla vytvořena precedenční tabulka, ktérá určuje pořadí, v jakém jsou vyhodnoceny jedntlivé části výrazu. 

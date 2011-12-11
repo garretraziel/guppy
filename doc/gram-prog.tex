@@ -1,0 +1,30 @@
+program $ \rightarrow $ definice-funkce   definice-funkcí   \textbf{;}   \textbf{EOF} \\
+definice-funkce $ \rightarrow $	\textbf{function} \textbf{id} \textbf{(} parametry \textbf{)} deklarace příkazy \textbf{end} \\
+definice-funkcí $ \rightarrow $ definice-funkce   definice-funkcí \\
+definice-funkcí $ \rightarrow \varepsilon $ \\
+parametry $ \rightarrow $	\textbf{identifier}   parametry-z \\
+parametry $ \rightarrow \varepsilon $ \\
+parametry-z $ \rightarrow $ \textbf{,}   \textbf{id} parametry-z \\
+parametry-z $ \rightarrow 	\varepsilon $ \\
+deklarace $ \rightarrow $	\textbf{local} \textbf{id} deklarace-z   deklarace \\
+deklarace $ \rightarrow \varepsilon $ \\
+deklarace-z $ \rightarrow $ \textbf{=} výraz \textbf{;} \\
+deklarace-z $ \rightarrow $ \textbf{;} \\
+literál $ \rightarrow $	\textbf{číslo} \\
+literál $ \rightarrow $ \textbf{řetězec} \\
+literál $ \rightarrow $ \textbf{nil} \\
+literál $ \rightarrow $ \textbf{true} \\
+literál $ \rightarrow $ \textbf{false} \\ 
+sekvence-příkazů $ \rightarrow $	příkaz   \textbf{;}   sekvence-příkazů \\
+sekvence-příkazů $ \rightarrow \varepsilon $ \\
+příkaz $ \rightarrow $	\textbf{id} \textbf{=} assign-z \\
+příkaz $ \rightarrow $	\textbf{write} \textbf{(} seznam-výrazů \textbf{)} \\
+příkaz $ \rightarrow $	\textbf{if} výraz \textbf{then} sekvence-příkazů \textbf{else} sekvence-příkazů \textbf{end} \\
+příkaz $ \rightarrow $	\textbf{while} výraz \textbf{do} sekvence-příkazů \textbf{end} \\
+příkaz $ \rightarrow $	\textbf{return} výraz \\
+příkaz $ \rightarrow $	\textbf{repeat} sekvence-příkazů \textbf{until} výraz \\
+assign-z $ \rightarrow $ \textbf{read}   \textbf{(}  literál \textbf{)} \\
+assign-z $ \rightarrow $ výraz \\
+seznam-výrazů $ \rightarrow $ výraz seznam-výrazů-z \\
+seznam-výrazů-z $ \rightarrow $ \textbf{,} výraz seznam-výrazů-z \\
+seznam-výrazů-z $ \rightarrow \varepsilon $ \\

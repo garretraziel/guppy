@@ -58,7 +58,7 @@ V našem interpretru hraje zásobník důležitou roli. Používá se jak pro lo
 
 \subsection{Volání funkcí a návrat z funkce}
 
-Implementace volání funkcí je inspirována znalostmi z kurzu IAS, argumenty funkce jsou uloženy na zásobníku spolu s návratovou adresou funkce. Argumenty funkce byly vloženy na zásobník již před voláním CALL. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$, tím se pro lokální proměnné vytvoří místo. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
+Implementace volání funkcí je inspirována znalostmi z kurzu IAS, argumenty funkce jsou uloženy na zásobníku spolu s návratovou adresou funkce. Argumenty funkce byly vloženy na zásobník již před voláním CALL. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$, tím se pro lokální proměnné vytvoří místo. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu, na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
 
 
 Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr $EBP$. Protože je zásobník implementovaný dynamicky alokovaným polem, umožňuje to přímý přístup.

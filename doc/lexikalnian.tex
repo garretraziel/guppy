@@ -7,9 +7,9 @@ Lexikální analyzátor je navržen a implementován jako deterministický ko\-n
 \label{lex.lex}
 \end{figure}
 
-V koncovém stavu pro indentifikátory skončí i klíčová a rezervovaná slova. Kdyby je měl automat zpracovávat zvlášť, přibylo by mnoho stavů a automat by se stal nepřehledným. Proto jsou zpracovány spolčně s identifikátory a na konci je volána funkce, která určí, zda se skutečně jedná o identifikátor, nebo některé z klíčových nebo rezervovaných slov.
+V koncovém stavu pro indentifikátory skončí i klíčová a rezervovaná slova. Kdyby je měl automat zpracovávat zvlášť, přibylo by mnoho stavů a automat by se stal nepřehledným. Proto jsou zpracovány společně s identifikátory a na konci je volána funkce, která určí, zda se skutečně jedná o identifikátor, nebo některé z klíčových nebo rezervovaných slov.
 
-Graf na obázku \ref{lex.lex} není úplný, zobrazuje jen analýzu řetězců, identifikátorů, čísel a komentářů. Analýza ostatních lexémů, jedná so o operátory, je realizována jen jedním, případně dvěma, přechody z počátečního stavu {\tt start}. Graf by se ale při takovém množství přechodů z počátečního stavu stal nepřehledným. Proto je jejich zpracování zobrazeno obrázku \ref{lex.ope} zvlášť od složitější a zajímavější části automatu.
+Graf na obázku \ref{lex.lex} není úplný, nepopisuje celý automat, ale jen jeho část, která analyzuje řetězce, identifikátory, čísla a komentáře. Analýza ostatních lexémů, jedná se o operátory, je realizována jen jedním, případně dvěma, přechody z počátečního stavu {\tt start}. Graf by se ale při takovém množství přechodů z počátečního stavu stal nepřehledným. Proto je pro úplnost zpracování operátorů zobrazeno na obrázku \ref{lex.ope} bokem od složitější a zajímavější části automatu z obrázku \ref{lex.lex}.
 
 \begin{figure}
 \centering

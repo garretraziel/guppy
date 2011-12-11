@@ -37,8 +37,8 @@ Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parse
 \subsection{Sémantické kontroly}
 Pokud je znám typ operandu nějaké operace už v době překladu, analyzátor kontroluje kompatibilitu typu tohoto operandu vzhledem k prováděné operaci. To je realizováno tak, že zásobníkový automat uchovává symboly ve svém zásobníku i s informací o jejich typu.
 
-Při nahrazení literálu na zásobníku symbolem $E$, je uložen na zásobník symbol $E$ s informací o typu nahrazovaného literálu.
-Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratové hodnoty funkcí jsou vždy neznámého typu, který je povolen pro všechny operace a jeho typ je kontrolován až v době interpretace. Toto šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly, než kdyby se typ kontroloval jen u literálů.
+Při nahrazení literálu na zásobníku symbolem $E$ je uložen na zásobník symbol $E$ s informací o typu nahrazovaného literálu.
+Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratové hodnoty funkcí jsou vždy neznámého typu, pro který jsou povoleny všechny operace. Tento typ je kontrolován až v době interpretace. Šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly, než kdyby se typ kontroloval jen u literálů.
 
 \subsection{Generování instrukcí}
 
@@ -58,7 +58,7 @@ V našem interpretru hraje zásobník důležitou roli. Používá se jak pro lo
 
 \subsection{Volání funkcí a návrat z funkce}
 
-Pro volání funkcí jsme se inspirovali v kurzu IAS. Argumenty funkce byly již před voláním CALL vloženy na zásobník. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
+Implementace volání funkcí je inspirována znalostmi z kurzu IAS, argumenty funkce jsou uloženy na zásobníku spolu s návratovou adresou funkce. Argumenty funkce byly vloženy na zásobník již před voláním CALL. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$, tím se pro lokální proměnné vytvoří místo. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu na kterou poté interpret skočí při návratu z funkce. Parser se poté sám postará o správné nastavení lokálních proměnných.
 
 
 Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr $EBP$. Protože je zásobník implementovaný dynamicky alokovaným polem, umožňuje to přímý přístup.

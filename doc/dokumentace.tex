@@ -40,6 +40,13 @@ Pokud je znám typ operandu nějaké operace už v době překladu, analyzátor 
 Při nahrazení literálu na zásobníku symbolem $E$, je uložen na zásobník symbol $E$ s informací o typu nahrazovaného literálu.
 Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratové hodnoty funkcí jsou vždy neznámého typu, který je povolen pro všechny operace a jeho typ je kontrolován až v době interpretace. Toto šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly, než kdyby se typ kontroloval jen u litérálů.
 
+\subsection{Generování instrukcí}
+
+Syntaktický analyzátor ukládá informace, získané ze zdrojového kódu pře\-klá\-da\-ného programu a potřebné k překladu, do tabulek symbolů, kterých používáme hned několik. V tabulce funkcí je pro každou funkci uložen identifikátor funkce, adresa začátku jejího kódu, počet parametrů, počet lokálních pro\-měn\-ných a ukazatel do tabulky lokálních symbolů. Do tabulek lokálních symbolů jsou ukládány identifikátory parametrů a lokálních proměnných funkce, ke která tabulka patří, a offsety těchto proměnných. Klíčem pro vyhledávání v tabulce funkcí a tabulce lokálních symbolů je identifikátor.
+Dále je využívána tabulka literálů, kam jsou ukládány řetězcové a číselné  literály. Uložen je typ a hodnota literálu.
+
+
+
 \section{Interpretace}
 
 Pro účely našeho interpretru používáme variantu tříadresného kódu. Pro\-to\-že veškeré aritmetické a porovnávací instrukce pracují se zásobníkem, je v instrukcích potřeba maximálně jediná adresa.

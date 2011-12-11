@@ -58,13 +58,13 @@ V našem interpretru hraje zásobník důležitou roli. Používá se jak pro lo
 
 \subsection{Volání funkcí a návrat z funkce}
 
-Implementace volání funkcí je inspirována znalostmi z kurzu IAS, argumenty funkce jsou uloženy na zásobníku spolu s návratovou adresou funkce. Instrukce CALL dostane adresu do tabulky funkcí, kde je mimo jiné také napsán počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$, tím se pro lokální proměnné vytvoří místo. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu, na kterou poté interpret skočí při návratu z funkce.
+Implementace volání funkcí je inspirována znalostmi z kurzu IAS, argumenty funkce jsou uloženy na zásobníku spolu s návratovou adresou funkce. Instrukce CALL dostane adresu do tabulky funkcí, kde je uložen počet lokálních pro\-měn\-ných funkce. Toto CALL přičte k registru $ESP$, tím se pro lokální proměnné vytvoří místo. Poté uloží obsah registru $EBP$ na zásobník a za něj uloží návratovou adresu, na kterou poté interpret skočí při návratu z funkce.
 
 
 Pro přístup k lokálním proměnným se používá strom lokálních pro\-měn\-ných. V tomto je uložen offset jednotlivých proměnných, jejich vzdálenost od prvku, na který ukazuje registr $EBP$. Protože je zásobník implementovaný dynamicky alokovaným polem, umožňuje to přímý přístup.
 
 
-Při návratu z funkce (při volání instrukce RET) se vybere návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr $EBP$. Obnoví se obsah registru $EBP$ a návratová adresa. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
+Při návratu z funkce (při provádění instrukce RET) se přečte návratová hodnota z vrcholu zásobníku. Poté se ze zásobníku uvolňují prvky, až po registr $EBP$. Obnoví se obsah registru $EBP$ a podle návratové adresy se nastaví adresa následující instrukce. Následně se z vrcholu zásobníku uvolní počet lokálních proměnných společně s počtem argumentů funkce (tato informace je opět dostupná v tabulce funkcí). Nakonec se na zásobník vloží návratová hodnota a provede se skok zpět na místo, odkud byla funkce volána.
 
 \section{Popis použitých algoritmů}
 

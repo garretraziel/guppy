@@ -27,16 +27,18 @@ Tento text je dokumentací k týmovému projektu do kurzu IFJ (Formální jazyky
 \input{syntaktickaan.tex}
 
 \subsection{Analýza výrazů}
-Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru, která je realizována zásobníkovým automatem. Pro tuto potřebu byla vytvořena precedenční tabulka zobrazená v tabulce \ref{tab.prec}, která určuje jak zásobníkový automat reaguje na vstupní token v závislosti na terminálním symbolu nejblíže vrcholu zásobníku. Gramatika popisující výrazu je uvedena na obrázku \ref{syn.expr}.
+Analýza výrazů je obstarána funkcí {\tt expression()}, kterou zavolá parser, když je dle pravidel očekáván výraz. Výrazy jsou zpracovány pomocí precedenční syntaktické analýzy zdola nahoru, která je realizována zásobníkovým automatem. Pro tuto potřebu byla vytvořena precedenční tabulka zobrazená v tabulce \ref{tab.prec}, která určuje jak zásobníkový automat reaguje na vstupní token v závislosti na terminálním symbolu nejblíže vrcholu zásobníku. Gramatika popisující výrazy je uvedena na obrázku \ref{syn.expr}.
+Úkolem analyzátoru výrazů je také kontrolovat, zda operandy každé operace mají správný typ. Toto je předmětem následující podkapitoly.
 
 \input{gram-vyrazy.tex}
 
 \input{prectabulka.tex}
 
 \subsection{Sémantické kontroly}
-Případy, kdy je operand dané operace nekompatibilního typu, se dělí na dvě možnosti. Pokud je operand literál, je o chybě rozhodnuto již v době analýzy zdrojového kódu a jedná se o sémantickou chybu. V případě, že operand není literál, jedná se o chybu interpretace. 
-Volání funkcí je zpracováno jako výraz a funkce mohou být součástí výrazu, zároveň mohou být výrazy v parametrech funkcí.
+Pokud je znám typ operandu nějaké operace už v době překladu, analyzátor kontroluje kompatibilitu typu tohoto operandu vzhledem k prováděné operaci. To je realizováno tak, že zásobníkový automat uchovává symboly ve svém zásobníku i s informací jejich typu.
 
+Při nahrazení literálu na zásobníku symbolem $E$, je uložen na zásobník symbol $E$ s informací o typu nahrazovaného literálu.
+Při nahrazení pravé strany pravidla, která popisuje nějakou operaci, např. konkatenaci řetězců $E .. E$, je zkontrolován typ obou operandů a na zásobník uložen symbol $E$ s typem výsledku dané operace, v tomto případě string. Proměnné a návratoví hodnoty funkcí jsou vždy neznámého typu, který je povolen pro všechny operace a jeho typ je kontrolován až v době interpretace. Toto šíření typů výsledků operací umožňuje provádět rozsáhlejší kontroly typů než kdyby se typ kontroloval jen u litérálů.
 
 \section{Interpretace}
 

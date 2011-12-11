@@ -46,7 +46,7 @@ Syntaktický analyzátor během překladu hlaviček funcí a sekvence definic lo
 
 V průběhu zpracovaní literálů a výrazu je využíváva tabulka literálů, kam jsou ukládány řetězcové a číselné  literály. Uložen je typ a hodnota literálu.
 
-Během překladu jednotlivých příkazů a výrazů analyzátor vyhledává v tabulkách symbolů a generuje instrukce, kterým předává ukazatele do těchto tabulek. Např. při překladu příkazu přiřazení do proměnné se vygenerují instrukce pro výpočet výrazu. Tyto instrukce generuje analyzátor výrazů v okamžiku, kdy na zásobníku nahrazuje pravou stranu pravidla za levý neterminální symbol. Nakonec je identifikátor proměnné vyhledán v tabulce symbolů a je vygenerována instrukce pro přesun výsledku výrazu ze zásobníku na místo, které má na zásobníku rezervované daná proměnná.
+Během překladu jednotlivých příkazů a výrazů analyzátor vyhledává v tabulkách symbolů a generuje instrukce, kterým předává ukazatele do těchto tabulek. Např. při překladu příkazu přiřazení do proměnné se vygenerují instrukce pro výpočet výrazu. Tyto instrukce generuje analyzátor výrazů v okamžiku, kdy na zásobníku nahrazuje pravou stranu pravidla za levou. Nakonec je identifikátor proměnné vyhledán v tabulce symbolů a je vygenerována instrukce pro přesun výsledku výrazu z vrcholu zásobníku na místo, které má na zásobníku rezervované daná proměnná.
 
 \section{Interpretace}
 

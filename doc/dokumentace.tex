@@ -74,7 +74,9 @@ Při návratu z funkce (při volání instrukce RET) se vybere návratová hodno
 
 \subsection{Řazení quicksort}
 
-Quicksort patří mezi nejrychlejší algoritmy řazení. Implementovali jsme jeho rekurzivní variantu, která by sice nebyla natolik efektivní jako nerekurzivní varianta, nicméně jsou třízena spíše menší pole, tudíž rozdíl není zas až tak značný.
+Quicksort je rozdělovací metodou řazení, která se snaží řazenou posloupnost rozdělit na 2 nejlépe stejně velké části tak, aby v jedné byly jen prvky menší nebo rovny než nějaká vybraná hodnota a v druhém jen větší nebo rovny než tato hodnota. Optimální je výběr mediánu, ale jeho výpočet je časově náročný a proto nevhodný. My vybíráme prvek uprostřed řazené posloupnosti. 
+
+Quicksort patří mezi nejrychlejší algoritmy řazení. Implementovali jsme jeho rekurzívní variantu, která by sice nebyla natolik efektivní jako nerekurzivní varianta, nicméně jsou řazena spíše menší pole, tudíž rozdíl není zas až tak značný.
 
 \subsection{Strom pro uchování symbolů}
 

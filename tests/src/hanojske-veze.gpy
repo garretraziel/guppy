@@ -11,7 +11,7 @@ end
 function main()
     local x;
 
-    x = 5;
+    x = 50;
 
     x = hanoi(x, "A", "B", "C");
 

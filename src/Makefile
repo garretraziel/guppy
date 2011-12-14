@@ -1,8 +1,8 @@
 LOGIN=xmokra00
 PROJECT=guppy
 
-CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -lm
+CC=cgcc
+CFLAGS=-std=c99 -pedantic -Wall -Wextra -lm -O3 -march=native
 DFLAGS=-g -DDEBUG
 
 .PHONY: rebuild build dep clean zip debug

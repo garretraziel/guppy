@@ -1,0 +1,47 @@
+Dobrý den, jsem $JMENO a budu Vám za náš tým prezentovat náš projekt.
+
+>>>
+
+Jsme tým 097 se zadáním (ukázání na tabuli): Quicksort pro třídění, BVS pro tabulku symbolů, a KMP algoritmus pro vzhledávání podřetězců.
+
+>>>
+
+Zde je schéma syntaxí řízeného překladače, tedy i našeho projektu.
+
+
+>>>
+
+Lexikální analyzátor je konečný automat. Schéma automatu je zde na obrázku, pro zjednodušení bez operátorů.
+V horní části je znázorněno zpracování komentářu, na spod nalevo je zpracování řetězců. Naspod napravo je zpracování čísel, tato část automatu byla využita i pro načítání čísel vestavěnou funkcí read();
+
+Pro rozlišení klíčových slov od identifikátorů se nejdříve testuje délka lexému, delší než nejdelší klíčové slovo je automaticky považován za identifikátor. Dále se porovnáním prvních písmen omezí volání fce strcmp() na minimum.
+
+>>>
+
+Syntaktická analýza je jádrem celého překladače, rekurzivním sestupem kontroluje pravidla LL-gramatiky. Provádí i generování instrukcí na pásce. V této části projektu je realizováno vypracování třech rozšíření. V případě REPEAT a LOCALEXPR se jednalo o úpravu pravidel. U VOIDCALL se jedná navíc o dodatečnou režii, která mění generování instrukcí.
+
+>>>
+
+Výrazy jsou zpracovány zdola nahoru za pomoci precedenční tabulky. Je zde prováděna kontrola typů, každý redukovaný terminál si s sebou nese informaci o svém typu, případně typ neznámý. Již od prvních návrhů bylo za výrazy je považováno i volání funkcí, a proto rozšíření FUNEXP vyžadovalo minimální zásahy do zdrojových kódů.
+
+>>>
+
+Nyní něco o interpretu.
+Pro implementaci jsme se rozhodli použít ve velké míře zásobník. Všechny aritmetické operace vezmou příslušný počet operadnů ze zásobníku, provede se operace a výsledek je vrácen opět na zásobník. K tomuto řešení navádí jednak, že zpracování výrazů převádí z infixu do postfixu a také, že implementace tohoto řešení je jednoduchá a transparentní. (pomalost neříkat, tu rozebrat v případných dotazech)
+
+Na grafu je znázorněno využití zásobníku. Při vyčerpání přiděleného prostoru je provedena realokace na dvojnásobnou velikost. Základní velikost byla stanovena na 1000 položek, menší programy proto nemusí realokovat a u rozsáhlejších je režie ve realokací ve srovnání se samotným programem zanedbatelná.
+
+>>>
+
+Zde na posledním slajdu vám chci ukázat jakým způsobem se používá zásobník při volání funkcí.
+
+Máme nadefinovanou funcki se třemi parametry a jednou lokální proměnnou. Funkce je zavolána jen se dvěma argumenty.
+
+Argumenty funkce jsou pusnuty na zásobík zleva doprava, podle tabulky funkcí je rozpoznáno, že se jedná o menší počet než s jakým byla funkce deklarována. Proto je na zásobníku nil, který je vložen při zpracování výrazů - jak jsem již řekl(a), volání funkce je považováno za výraz. Dále se alokuje místo pro lokální proměnné, přidá se návratová adresa a EBP, který nám slouží pro vypočítaní pozice lokální proměnné nebo argumentů. Jedná se defakto o vytvoření stack framu, podobně jako v asembleru pro x86.
+Při vracení z funkce je ze zásobník pročištěn, volání funkce je tak redukováno na návratovou hodnotu na zásobníku.
+
+>>>
+
+Jsme na konci prezentace, doufám, že se vám líbila a děkuji za pozornost.
+
+ 

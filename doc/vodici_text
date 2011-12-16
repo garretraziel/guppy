@@ -37,8 +37,8 @@ Zde na posledním slajdu vám chci ukázat jakým způsobem se používá zásob
 
 Máme nadefinovanou funcki se třemi parametry a jednou lokální proměnnou. Funkce je zavolána jen se dvěma argumenty.
 
-Argumenty funkce jsou pusnuty na zásobík zleva doprava, podle tabulky funkcí je rozpoznáno, že se jedná o menší počet než s jakým byla funkce deklarována. Proto je na zásobníku nil, který je vložen při zpracování výrazů - jak jsem již řekl(a), volání funkce je považováno za výraz. Dále se alokuje místo pro lokální proměnné, přidá se návratová adresa a EBP, který nám slouží pro vypočítaní pozice lokální proměnné nebo argumentů. Jedná se defakto o vytvoření stack framu, podobně jako v asembleru pro x86.
-Při vracení z funkce je ze zásobník pročištěn, volání funkce je tak redukováno na návratovou hodnotu na zásobníku.
+Argumenty funkce jsou vloženy na zásobík zleva doprava, podle tabulky funkcí je rozpoznáno, že se jedná o menší počet než s jakým byla funkce deklarována. Proto je na zásobníku nil, který je vložen při zpracování výrazů - jak jsem již řekl(a), volání funkce je považováno za výraz. Dále se alokuje místo pro lokální proměnné, přidá se návratová adresa a EBP, který nám slouží pro vypočítaní pozice lokální proměnné nebo argumentů. Jedná se defakto o vytvoření stack framu, podobně jako v asembleru pro x86.
+Při vracení z funkce je zásobník pročištěn, volání funkce je tak redukováno na návratovou hodnotu na zásobníku.
 
 >>>
 

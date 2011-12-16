@@ -14,11 +14,11 @@
 \end{frame}
 
 \begin{frame}
-  Tým číslo 097, varianta $\alpha$/1/I.
+  Tým číslo 097, varianta a/1/I.
   \begin{itemize}
+  \item Knuth-Morris-Prattův algoritmus
   \item Quicksort
   \item Binární vyhledávací strom
-  \item Knuth-Morris-Prattův algoritmus
   \end{itemize}
 \end{frame}
 
@@ -53,6 +53,7 @@
   \begin{itemize}
   \item zdola nahoru
   \item precedenční tabulka
+  \item kontrola datových typů operandů
   \item zpracování argumentů funkcí
   \item FUNEXP
   \end{itemize}
@@ -60,9 +61,15 @@
 
 \begin{frame}{Interpret}
   \begin{itemize}
-  \item inspirace x86
-  \item zásobníková aritmetika
-  \item lokální proměnné na zásobníku
+  \item instrukce v lineárním seznamu
+  \item využívá zásobník
+    \begin{itemize}
+    \item zásobníková aritmetika
+    \item lokální proměnné na zásobníku
+    \item stackframe
+    \end{itemize}
+  \item obdoba EBP, ESP, EIP
+  \item začátek interpretace = volání main
   \end{itemize}
 \end{frame}
 
@@ -84,10 +91,9 @@
 \end{frame}
 
 \begin{frame}{}
-  Radka Mokrá Vám přeje veselé Vánoce.\\
-  Aleš Dujíček Vám děkuje za body.\\
-  Jan Sedlák říká: ``Sbohem a dík za všechny ryby.''\\
-  Lukáš Brabec mlčky přikyvuje.
+  \begin{center}
+    Děkujeme za pozornost.
+  \end{center}
 \end{frame}
 
 \end{document}

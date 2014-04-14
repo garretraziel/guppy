@@ -1,7 +1,7 @@
 LOGIN=xmokra00
 PROJECT=guppy
 
-CC=cgcc
+CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -lm -O3 -march=native
 DFLAGS=-g -DDEBUG
 
